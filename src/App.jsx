@@ -14,6 +14,8 @@ import CtaSection from './components/CtaSection.jsx'
 import Footer from './components/Footer.jsx'
 import BlogPage from './pages/BlogPage.jsx'
 import ArticlePage from './pages/ArticlePage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import Platform from './platform/Platform.jsx'
 
 function Home() {
   useEffect(() => { document.title = 'Islom Iqtisodiyoti' }, [])
@@ -40,10 +42,16 @@ export default function App() {
   // Sahifa almashganda: bo'lim havolasi bo'lsa o'sha joyga, aks holda yuqoriga
   useEffect(() => {
     const h = window.location.hash
-    const target = h && !h.startsWith('#/') ? document.querySelector(h) : null
+    let target = null
+    if (h && !h.startsWith('#/')) { try { target = document.querySelector(h) } catch { /* noto'g'ri selektor */ } }
     if (target) target.scrollIntoView({ behavior: 'instant' })
     else window.scrollTo({ top: 0, behavior: 'instant' })
   }, [path])
+
+  // Kirish sahifasi — header/footer'siz alohida sahifa
+  if (path === '/kirish') return <LoginPage />
+  // Platforma (dashboard) — o'z layoutiga ega, himoyalangan
+  if (path === '/platform' || path.startsWith('/platform/')) return <Platform path={path} />
 
   let page = <Home />
   if (path === '/blog') page = <BlogPage key={search} initialTag={new URLSearchParams(search).get('tag') || ''} />

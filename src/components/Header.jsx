@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Logo from './Logo.jsx'
+import { useAuth } from '../platform/store/auth.jsx'
 
 // section — bosh sahifadagi mos bo'lim (faol bandni aniqlash uchun)
 const NAV_LINKS = [
@@ -12,6 +13,9 @@ const NAV_LINKS = [
 
 export default function Header({ route = '/' }) {
   const [open, setOpen] = useState(false)
+  const { user } = useAuth()
+  const loginHref = user ? '#/platform' : '#/kirish'
+  const loginLabel = user ? 'Platforma' : 'Kirish'
 
   const [active, setActive] = useState('')
 
@@ -50,10 +54,10 @@ export default function Header({ route = '/' }) {
               </li>
             ))}
           </ul>
-          <a href="#kirish" className="btn btn--primary nav__login-mobile">Kirish</a>
+          <a href={loginHref} className="btn btn--primary nav__login-mobile">{loginLabel}</a>
         </nav>
 
-        <a href="#kirish" className="btn btn--primary header__login">Kirish</a>
+        <a href={loginHref} className="btn btn--primary header__login">{loginLabel}</a>
 
         <button
           className={`burger ${open ? 'burger--open' : ''}`}

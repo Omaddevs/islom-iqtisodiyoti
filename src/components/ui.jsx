@@ -1,6 +1,74 @@
 // Umumiy UI bo'laklari: ikonkalar, bo'lim sarlavhasi, kurs muqovasi, avatar, yulduzlar
 
 const PATHS = {
+  // --- Platforma ikonkalari ---
+  radio: 'M12 12h.01M8.5 15.5a5 5 0 0 1 0-7M15.5 8.5a5 5 0 0 1 0 7M5.6 18.4a9 9 0 0 1 0-12.8M18.4 5.6a9 9 0 0 1 0 12.8',
+  wifi: 'M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5h.01',
+  home: 'M4 11 12 4l8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z',
+  video: 'M3 7h12v10H3zM15 10l6-3v10l-6-3',
+  videoOff: 'M3 3l18 18M15 10l6-3v10M3 7h9l3 3v7H3z',
+  mic: 'M9 4a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3M8 21h8',
+  micOff: 'M3 3l18 18M9 9v2a3 3 0 0 0 5 2.2M15 9V4a3 3 0 0 0-6 0M5 11a7 7 0 0 0 11 5.7M19 11a7 7 0 0 1-.6 2.8M12 18v3M8 21h8',
+  screen: 'M3 5h18v12H3zM8 21h8M12 17v4M12 8v5M9.5 10.5 12 8l2.5 2.5',
+  record: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  hand: 'M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4a1.5 1.5 0 0 1 3 0v7M14 10.5V5.5a1.5 1.5 0 0 1 3 0V13M17 9.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-2a6 6 0 0 1-5.4-3.4L4 13a1.5 1.5 0 0 1 2.6-1.5L8 13',
+  phoneOff: 'M3 3l18 18M9.5 14.5c-1.5-1.5-2.7-3.2-3.5-5M20 15.5v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1M4 6.2A2 2 0 0 1 6 4h3l1.5 3.6L8.6 9M15 13l1.6-1.8 3.5 1.5',
+  message: 'M4 5h16v11H9l-5 4z',
+  bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+  settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z',
+  logOut: 'M9 4H5v16h4M14 8l4 4-4 4M18 12H8',
+  plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  edit: 'M4 20h4l11-11-4-4L4 16zM13 7l4 4',
+  trash: 'M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6',
+  copy: 'M9 9h11v11H9zM4 15V4h11',
+  more: 'M5 12h.01M12 12h.01M19 12h.01',
+  moreV: 'M12 5h.01M12 12h.01M12 19h.01',
+  building: 'M4 21V5l8-3 8 3v16M9 9h.01M13 9h.01M9 13h.01M13 13h.01M9 17h.01M13 17h.01M2 21h20',
+  layers: 'M12 3 3 8l9 5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5',
+  bookOpen: 'M12 6c-2-1.5-5-2-9-2v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2zM12 6v14',
+  fileText: 'M6 3h9l5 5v13H6zM14 3v6h6M9 13h6M9 17h6',
+  clipboard: 'M8 4h8v3H8zM6 6H5v15h14V6h-1M9 12h6M9 16h4',
+  award: 'M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM8.5 14 7 22l5-3 5 3-1.5-8',
+  star: 'M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z',
+  upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
+  download: 'M12 4v12M7 11l5 5 5-5M4 20h16',
+  filter: 'M3 5h18l-7 8v6l-4 2v-8z',
+  refresh: 'M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5',
+  key: 'M14 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM13 13l-8 8M8 18l2 2M11 15l2 2',
+  userPlus: 'M15 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-4A3.5 3.5 0 0 0 4 18.5V20M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19 8v6M16 11h6',
+  user: 'M18 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 6 18.5V20M12 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  zap: 'M13 2 4 14h7l-1 8 9-12h-7z',
+  checkCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 12l2.5 2.5 4.5-5',
+  alertCircle: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8v5M12 16h.01',
+  externalLink: 'M14 4h6v6M20 4l-9 9M18 13v7H4V6h7',
+  pause: 'M8 5v14M16 5v14',
+  volume: 'M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
+  maximize: 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5',
+  pinTack: 'M9 3h6l-1 6 3 3v2H7v-2l3-3zM12 14v7',
+  smile: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 14a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01',
+  image: 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M15.5 9.5h.01',
+  paperclip: 'M20 12.5 12 20.5a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8',
+  layoutGrid: 'M4 4h16v16H4zM4 10h16M10 10v10',
+  spark: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6',
+  globe: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18',
+  headphones: 'M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v6H4zM17 14h3v6h-3z',
+  bookmark: 'M6 3h12v18l-6-4-6 4z',
+  translate: 'M4 5h10M9 3v2M11 5c-1 4-3.5 7-7 9M7 9c1.5 2.5 4 4.5 7 5.5M13 21l4-10 4 10M14.5 17h5',
+  cards: 'M3 8h13v12H3zM8 4h13v12h-2',
+  chevUp: 'M6 15l6-6 6 6',
+  timer: 'M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM12 10v4l2 2M9 2h6M19 5l1.5 1.5',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  logout: 'M9 4H5v16h4M14 8l4 4-4 4M18 12H8',
+  sun: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  moon: 'M20 15A8 8 0 0 1 9 4a8 8 0 1 0 11 11z',
+  emoji: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 14a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01',
+  lockOpen: 'M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 6.8-1M12 15v2',
+  block: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8',
+  gift: 'M4 11h16v10H4zM2 7h20v4H2zM12 7v14M12 7c-2-4-6-3-6-1s3 1 6 1M12 7c2-4 6-3 6-1s-3 1-6 1',
+  lock: 'M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3M12 15v2',
+  eyeOff: 'M3 3l18 18M10.6 5.2A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2',
+  logIn: 'M15 4h4v16h-4M10 8l4 4-4 4M14 12H3',
   book: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5',
   bank: 'M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18',
   chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
@@ -33,6 +101,10 @@ const PATHS = {
   tag: 'M3 12V4h8l10 10-8 8zM7.5 8.5h.01',
   trending: 'M3 17l6-6 4 4 8-8M15 7h6v6',
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8h.01',
+  cloud: 'M7 18h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 8.5 4.75 4.75 0 0 0 7 18z',
+  rain: 'M7 15h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 5.5 4.75 4.75 0 0 0 7 15zM8 18l-1 3M12 18l-1 3M16 18l-1 3',
+  snow: 'M7 15h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 5.5 4.75 4.75 0 0 0 7 15zM8 19h.01M12 19h.01M16 19h.01M10 22h.01M14 22h.01',
+  bolt: 'M13 2 4 14h7l-1 8 9-12h-7z',
 }
 
 export function Icon({ name, size = 20, stroke = 1.8, className }) {
@@ -41,6 +113,24 @@ export function Icon({ name, size = 20, stroke = 1.8, className }) {
       strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={PATHS[name]} />
     </svg>
+  )
+}
+
+// Forma maydoni: yorliq, ixtiyoriy chap ikonka, xato matni
+export function Field({ label, icon, error, extra, as = 'label', children }) {
+  const Tag = as
+  return (
+    <Tag className={`field ${error ? 'field--error' : ''} ${icon ? 'field--icon' : ''}`}>
+      <span className="field__top">
+        <span className="field__label">{label}</span>
+        {extra}
+      </span>
+      <span className="field__control">
+        {icon && <Icon name={icon} size={18} className="field__icon" />}
+        {children}
+      </span>
+      {error && <span className="field__error"><Icon name="info" size={14} /> {error}</span>}
+    </Tag>
   )
 }
 

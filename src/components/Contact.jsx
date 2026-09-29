@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { CONTACTS } from '../data/content.js'
-import { Icon, SectionHead, SocialIcon } from './ui.jsx'
+import { Field, Icon, SectionHead, SocialIcon } from './ui.jsx'
+import { formatPhone, isFullPhone } from '../utils/phone.js'
 
 const TOPICS = [
   { value: 'Kurslar haqida savol', hint: 'Dastur, daraja va sertifikat', icon: 'book' },
@@ -20,15 +21,6 @@ const INFO = [
 const MSG_MAX = 500
 const EMPTY = { name: '', phone: '+998 ', topic: TOPICS[0].value, message: '' }
 
-// +998 90 123 45 67 ko'rinishiga keltiradi
-function formatPhone(raw) {
-  let d = raw.replace(/\D/g, '')
-  if (d.startsWith('998')) d = d.slice(3)
-  d = d.slice(0, 9)
-  const parts = [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean)
-  return '+998 ' + parts.join(' ')
-}
-
 export default function Contact() {
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
@@ -43,7 +35,7 @@ export default function Contact() {
   const validate = () => {
     const e = {}
     if (form.name.trim().length < 2) e.name = 'Ismingizni kiriting'
-    if (form.phone.replace(/\D/g, '').length < 12) e.phone = 'Telefon raqamini to‘liq kiriting'
+    if (!isFullPhone(form.phone)) e.phone = 'Telefon raqamini to‘liq kiriting'
     if (form.message.trim().length < 10) e.message = 'Xabar kamida 10 ta belgidan iborat bo‘lsin'
     return e
   }
@@ -140,23 +132,6 @@ export default function Contact() {
         </div>
       </div>
     </section>
-  )
-}
-
-function Field({ label, icon, error, extra, as = 'label', children }) {
-  const Tag = as
-  return (
-    <Tag className={`field ${error ? 'field--error' : ''} ${icon ? 'field--icon' : ''}`}>
-      <span className="field__top">
-        <span className="field__label">{label}</span>
-        {extra}
-      </span>
-      <span className="field__control">
-        {icon && <Icon name={icon} size={18} className="field__icon" />}
-        {children}
-      </span>
-      {error && <span className="field__error"><Icon name="info" size={14} /> {error}</span>}
-    </Tag>
   )
 }
 
