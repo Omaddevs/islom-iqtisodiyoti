@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { CONTACTS } from '../data/content.js'
-import { Field, Icon, SectionHead, SocialIcon } from './ui.jsx'
+import { Icon, SocialIcon } from './ui.jsx'
 import { formatPhone, isFullPhone } from '../utils/phone.js'
+import { leadsApi } from '../platform/api/client.js'
 
 const TOPICS = [
   { value: 'Kurslar haqida savol', hint: 'Dastur, daraja va sertifikat', icon: 'book' },
@@ -11,15 +12,9 @@ const TOPICS = [
   { value: 'Boshqa', hint: 'Boshqa mavzudagi savollar', icon: 'info' },
 ]
 
-const INFO = [
-  { icon: 'phone', label: 'Telefon', value: CONTACTS.phone, href: `tel:${CONTACTS.phone.replace(/\s/g, '')}` },
-  { icon: 'mail', label: 'Email', value: CONTACTS.email, href: `mailto:${CONTACTS.email}` },
-  { icon: 'pin', label: 'Manzil', value: CONTACTS.address },
-  { icon: 'clock', label: 'Ish vaqti', value: CONTACTS.hours },
-]
-
 const MSG_MAX = 500
-const EMPTY = { name: '', phone: '+998 ', topic: TOPICS[0].value, message: '' }
+const EMPTY = { first: '', last: '', phone: '+998 ', topic: TOPICS[0].value, message: '' }
+const TEL = `tel:${CONTACTS.phone.replace(/\s/g, '')}`
 
 export default function Contact() {
   const [form, setForm] = useState(EMPTY)
@@ -34,9 +29,9 @@ export default function Contact() {
 
   const validate = () => {
     const e = {}
-    if (form.name.trim().length < 2) e.name = 'Ismingizni kiriting'
+    if (form.first.trim().length < 2) e.first = 'Ismingizni kiriting'
     if (!isFullPhone(form.phone)) e.phone = 'Telefon raqamini to‘liq kiriting'
-    if (form.message.trim().length < 10) e.message = 'Xabar kamida 10 ta belgidan iborat bo‘lsin'
+    if (form.message.trim().length < 10) e.message = 'Kamida 10 ta belgi yozing'
     return e
   }
 
@@ -46,92 +41,94 @@ export default function Contact() {
     setErrors(e)
     if (Object.keys(e).length) return
     setStatus('sending')
-    // TODO: backend API ulanganda shu yerda so'rov yuboriladi
-    setTimeout(() => setStatus('sent'), 900)
+    leadsApi.send({ kind: 'contact', name: `${form.first} ${form.last}`.trim(), phone: form.phone, topic: form.topic, message: form.message })
+      .then(() => setStatus('sent'))
+      .catch((er) => { setErrors({ message: er.message }); setStatus('idle') })
   }
 
   return (
-    <section className="section" id="aloqa">
-      <div className="contact">
-        <div className="contact__info">
-          <SectionHead
-            eyebrow="Aloqa"
-            title="Savolingiz bormi? Biz bilan bog‘laning"
-            text="Kurs tanlash, to‘lov yoki hamkorlik bo‘yicha yozing — mutaxassislarimiz ish vaqtida 30 daqiqa ichida javob beradi."
-          />
-          <ul className="contact__list">
-            {INFO.map((i) => {
-              const Tag = i.href ? 'a' : 'div'
-              return (
-                <li key={i.label}>
-                  <Tag className="contact__item" {...(i.href ? { href: i.href } : {})}>
-                    <span className="contact__icon"><Icon name={i.icon} size={20} /></span>
-                    <span className="contact__text">
-                      <small>{i.label}</small>
-                      <b>{i.value}</b>
-                    </span>
-                    {i.href && <Icon name="arrowUpRight" size={16} className="contact__go" />}
-                  </Tag>
-                </li>
-              )
-            })}
-          </ul>
+    <section className="ct-wrap" id="aloqa">
+      <div className="ct">
+        <div className="ct__bg" aria-hidden="true"><div className="ct__beam" /></div>
 
-          <a className="contact__tg" href={CONTACTS.telegram} target="_blank" rel="noreferrer">
-            <span className="contact__tg-icon"><SocialIcon name="telegram" size={22} /></span>
-            <span className="contact__text">
-              <b>Telegram orqali tezroq</b>
-              <small>O‘rtacha javob vaqti — 5 daqiqa</small>
-            </span>
-            <span className="contact__tg-status"><i /> Onlayn</span>
-          </a>
+        <div className="ct__info">
+          <div>
+            <p className="ct-hand ct__eyebrow">Biz bilan bog‘laning</p>
+            <h2 className="ct__title">Savolingizga javob <br />bir xabar narida.</h2>
+            <p className="ct__text">
+              Kurs tanlash, to‘lov yoki hamkorlik bo‘yicha yozing — mutaxassislarimiz ish vaqtida
+              30 daqiqa ichida javob beradi.
+            </p>
+          </div>
+
+          <div className="ct__call">
+            <p className="ct-hand ct__call-hand">Qo‘ng‘iroq afzalmi?</p>
+            <p className="ct__call-row">
+              15 daqiqalik bepul maslahat:
+              <a href={TEL}>{CONTACTS.phone} <Icon name="arrowUpRight" size={14} /></a>
+            </p>
+            <p className="ct__call-row">
+              Yoki tezroq:
+              <a href={CONTACTS.telegram} target="_blank" rel="noreferrer">
+                <SocialIcon name="telegram" size={13} /> Telegram’da yozing <Icon name="arrowUpRight" size={14} />
+              </a>
+            </p>
+          </div>
         </div>
 
-        <div className="form-card">
+        <div className="ct-form">
           {status === 'sent' ? (
-            <div className="form-done">
-              <span className="form-done__icon"><Icon name="check" size={32} stroke={2.4} /></span>
+            <div className="ct-done">
+              <span className="ct-done__icon"><Icon name="check" size={28} stroke={2.4} /></span>
               <h3>Xabaringiz yuborildi!</h3>
-              <p>Rahmat, {form.name.trim().split(' ')[0]}. Tez orada {form.phone} raqamiga qo‘ng‘iroq qilamiz.</p>
-              <button className="btn btn--primary" onClick={() => { setForm(EMPTY); setStatus('idle') }}>
+              <p>Rahmat, {form.first.trim()}. Tez orada {form.phone} raqamiga bog‘lanamiz.</p>
+              <button type="button" className="ct-btn" onClick={() => { setForm(EMPTY); setStatus('idle') }}>
                 Yana yozish
               </button>
             </div>
           ) : (
             <form onSubmit={submit} noValidate>
-              <div className="form-card__head">
-                <h3 className="form-card__title">Xabar qoldiring</h3>
-                <p>Barcha maydonlarni to‘ldiring — sizga o‘zimiz bog‘lanamiz.</p>
+              <div className="ct-row">
+                <CtField label="Ism" error={errors.first}>
+                  <input value={form.first} onChange={set('first')} placeholder="Ismingizni kiriting" autoComplete="given-name" />
+                </CtField>
+                <CtField label="Familiya">
+                  <input value={form.last} onChange={set('last')} placeholder="Familiyangizni kiriting" autoComplete="family-name" />
+                </CtField>
               </div>
-              <div className="form-row">
-                <Field label="Ismingiz" icon="users" error={errors.name}>
-                  <input value={form.name} onChange={set('name')} placeholder="Ism familiya" autoComplete="name" />
-                </Field>
-                <Field label="Telefon raqam" icon="phone" error={errors.phone}>
-                  <input value={form.phone} onChange={(e) => update('phone', formatPhone(e.target.value))}
-                    placeholder="+998 90 123 45 67" inputMode="tel" autoComplete="tel" />
-                </Field>
-              </div>
-              <Field label="Mavzu" as="div">
+              <CtField label="Telefon raqam" error={errors.phone}>
+                <input value={form.phone} onChange={(e) => update('phone', formatPhone(e.target.value))}
+                  placeholder="+998 90 123 45 67" inputMode="tel" autoComplete="tel" />
+              </CtField>
+              <CtField label="Mavzu" as="div">
                 <Dropdown options={TOPICS} value={form.topic} onChange={(v) => update('topic', v)} />
-              </Field>
-              <Field label="Xabar" error={errors.message}
-                extra={<span className="field__count">{form.message.length}/{MSG_MAX}</span>}>
-                <textarea rows={5} value={form.message} maxLength={MSG_MAX} onChange={set('message')}
-                  placeholder="Savolingizni batafsil yozing…" />
-              </Field>
-              <button type="submit" className="btn btn--primary form-card__submit" disabled={status === 'sending'}>
-                {status === 'sending' ? <span className="spinner" /> : <Icon name="send" size={18} />}
-                {status === 'sending' ? 'Yuborilmoqda…' : 'Yuborish'}
+              </CtField>
+              <CtField label="Xabar" error={errors.message}
+                extra={<span className="ct-field__count">{form.message.length}/{MSG_MAX}</span>}>
+                <textarea rows={4} value={form.message} maxLength={MSG_MAX} onChange={set('message')}
+                  placeholder="Savolingizni yozing…" />
+              </CtField>
+              <button type="submit" className="ct-btn" disabled={status === 'sending'}>
+                {status === 'sending' ? <><span className="spinner" /> Yuborilmoqda…</> : 'Xabar yuborish'}
               </button>
-              <p className="form-card__note">
-                <Icon name="shield" size={14} /> Yuborish orqali shaxsiy ma’lumotlarni qayta ishlashga rozilik bildirasiz.
-              </p>
             </form>
           )}
         </div>
       </div>
     </section>
+  )
+}
+
+function CtField({ label, error, extra, as = 'label', children }) {
+  const Tag = as
+  return (
+    <Tag className={`ct-field ${error ? 'is-error' : ''}`}>
+      <span className="ct-field__top">
+        <span className="ct-field__label">{label}</span>
+        {error ? <span className="ct-field__err">{error}</span> : extra}
+      </span>
+      {children}
+    </Tag>
   )
 }
 

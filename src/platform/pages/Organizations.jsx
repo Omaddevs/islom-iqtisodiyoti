@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, setDB, logActivity } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Credentials, cx } from '../ui/kit.jsx'
-import { fmtDate } from '../ui/format.js'
+import { add, patch, commit, loadDB, logActivity } from '../store/db.js'
+import { Card, Btn, Badge, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Credentials, cx } from '../ui/kit.jsx'
 import { genPassword, genPhone, prettyPhone, digits } from '../store/ids.js'
 import { formatPhone, isFullPhone } from '../../utils/phone.js'
 import { hashQuery } from './Meetings.jsx'
+import { HeroArt } from './Articles.jsx'
+import { StatSpark } from '../ui/charts.jsx'
 
 const COLORS = ['#4aa3f8', '#14b8a6', '#8b5cf6', '#f59e0b', '#10b981', '#f43f5e', '#0ea5e9', '#6366f1']
 
 export default function Organizations() {
-  const { user, db, setViewOrg } = useAuth()
+  const { user, db, viewOrgId, setViewOrg } = useAuth()
   const toast = useToast()
   const [editing, setEditing] = useState(null)
   const [creds, setCreds] = useState(null)
@@ -19,56 +20,106 @@ export default function Organizations() {
   if (user.role !== 'superadmin') return <Card><Empty icon="shield" title="Ruxsat yo‘q" text="Bu bo‘lim faqat bosh administrator uchun." /></Card>
 
   const toggle = (o) => { patch('organizations', o.id, { status: o.status === 'active' ? 'suspended' : 'active' }); toast(o.status === 'active' ? 'Tashkilot to‘xtatildi' : 'Tashkilot faollashtirildi') }
-  const doDelete = (o) => {
-    setDB((s) => {
-      const drop = (col) => s[col].filter((x) => x.orgId !== o.id)
-      return { ...s, organizations: s.organizations.filter((x) => x.id !== o.id), users: drop('users'), groups: drop('groups'), meetings: drop('meetings'), videos: drop('videos'), tests: drop('tests'), vocabSets: drop('vocabSets'), library: drop('library'), articles: drop('articles'), homework: drop('homework'), activity: drop('activity') }
-    })
-    toast('Tashkilot va uning ma’lumotlari o‘chirildi')
+  // Server tashkilotni barcha foydalanuvchi, guruh va materiallari bilan birga o'chiradi
+  const doDelete = async (o) => {
+    try {
+      await commit([{ col: 'organizations', op: 'delete', id: o.id }])
+      await loadDB()
+      if (viewOrgId === o.id) setViewOrg(null)
+      toast('Tashkilot va uning ma’lumotlari o‘chirildi')
+    } catch (e) { toast(e.message, 'err') }
   }
+
+  const enter = (o) => { setViewOrg(o.id); window.location.hash = '#/platform' }
+  const allUsers = db.users.filter((u) => u.orgId)
+  const byRole = (r) => allUsers.filter((u) => u.role === r)
+  // 12 oylik o'sish: har oy oxirigacha yaratilgan yozuvlar soni
+  const growth = (list) => Array.from({ length: 12 }, (_, i) => { const ts = Date.now() - (11 - i) * 30 * 864e5; return list.filter((x) => (x.createdAt || 0) <= ts).length })
 
   return (
     <>
-      <PageHead icon="building" title="Tashkilotlar" sub="Har bir tashkilot o‘z adminlari, ustozlari, o‘quvchilari va kontentiga ega. Ma’lumotlar bir-biridan ajratilgan." actions={<Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Tashkilot qo‘shish</Btn>} />
-      <div className="pgrid pgrid--cards">
+      {/* Sarlavha banneri */}
+      <section className="pthero pahero puhero pohero">
+        <span className="pthero__icon"><Icon name="building" size={34} /></span>
+        <div className="pthero__text">
+          <h1>Tashkilotlar</h1>
+          <p>Har bir tashkilot o‘z adminlari, ustozlari, o‘quvchilari va kontentiga ega. Ma’lumotlar bir-biridan ajratilgan.</p>
+        </div>
+        <blockquote className="pthero__quote">“Ilm bilan yuksalgan jamiyat barhayotdir.”</blockquote>
+        <HeroArt />
+        <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Tashkilot qo‘shish</Btn>
+      </section>
+
+      {/* Statistika */}
+      <div className="postats">
+        <StatSpark icon="building" tone="blue" color="#3b8ef0" value={db.organizations.length} label="Tashkilot" data={growth(db.organizations)} />
+        <StatSpark icon="users" tone="violet" color="#8b5cf6" value={byRole('org_admin').length} label="Admin" data={growth(byRole('org_admin'))} />
+        <StatSpark icon="user" tone="green" color="#10b981" value={byRole('teacher').length} label="Ustoz" data={growth(byRole('teacher'))} />
+        <StatSpark icon="users" tone="amber" color="#f59e0b" value={byRole('student').length} label="O‘quvchi" data={growth(byRole('student'))} />
+      </div>
+
+      {db.organizations.length === 0 && <Card><Empty icon="building" title="Tashkilotlar yo‘q" text="Birinchi tashkilotni qo‘shing — u bilan birga admin ham yaratiladi." /></Card>}
+      <div className="porgs">
         {db.organizations.map((o) => {
           const us = db.users.filter((u) => u.orgId === o.id)
           const admins = us.filter((u) => u.role === 'org_admin')
+          const main = admins[0]
+          const active = o.status === 'active'
+          const stats = [
+            { icon: 'users', tone: 'blue', n: admins.length, label: 'Admin' },
+            { icon: 'user', tone: 'green', n: us.filter((u) => u.role === 'teacher').length, label: 'Ustoz' },
+            { icon: 'user', tone: 'amber', n: us.filter((u) => u.role === 'student').length, label: 'O‘quvchi' },
+            { icon: 'users', tone: 'violet', n: db.groups.filter((g) => g.orgId === o.id).length, label: 'Guruh' },
+          ]
           return (
-            <article key={o.id} className="porg">
+            <article key={o.id} className={cx('porg', !active && 'is-off')}>
               <div className="porg__head">
-                <div className="porg__logo" style={{ background: o.color }}>{o.name[0]}</div>
-                <div style={{ minWidth: 0, flex: 1 }}><h4>{o.name}</h4><span>{o.slug} · {fmtDate(o.createdAt)} dan</span></div>
-                <Menu items={[
-                  { label: 'Tashkilot ichiga kirish', icon: 'logIn', onClick: () => { setViewOrg(o.id); window.location.hash = '#/platform' } },
+                <div className="porg__logo" style={{ background: `linear-gradient(145deg, ${o.color}, color-mix(in srgb, ${o.color} 78%, #000))` }}>{o.name[0]}</div>
+                <div className="porg__ttl">
+                  <h4 title={o.name}>{o.name}</h4>
+                  <div className="porg__meta"><span className="mono">{o.slug}</span><Badge tone={active ? 'green' : 'red'} dot>{active ? 'Faol' : 'To‘xtatilgan'}</Badge></div>
+                </div>
+                <Menu trigger={<button type="button" className="porg__more" aria-label="Amallar"><Icon name="moreV" size={18} /></button>} items={[
+                  { label: 'Tashkilot ichiga kirish', icon: 'logIn', onClick: () => enter(o) },
                   { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(o) },
                   { label: 'Admin qo‘shish', icon: 'userPlus', onClick: () => setEditing({ ...o, _addAdmin: true }) },
                   'sep',
-                  { label: o.status === 'active' ? 'To‘xtatish' : 'Faollashtirish', icon: o.status === 'active' ? 'block' : 'checkCircle', onClick: () => toggle(o) },
+                  { label: active ? 'To‘xtatish' : 'Faollashtirish', icon: active ? 'block' : 'checkCircle', onClick: () => toggle(o) },
                   { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(o) },
                 ]} />
               </div>
-              <div className="prow" style={{ marginTop: 12, gap: 6 }}>
-                <Badge tone={o.plan === 'pro' ? 'violet' : 'gray'}>{o.plan === 'pro' ? 'Pro tarif' : 'Basic tarif'}</Badge>
-                <Badge tone={o.status === 'active' ? 'green' : 'red'} dot>{o.status === 'active' ? 'Faol' : 'To‘xtatilgan'}</Badge>
+
+              <div className="porg__plan">
+                <span className={cx('porg__tarif', o.plan === 'pro' && 'is-pro')}><Icon name={o.plan === 'pro' ? 'crown' : 'box'} size={17} />{o.plan === 'pro' ? 'Pro tarif' : 'Basic tarif'}</span>
+                <p>{o.description || <span className="pmuted">Tavsif kiritilmagan</span>}</p>
               </div>
-              {o.description && <p className="pmuted" style={{ marginTop: 10, fontSize: 13.5 }}>{o.description}</p>}
+
               <div className="porg__stats">
-                <div><b>{admins.length}</b><span>admin</span></div>
-                <div><b>{us.filter((u) => u.role === 'teacher').length}</b><span>ustoz</span></div>
-                <div><b>{us.filter((u) => u.role === 'student').length}</b><span>o‘quvchi</span></div>
-                <div><b>{db.groups.filter((g) => g.orgId === o.id).length}</b><span>guruh</span></div>
+                {stats.map((s) => (
+                  <div key={s.label} className={`porg__stat is-${s.tone}`}>
+                    <span className="porg__sico"><Icon name={s.icon} size={17} /></span>
+                    <span><b>{s.n}</b><small>{s.label}</small></span>
+                  </div>
+                ))}
               </div>
-              <div style={{ fontSize: 13, color: 'var(--pf-text-2)' }}>
-                <div className="prow" style={{ gap: 6, marginBottom: 4 }}><Icon name="phone" size={14} /> {o.phone || '—'}</div>
-                <div className="prow" style={{ gap: 6 }}><Icon name="mail" size={14} /> {o.email || '—'}</div>
+
+              <ul className="porg__contacts">
+                <li><Icon name="phone" size={17} />{o.phone ? <a href={`tel:${o.phone.replace(/\s/g, '')}`}>{o.phone}</a> : <span className="pmuted">—</span>}</li>
+                <li><Icon name="mail" size={17} />{o.email ? <a href={`mailto:${o.email}`}>{o.email}</a> : <span className="pmuted">—</span>}</li>
+              </ul>
+
+              <div className="porg__admin">
+                <Icon name="user" size={22} />
+                <div>
+                  <small>Asosiy admin</small>
+                  {main ? <b>{main.name}{admins.length > 1 && <em>+{admins.length - 1}</em>}</b> : <b className="pmuted">Admin yo‘q</b>}
+                </div>
+                {main
+                  ? <Btn variant="ghost" icon="key" onClick={() => setCreds(main)}>Login</Btn>
+                  : <Btn variant="ghost" icon="userPlus" onClick={() => setEditing({ ...o, _addAdmin: true })}>Qo‘shish</Btn>}
               </div>
-              <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--pf-line)' }}>
-                <span className="pmuted" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>Adminlar</span>
-                {admins.length === 0 && <span className="pmuted" style={{ fontSize: 13 }}>Admin yo‘q</span>}
-                {admins.map((a) => <div key={a.id} className="prow prow--between" style={{ fontSize: 13.5, marginBottom: 4 }}><span>{a.name}</span><Btn size="sm" variant="ghost" icon="key" onClick={() => setCreds(a)}>Login</Btn></div>)}
-              </div>
-              <div style={{ marginTop: 14 }}><Btn variant="soft" icon="logIn" style={{ width: '100%' }} onClick={() => { setViewOrg(o.id); window.location.hash = '#/platform' }}>Tashkilot ichiga kirish</Btn></div>
+
+              <Btn variant="soft" icon="logIn" className="porg__enter" onClick={() => enter(o)}>Tashkilot ichiga kirish</Btn>
             </article>
           )
         })}

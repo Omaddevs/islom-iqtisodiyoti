@@ -1,70 +1,256 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, UAvatar, Confirm, Menu, useToast, Progress, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Search, cx } from '../ui/kit.jsx'
 import { fmtDateTime, fmtLeft, fmtAgo, toLocalInput, fromLocalInput, pct } from '../ui/format.js'
+import { StatSpark, Donut, series, endOfDay } from '../ui/charts.jsx'
 
 export default function Homework({ param }) {
   if (param) return <HomeworkDetail id={param} />
   return <HomeworkList />
 }
 
+/* ---------- Yordamchilar ---------- */
+
+const D = 864e5
+const SOON = 3 * D // "Muddati yaqin" chegarasi
+
+// Vazifa holatlari (donut va legend uchun)
+const STAFF_STATES = [
+  { key: 'done', label: 'Bajarilgan', color: '#10b981' },
+  { key: 'progress', label: 'Jarayonda', color: '#3b8ef0' },
+  { key: 'pending', label: 'Baholash kutilmoqda', color: '#f5a524' },
+  { key: 'late', label: 'Muddati o‘tgan', color: '#ef4444' },
+]
+const STUDENT_STATES = [
+  { key: 'done', label: 'Baholangan', color: '#10b981' },
+  { key: 'pending', label: 'Tekshirilmoqda', color: '#3b8ef0' },
+  { key: 'progress', label: 'Bajarish kerak', color: '#f5a524' },
+  { key: 'late', label: 'Muddati o‘tgan', color: '#ef4444' },
+]
+const stateOf = (r, isStaff) => {
+  if (isStaff) {
+    if (r.pending > 0) return 'pending'
+    if (r.total > 0 && r.subs.length >= r.total) return 'done'
+    return r.expired ? 'late' : 'progress'
+  }
+  if (r.my) return r.my.status === 'graded' ? 'done' : 'pending'
+  return r.expired ? 'late' : 'progress'
+}
+
+/* ---------- Ro'yxat sahifasi ---------- */
+
 function HomeworkList() {
   const { user, db, scope, can } = useAuth()
   const toast = useToast()
+  const isStaff = user.role !== 'student'
   const [tab, setTab] = useState('active')
+  const [q, setQ] = useState('')
+  const [grp, setGrp] = useState('all')
+  const [showAll, setShowAll] = useState(false)
   const [editing, setEditing] = useState(null)
   const [del, setDel] = useState(null)
-  const isStaff = user.role !== 'student'
+  const now = Date.now()
+
+  const hwIds = useMemo(() => new Set(scope.homework.map((h) => h.id)), [scope.homework])
+  // Talaba faqat o'z javoblarini ko'radi, xodim — o'z doirasidagi barchasini
+  const subsAll = useMemo(() => db.submissions.filter((s) => hwIds.has(s.homeworkId) && (isStaff || s.studentId === user.id)), [db.submissions, hwIds, isStaff, user.id])
 
   const rows = useMemo(() => scope.homework.map((h) => {
     const g = db.groups.find((x) => x.id === h.groupId)
-    const subs = db.submissions.filter((s) => s.homeworkId === h.id)
+    const subs = subsAll.filter((s) => s.homeworkId === h.id)
     const my = subs.find((s) => s.studentId === user.id)
-    return { h, g, subs, my, total: g?.studentIds.length || 0, graded: subs.filter((s) => s.status === 'graded').length, pending: subs.filter((s) => s.status === 'submitted').length, expired: h.dueAt < Date.now() }
-  }).filter((r) => {
-    if (isStaff) return tab === 'active' ? !r.expired || r.pending > 0 : true
-    return tab === 'active' ? !r.my && !r.expired : tab === 'done' ? !!r.my : r.expired && !r.my
-  }).sort((a, b) => a.h.dueAt - b.h.dueAt), [scope.homework, db.groups, db.submissions, tab, user.id, isStaff])
+    return { h, g, subs, my, total: g?.studentIds.length || 0, graded: subs.filter((s) => s.status === 'graded').length, pending: subs.filter((s) => s.status === 'submitted').length, expired: h.dueAt < now }
+  }).sort((a, b) => (a.expired - b.expired) || (a.expired ? b.h.dueAt - a.h.dueAt : a.h.dueAt - b.h.dueAt)), [scope.homework, db.groups, subsAll, user.id, now])
 
+  const is = {
+    active: (r) => (isStaff ? !r.expired || r.pending > 0 : !r.my && !r.expired),
+    soon: (r) => !r.expired && r.h.dueAt - now < SOON && (isStaff || !r.my),
+    done: (r) => !!r.my,
+    late: (r) => r.expired && !r.my,
+    all: () => true,
+  }
+  const count = (k) => rows.filter(is[k]).length
   const tabs = isStaff
-    ? [{ value: 'active', label: 'Faol', icon: 'fileText', count: scope.homework.filter((h) => h.dueAt > Date.now()).length }, { value: 'all', label: 'Barchasi' }]
-    : [{ value: 'active', label: 'Bajarish kerak', icon: 'fileText' }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle' }, { value: 'late', label: 'Muddati o‘tgan' }]
+    ? [{ value: 'active', label: 'Faol', icon: 'fileText', count: count('active') }, { value: 'all', label: 'Barchasi', icon: 'layers', count: rows.length }, { value: 'soon', label: 'Muddati yaqin', icon: 'clock', count: count('soon') }]
+    : [{ value: 'active', label: 'Bajarish kerak', icon: 'fileText', count: count('active') }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle', count: count('done') }, { value: 'late', label: 'Muddati o‘tgan', icon: 'clock', count: count('late') }]
+
+  const list = useMemo(() => {
+    const s = q.trim().toLowerCase()
+    return rows.filter(is[tab]).filter((r) => !s || [r.h.title, r.h.description, r.g?.name, r.g?.course].some((x) => (x || '').toLowerCase().includes(s)))
+  }, [rows, tab, q]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Statistika + sparkline qatorlari (oxirgi 14 kun)
+  const stats = useMemo(() => {
+    const upto = (ts) => subsAll.filter((s) => s.submittedAt <= endOfDay(ts))
+    const hwBy = (ts) => rows.filter((r) => (r.h.createdAt || 0) <= endOfDay(ts))
+    const waiting = (ts) => upto(ts).filter((s) => s.status === 'submitted' || (s.gradedAt || 0) > endOfDay(ts)).length
+    const rate = (ts) => {
+      const hs = hwBy(ts)
+      return isStaff ? pct(upto(ts).length, hs.reduce((n, r) => n + r.total, 0)) : pct(upto(ts).length, hs.length)
+    }
+    const maxOf = (s) => rows.find((r) => r.h.id === s.homeworkId)?.h.maxGrade || 100
+    const avgGrade = (list) => (list.length ? Math.round(list.reduce((n, s) => n + pct(s.grade, maxOf(s)), 0) / list.length) : 0)
+    const graded = subsAll.filter((s) => s.status === 'graded')
+    return {
+      subs: subsAll.length,
+      pending: subsAll.filter((s) => s.status === 'submitted').length,
+      rate: rate(now),
+      avgGrade: avgGrade(graded),
+      sActive: series(14, (ts) => hwBy(ts).filter((r) => r.h.dueAt > ts).length),
+      sSubs: series(14, (ts) => upto(ts).length),
+      sPending: series(14, waiting),
+      sRate: series(14, rate),
+      sGrade: series(14, (ts) => avgGrade(graded.filter((s) => (s.gradedAt || s.submittedAt) <= endOfDay(ts)))),
+    }
+  }, [subsAll, rows, now, isStaff])
+
+  const recent = useMemo(() => [...subsAll].sort((a, b) => b.submittedAt - a.submittedAt), [subsAll])
+  const STATES = isStaff ? STAFF_STATES : STUDENT_STATES
+  const inGrp = grp === 'all' ? rows : rows.filter((r) => r.h.groupId === grp)
+  const parts = STATES.map((st) => ({ ...st, value: inGrp.filter((r) => stateOf(r, isStaff) === st.key).length }))
+  const grpRate = isStaff ? pct(inGrp.reduce((n, r) => n + r.subs.length, 0), inGrp.reduce((n, r) => n + r.total, 0)) : pct(inGrp.filter((r) => r.my).length, inGrp.length)
+  const grpOpts = [{ value: 'all', label: 'Barcha vazifalar' }, ...scope.groups.filter((g) => rows.some((r) => r.h.groupId === g.id)).map((g) => ({ value: g.id, label: g.name }))]
+
+  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const canCreate = isStaff && can('content.create')
+  const hwOf = (s) => rows.find((r) => r.h.id === s.homeworkId)?.h
 
   return (
     <>
-      <PageHead icon="fileText" title="Uy vazifalari" sub={isStaff ? 'Topshiriqlar bering, javoblarni baholang' : 'Topshiriqlar va baholar'} actions={isStaff && can('content.create') && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Vazifa berish</Btn>} />
-      <Tabs value={tab} onChange={setTab} items={tabs} />
-      {rows.length === 0 ? <Card><Empty icon="fileText" title="Vazifa yo‘q" text={isStaff ? 'Guruhga yangi vazifa bering.' : 'Barcha vazifalar bajarilgan.'} /></Card> : (
+      {/* Sarlavha banneri */}
+      <section className="pthero">
+        <span className="pthero__icon"><Icon name="fileText" size={34} /></span>
+        <div className="pthero__text">
+          <h1>Uy vazifalari</h1>
+          <p>{isStaff ? 'Topshiriqlar bering, javoblarni baholang' : 'Topshiriqlarni bajaring, baholaringizni kuzating'}</p>
+        </div>
+        <blockquote className="pthero__quote">“Ilm bilan amal qilish eng ulug‘ ne’matdir.”</blockquote>
+        {canCreate && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Vazifa berish</Btn>}
+      </section>
+
+      {/* Statistika */}
+      <div className="pgrid pgrid--4 ptstats phwstats">
+        {isStaff ? <>
+          <StatSpark icon="fileText" tone="blue" color="#3b8ef0" value={count('active')} label="Faol vazifa" data={stats.sActive} onClick={() => setTab('active')} />
+          <StatSpark icon="users" tone="teal" color="#14b8a6" value={stats.subs} label="Topshirishlar" data={stats.sSubs} onClick={() => scrollTo('phw-recent')} />
+          <StatSpark icon="clock" tone="amber" color="#f5a524" value={stats.pending} label="Baholash kutilmoqda" data={stats.sPending} onClick={() => scrollTo('phw-recent')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={`${stats.rate}%`} label="O‘rtacha bajarilish" data={stats.sRate} onClick={() => scrollTo('phw-state')} />
+        </> : <>
+          <StatSpark icon="fileText" tone="blue" color="#3b8ef0" value={count('active')} label="Bajarish kerak" data={stats.sActive} onClick={() => setTab('active')} />
+          <StatSpark icon="checkCircle" tone="teal" color="#14b8a6" value={count('done')} label="Topshirilgan" data={stats.sSubs} onClick={() => setTab('done')} />
+          <StatSpark icon="clock" tone="amber" color="#f5a524" value={stats.pending} label="Tekshirilmoqda" data={stats.sPending} onClick={() => scrollTo('phw-recent')} />
+          <StatSpark icon="award" tone="violet" color="#8b5cf6" value={`${stats.avgGrade}%`} label="O‘rtacha baho" data={stats.sGrade} onClick={() => scrollTo('phw-state')} />
+        </>}
+      </div>
+
+      {/* Filtr paneli */}
+      <div className="pvtool">
+        <Tabs value={tab} onChange={setTab} items={tabs} className="pttabs" />
+        <Search value={q} onChange={setQ} placeholder="Vazifa nomi, fan yoki tavsif bo‘yicha qidirish…" className="ptsearch" />
+      </div>
+
+      {/* Vazifa kartalari */}
+      {list.length === 0 ? (
+        <Card>
+          {q
+            ? <Empty icon="search" title="Hech narsa topilmadi" text="Qidiruv so‘rovingizga mos vazifa yo‘q." action={<Btn icon="refresh" onClick={() => setQ('')}>Qidiruvni tozalash</Btn>} />
+            : <Empty icon="fileText" title="Vazifa yo‘q" text={isStaff ? 'Guruhga yangi vazifa bering.' : 'Bu bo‘limda vazifa yo‘q.'} action={canCreate && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Vazifa berish</Btn>} />}
+        </Card>
+      ) : (
         <div className="pgrid pgrid--2">
-          {rows.map(({ h, g, my, total, graded, pending, expired, subs }) => (
-            <article key={h.id} className="phw">
-              <div className="phw__icon"><Icon name="fileText" size={22} /></div>
-              <div className="phw__body">
-                <div className="prow prow--between" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-                  <h4>{h.title}</h4>
-                  {my ? (my.status === 'graded' ? <Badge tone="green">Baho: {my.grade}/{h.maxGrade}</Badge> : <Badge tone="blue">Tekshirilmoqda</Badge>) : expired ? <Badge tone="gray">Muddat tugagan</Badge> : <Badge tone={h.dueAt - Date.now() < 864e5 ? 'red' : 'amber'}>{fmtLeft(h.dueAt)}</Badge>}
-                </div>
-                <p>{h.description}</p>
-                <div className="phw__meta"><span><Icon name="layers" size={14} /> {g?.name}</span><span><Icon name="calendar" size={14} /> {fmtDateTime(h.dueAt)}</span><span><Icon name="award" size={14} /> maks. {h.maxGrade} ball</span></div>
-                {isStaff && (
-                  <div style={{ marginTop: 12 }}>
-                    <div className="prow prow--between" style={{ fontSize: 13, marginBottom: 6 }}><span>Topshirdi: <b>{subs.length}/{total}</b></span><span>{pending > 0 ? <b style={{ color: '#d97706' }}>{pending} ta baholanmagan</b> : `${graded} ta baholangan`}</span></div>
-                    <Progress value={pct(subs.length, total)} tone="amber" size="sm" />
-                  </div>
-                )}
-                <div className="prow prow--between" style={{ marginTop: 14 }}>
-                  <Btn size="sm" variant={isStaff && pending ? 'primary' : 'soft'} icon={isStaff ? 'eye' : my ? 'eye' : 'send'} as="a" href={`#/platform/homework/${h.id}`}>{isStaff ? (pending ? 'Baholash' : 'Ko‘rish') : my ? 'Javobimni ko‘rish' : 'Topshirish'}</Btn>
-                  {isStaff && (h.authorId === user.id || user.role !== 'teacher') && <Menu items={[{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(h) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(h) }]} />}
-                </div>
-              </div>
-            </article>
-          ))}
+          {list.map((r) => <HomeworkCard key={r.h.id} r={r} isStaff={isStaff}
+            menu={isStaff && (r.h.authorId === user.id || user.role !== 'teacher') ? [
+              { label: 'Javoblar', icon: 'eye', onClick: () => { window.location.hash = `#/platform/homework/${r.h.id}` } },
+              { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(r.h) }, 'sep',
+              { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(r.h) },
+            ] : null} />)}
+          {/* Toq sonli kartada bo'sh joyni iqtibos bilan to'ldiramiz */}
+          {list.length % 2 === 1 && <blockquote className="phwquote" aria-hidden="true">“Har bir ilm amaliyot bilan go‘zallashadi.”</blockquote>}
         </div>
       )}
+
+      {/* Pastki qism: so'nggi topshiruvlar + holat */}
+      <div className="ptbottom phwbottom">
+        <Card id="phw-recent" pad={false} className="ptrecent phwrecent">
+          <header className="ptcard-h">
+            <h3 className="pdt"><span className="pdt__ico"><Icon name="clock" size={18} /></span>{isStaff ? 'So‘nggi topshiruvlar' : 'Mening topshiruvlarim'}</h3>
+            {recent.length > 5 && <button type="button" className="ptlink" onClick={() => setShowAll((v) => !v)}>{showAll ? 'Yig‘ish' : 'Barchasini ko‘rish'} <Icon name={showAll ? 'chevUp' : 'arrowRight'} size={15} /></button>}
+          </header>
+          {recent.length === 0
+            ? <Empty icon="clock" title="Hali topshiruv yo‘q" text="Vazifa topshirilgach javoblar shu yerda ko‘rinadi." />
+            : (
+              <Table rows={showAll ? recent : recent.slice(0, 5)} onRow={(s) => { window.location.hash = `#/platform/homework/${s.homeworkId}` }} cols={[
+                { key: 'n', label: '#', w: 44, render: (s) => recent.indexOf(s) + 1 },
+                ...(isStaff ? [{ key: 's', label: 'Talaba', render: (s) => { const u = db.users.find((x) => x.id === s.studentId); return <div className="pcell-user ptuser"><UAvatar user={u} size={30} /><b>{u?.name || '—'}</b></div> } }] : []),
+                { key: 't', label: 'Vazifa nomi', render: (s) => <span className="ptname">{hwOf(s)?.title}</span> },
+                { key: 'd', label: 'Topshirilgan vaqt', render: (s) => <span className="ptdate">{fmtDateTime(s.submittedAt)}</span> },
+                { key: 'st', label: 'Holat', render: (s) => {
+                  const late = s.submittedAt > (hwOf(s)?.dueAt ?? Infinity)
+                  return s.status === 'graded' ? <span className="phwst phwst--green">Baholangan</span> : <span className={cx('phwst', late ? 'phwst--amber' : 'phwst--blue')}>{late ? 'Kech topshirildi' : 'Baholanmagan'}</span>
+                } },
+                { key: 'g', label: 'Ball', render: (s) => (s.status === 'graded' ? <span className="phwball">{s.grade}/{hwOf(s)?.maxGrade}</span> : <span className="pmuted">—</span>) },
+              ]} />
+            )}
+        </Card>
+
+        <Card id="phw-state" className="ptanalytics">
+          <header className="ptcard-h ptcard-h--in">
+            <h3 className="pdt"><span className="pdt__ico"><Icon name="chart" size={18} /></span>Vazifalar holati</h3>
+            <label className="pdsel"><span>{grpOpts.find((o) => o.value === grp)?.label}</span><Icon name="chevDown" size={16} />
+              <select value={grp} onChange={(e) => setGrp(e.target.value)} aria-label="Guruh">{grpOpts.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+            </label>
+          </header>
+          <div className="ptan">
+            <Donut parts={parts} center={inGrp.length ? `${grpRate}%` : '—'} sub={isStaff ? 'Bajarilish' : 'Topshirilgan'} />
+            <ul className="ptlegend">
+              {parts.map((p) => <li key={p.key}><i style={{ background: p.color }} /><span>{p.label}</span><b>{p.value}</b></li>)}
+            </ul>
+          </div>
+          {inGrp.length === 0 && <p className="pmuted ptan__empty">Bu guruhda vazifa yo‘q.</p>}
+        </Card>
+      </div>
+
       <HomeworkForm open={!!editing} hw={editing} onClose={() => setEditing(null)} />
       <Confirm open={!!del} onClose={() => setDel(null)} danger title="Vazifani o‘chirish" text={`«${del?.title}» va barcha javoblar o‘chiriladi.`} confirmLabel="O‘chirish" onConfirm={() => { remove('homework', del.id); toast('O‘chirildi') }} />
     </>
+  )
+}
+
+function HomeworkCard({ r, isStaff, menu }) {
+  const { h, g, subs, my, total, graded, pending, expired } = r
+  const href = `#/platform/homework/${h.id}`
+  return (
+    <article className={cx('phw', expired && !pending && 'is-expired')}>
+      <span className="phw__icon"><Icon name="fileText" size={24} /></span>
+      <div className="phw__body">
+        <div className="phw__top">
+          <h4><a href={href}>{h.title}</a></h4>
+          {my ? (my.status === 'graded' ? <span className="phwdue phwdue--ok">Baho: {my.grade}/{h.maxGrade}</span> : <span className="phwdue phwdue--info">Tekshirilmoqda</span>)
+            : expired ? <span className="phwdue phwdue--hot">Muddat tugagan</span>
+              : <span className={cx('phwdue', h.dueAt - Date.now() < D && 'phwdue--hot')}>{fmtLeft(h.dueAt)}</span>}
+        </div>
+        {h.description && <p className="phw__desc">{h.description}</p>}
+        <div className="phw__meta">
+          <span><Icon name="layers" size={15} />{g?.name}</span>
+          <span><Icon name="calendar" size={15} />{fmtDateTime(h.dueAt)}</span>
+          <span><Icon name="award" size={15} />maks. {h.maxGrade} ball</span>
+        </div>
+        {isStaff && (
+          <div className="phw__prog">
+            <div><b>Topshirdi: {subs.length}/{total}</b>{pending > 0 ? <b className="phw__warn">{pending} ta baholanmagan</b> : <span>{graded} ta baholangan</span>}</div>
+            <span className="phw__bar"><i style={{ width: `${pct(subs.length, total)}%` }} /></span>
+          </div>
+        )}
+        <div className="phw__foot">
+          {isStaff ? <Btn size="sm" variant={pending ? 'primary' : 'soft'} icon="eye" as="a" href={href}>{pending ? 'Baholash' : 'Ko‘rish'}</Btn>
+            : my ? <Btn size="sm" variant="soft" icon="eye" as="a" href={href}>Javobimni ko‘rish</Btn>
+              : expired ? <span className="pmuted" style={{ fontSize: 13.5 }}>Topshirish yopilgan</span>
+                : <Btn size="sm" variant="primary" icon="send" as="a" href={href}>Topshirish</Btn>}
+          {menu && <Menu items={menu} trigger={<button type="button" className="phw__more" aria-label="Amallar"><Icon name="moreV" size={18} /></button>} />}
+        </div>
+      </div>
+    </article>
   )
 }
 
@@ -155,7 +341,7 @@ function HomeworkDetail({ id }) {
             ) : expired ? <Card><Empty icon="alertCircle" title="Topshirish muddati tugagan" text="Ustoz bilan bog‘lanib qo‘shimcha vaqt so‘rashingiz mumkin." /></Card> : (
               <Card title="Javob yuborish" sub={fmtLeft(h.dueAt)}>
                 <Textarea style={{ minHeight: 180 }} value={text} onChange={(e) => setText(e.target.value)} placeholder="Javobingizni shu yerga yozing…" />
-                <div className="prow prow--between" style={{ marginTop: 12 }}><span className="pmuted" style={{ fontSize: 12.5 }}>Fayl biriktirish backend ulanganda qo‘shiladi</span><Btn variant="primary" icon="send" onClick={submit}>Yuborish</Btn></div>
+                <div className="prow prow--between" style={{ marginTop: 12 }}><span className="pmuted" style={{ fontSize: 12.5 }}>Fayl bo‘lsa — Google Drive yoki Telegram havolasini matnga qo‘shing</span><Btn variant="primary" icon="send" onClick={submit}>Yuborish</Btn></div>
               </Card>
             )
           )}

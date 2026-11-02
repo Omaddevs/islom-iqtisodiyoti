@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, cx } from '../ui/kit.jsx'
+import { add, patch, remove, notify, logActivity, commit, loadDB } from '../store/db.js'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx } from '../ui/kit.jsx'
 import { fmtDate, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
+import { StatSpark, Donut, series, endOfDay } from '../ui/charts.jsx'
 
 export default function Tests({ param }) {
   const { user } = useAuth()
@@ -11,74 +12,219 @@ export default function Tests({ param }) {
   return <TestList />
 }
 
+/* ---------- Yordamchilar ---------- */
+
+const D = 864e5
+// Natija darajalari (donut va jadval pill'lari uchun)
+const GRADES = [
+  { key: 'a', label: 'A’lo', range: '90–100%', min: 90, color: '#10b981', tone: 'green' },
+  { key: 'b', label: 'Yaxshi', range: '70–89%', min: 70, color: '#3b8ef0', tone: 'blue' },
+  { key: 'c', label: 'Qoniqarli', range: '50–69%', min: 50, color: '#f5a524', tone: 'amber' },
+  { key: 'd', label: 'Qoniqarsiz', range: '0–49%', min: 0, color: '#ef4444', tone: 'red' },
+]
+const gradeOf = (p) => GRADES.find((g) => p >= g.min)
+const PERIODS = [{ value: '7', label: 'So‘nggi 7 kun' }, { value: '30', label: 'So‘nggi 30 kun' }, { value: 'all', label: 'Butun davr' }]
+const avgOf = (list) => (list.length ? Math.round(list.reduce((s, a) => s + pct(a.score, a.total), 0) / list.length) : 0)
+
+/* ---------- Ro'yxat sahifasi ---------- */
+
 function TestList() {
   const { user, db, scope, can } = useAuth()
   const toast = useToast()
+  const isStaff = user.role !== 'student'
   const [tab, setTab] = useState('active')
+  const [q, setQ] = useState('')
+  const [period, setPeriod] = useState('30')
+  const [showAll, setShowAll] = useState(false)
   const [editing, setEditing] = useState(null)
   const [del, setDel] = useState(null)
-  const isStaff = user.role !== 'student'
-  const attempts = db.testAttempts
+  const now = Date.now()
+
+  const testIds = useMemo(() => new Set(scope.tests.map((t) => t.id)), [scope.tests])
+  // Talaba faqat o'z natijalarini ko'radi, xodim — o'z doirasidagi barcha testlarnikini
+  const attempts = useMemo(() => db.testAttempts.filter((a) => testIds.has(a.testId) && (isStaff || a.studentId === user.id)), [db.testAttempts, testIds, isStaff, user.id])
 
   const rows = useMemo(() => scope.tests.map((t) => {
-    const my = attempts.find((a) => a.testId === t.id && a.studentId === user.id)
+    const ta = attempts.filter((a) => a.testId === t.id)
+    const my = ta.find((a) => a.studentId === user.id)
     const groups = db.groups.filter((g) => t.groupIds.includes(g.id))
     const total = new Set(groups.flatMap((g) => g.studentIds)).size
-    const done = attempts.filter((a) => a.testId === t.id).length
-    const avg = done ? Math.round(attempts.filter((a) => a.testId === t.id).reduce((s, a) => s + pct(a.score, a.total), 0) / done) : 0
-    return { t, my, groups, total, done, avg, expired: t.dueAt < Date.now() }
-  }).filter((r) => tab === 'active' ? !r.expired && !r.my : tab === 'done' ? !!r.my : r.expired || (isStaff && true)).sort((a, b) => b.t.createdAt - a.t.createdAt), [scope.tests, attempts, tab, user.id, db.groups, isStaff])
+    const author = db.users.find((u) => u.id === t.authorId)
+    return { t, my, groups, total, author, done: ta.length, avg: avgOf(ta), expired: t.dueAt < now }
+  }).sort((a, b) => (a.expired - b.expired) || (a.expired ? b.t.dueAt - a.t.dueAt : a.t.dueAt - b.t.dueAt)), [scope.tests, attempts, db.groups, db.users, user.id, now])
 
+  const is = {
+    active: (r) => !r.expired && (isStaff || !r.my),
+    done: (r) => !!r.my,
+    expired: (r) => r.expired && !r.my,
+    all: () => true,
+  }
+  const count = (k) => rows.filter(is[k]).length
   const tabs = isStaff
-    ? [{ value: 'active', label: 'Faol', icon: 'clipboard' }, { value: 'all', label: 'Barchasi' }]
-    : [{ value: 'active', label: 'Topshirish kerak', icon: 'clipboard', count: scope.tests.filter((t) => t.dueAt > Date.now() && !attempts.some((a) => a.testId === t.id && a.studentId === user.id)).length }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle' }, { value: 'all', label: 'Muddati o‘tgan' }]
+    ? [{ value: 'active', label: 'Faol', icon: 'clipboard', count: count('active') }, { value: 'all', label: 'Barchasi', icon: 'fileText', count: rows.length }]
+    : [{ value: 'active', label: 'Topshirish kerak', icon: 'clipboard', count: count('active') }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle', count: count('done') }, { value: 'expired', label: 'Muddati o‘tgan', icon: 'clock', count: count('expired') }]
+
+  const list = useMemo(() => {
+    const s = q.trim().toLowerCase()
+    return rows.filter(is[tab]).filter((r) => !s || [r.t.title, r.t.description, r.author?.name, ...r.groups.map((g) => `${g.name} ${g.course}`)].some((x) => (x || '').toLowerCase().includes(s)))
+  }, [rows, tab, q]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Statistika + sparkline qatorlari (oxirgi 14 kun)
+  const stats = useMemo(() => {
+    const takers = new Set(attempts.map((a) => a.studentId)).size
+    const upto = (ts) => attempts.filter((a) => a.finishedAt <= endOfDay(ts))
+    return {
+      active: count('active'),
+      takers,
+      avg: avgOf(attempts),
+      sActive: series(14, (ts) => scope.tests.filter((t) => t.createdAt <= endOfDay(ts) && t.dueAt > ts).length),
+      sTakers: series(14, (ts) => new Set(upto(ts).map((a) => a.studentId)).size),
+      sAvg: series(14, (ts) => avgOf(upto(ts))),
+    }
+  }, [attempts, scope.tests, rows]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const recent = useMemo(() => [...attempts].sort((a, b) => b.finishedAt - a.finishedAt), [attempts])
+  const inPeriod = useMemo(() => (period === 'all' ? attempts : attempts.filter((a) => a.finishedAt >= now - Number(period) * D)), [attempts, period, now])
+  const parts = GRADES.map((g) => ({ ...g, value: inPeriod.filter((a) => gradeOf(pct(a.score, a.total)).key === g.key).length }))
+
+  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const canCreate = isStaff && can('content.create')
 
   return (
     <>
-      <PageHead icon="clipboard" title="Testlar" sub={isStaff ? 'Testlar yarating, natijalarni kuzating' : 'Bilimingizni tekshiring'}
-        actions={isStaff && can('content.create') && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Test yaratish</Btn>} />
-      <Tabs value={tab} onChange={setTab} items={tabs} />
-      {rows.length === 0 ? <Card><Empty icon="clipboard" title="Test yo‘q" text={isStaff ? 'Birinchi testingizni yarating.' : 'Hozircha topshiriladigan test yo‘q.'} /></Card> : (
+      {/* Sarlavha banneri */}
+      <section className="pthero">
+        <span className="pthero__icon"><Icon name="clipboard" size={34} /></span>
+        <div className="pthero__text">
+          <h1>Testlar</h1>
+          <p>{isStaff ? 'Testlar yarating, natijalarni kuzating' : 'Bilimingizni tekshiring, natijalaringizni kuzating'}</p>
+        </div>
+        <blockquote className="pthero__quote">“Bilim — hayotga nur, jamiyatga farovonlikdir.”</blockquote>
+        {canCreate && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Test yaratish</Btn>}
+      </section>
+
+      {/* Statistika */}
+      <div className="pgrid pgrid--3 ptstats">
+        {isStaff ? <>
+          <StatSpark icon="clipboard" tone="blue" color="#3b8ef0" value={stats.active} label="Faol testlar" data={stats.sActive} onClick={() => setTab('active')} />
+          <StatSpark icon="users" tone="teal" color="#14b8a6" value={stats.takers} label="Topshiruvchilar" data={stats.sTakers} onClick={() => scrollTo('pt-recent')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={`${stats.avg}%`} label="O‘rtacha natija" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
+        </> : <>
+          <StatSpark icon="clipboard" tone="blue" color="#3b8ef0" value={count('active')} label="Topshirish kerak" data={stats.sActive} onClick={() => setTab('active')} />
+          <StatSpark icon="checkCircle" tone="teal" color="#14b8a6" value={count('done')} label="Topshirilgan testlar" data={series(14, (ts) => attempts.filter((a) => a.finishedAt <= endOfDay(ts)).length)} onClick={() => setTab('done')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={`${stats.avg}%`} label="O‘rtacha natijam" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
+        </>}
+      </div>
+
+      {/* Filtr paneli */}
+      <div className="pvtool">
+        <Tabs value={tab} onChange={setTab} items={tabs} className="pttabs" />
+        <Search value={q} onChange={setQ} placeholder="Test nomi, fan yoki muallif bo‘yicha qidirish…" className="ptsearch" />
+      </div>
+
+      {/* Test kartalari */}
+      {list.length === 0 ? (
+        <Card>
+          {q
+            ? <Empty icon="search" title="Hech narsa topilmadi" text="Qidiruv so‘rovingizga mos test yo‘q." action={<Btn icon="refresh" onClick={() => setQ('')}>Qidiruvni tozalash</Btn>} />
+            : <Empty icon="clipboard" title="Test yo‘q" text={isStaff ? 'Birinchi testingizni yarating.' : 'Hozircha bu bo‘limda test yo‘q.'} action={canCreate && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Test yaratish</Btn>} />}
+        </Card>
+      ) : (
         <div className="pgrid pgrid--2">
-          {rows.map(({ t, my, groups, total, done, avg, expired }) => {
-            const a = db.users.find((u) => u.id === t.authorId)
-            const mine = t.authorId === user.id || user.role !== 'teacher'
-            return (
-              <Card key={t.id}>
-                <div className="prow prow--between" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-                  <div className="prow" style={{ flexWrap: 'nowrap', minWidth: 0 }}>
-                    <div className="pitem__icon" style={{ background: 'var(--pf-violet-soft)', color: 'var(--pf-violet)' }}><Icon name="clipboard" size={22} /></div>
-                    <div style={{ minWidth: 0 }}>
-                      <h4 style={{ fontSize: 16, fontWeight: 700 }}>{t.title}</h4>
-                      <span className="pmuted" style={{ fontSize: 13 }}>{t.questions.length} savol · {t.timeLimit} daq · {a?.name}</span>
-                    </div>
-                  </div>
-                  {my ? <Badge tone={pct(my.score, my.total) >= 60 ? 'green' : 'red'}>{pct(my.score, my.total)}%</Badge> : expired ? <Badge tone="gray">Muddat tugagan</Badge> : <Badge tone="amber">{fmtLeft(t.dueAt)}</Badge>}
-                </div>
-                {t.description && <p className="pmuted" style={{ marginTop: 12 }}>{t.description}</p>}
-                <div className="prow" style={{ marginTop: 12, gap: 6 }}>{groups.map((g) => <Badge key={g.id} tone="gray">{g.name}</Badge>)}<span className="pmuted" style={{ fontSize: 12.5 }}>Muddat: {fmtDateTime(t.dueAt)}</span></div>
-                {isStaff && (
-                  <div style={{ marginTop: 14 }}>
-                    <div className="prow prow--between" style={{ fontSize: 13, marginBottom: 6 }}><span>Topshirganlar: <b>{done}/{total}</b></span><span>O‘rtacha: <b>{avg}%</b></span></div>
-                    <Progress value={pct(done, total)} tone="violet" size="sm" />
-                  </div>
-                )}
-                <div className="prow prow--between" style={{ marginTop: 16 }}>
-                  {isStaff ? <Btn size="sm" variant="soft" icon="chart" as="a" href={`#/platform/tests/${t.id}`}>Natijalar</Btn>
-                    : my ? <Btn size="sm" variant="soft" icon="eye" as="a" href={`#/platform/tests/${t.id}`}>Natijani ko‘rish</Btn>
-                      : expired ? <span className="pmuted" style={{ fontSize: 13 }}>Test yopilgan</span>
-                        : <Btn size="sm" variant="primary" icon="play" as="a" href={`#/platform/tests/${t.id}`}>Testni boshlash</Btn>}
-                  {isStaff && mine && <Menu items={[{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(t) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(t) }]} />}
-                </div>
-              </Card>
-            )
-          })}
+          {list.map((r) => <TestCard key={r.t.id} r={r} isStaff={isStaff}
+            menu={isStaff && (r.t.authorId === user.id || user.role !== 'teacher') ? [
+              { label: 'Natijalar', icon: 'chart', onClick: () => { window.location.hash = `#/platform/tests/${r.t.id}` } },
+              { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(r.t) }, 'sep',
+              { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(r.t) },
+            ] : null} />)}
         </div>
       )}
+
+      {/* Pastki qism: so'nggi topshiruvlar + tahlil */}
+      <div className="ptbottom">
+        <Card id="pt-recent" pad={false} className="ptrecent">
+          <header className="ptcard-h">
+            <h3 className="pdt"><span className="pdt__ico"><Icon name="clock" size={18} /></span>{isStaff ? 'So‘nggi topshiruvlar' : 'Mening natijalarim'}</h3>
+            {recent.length > 5 && <button type="button" className="ptlink" onClick={() => setShowAll((v) => !v)}>{showAll ? 'Yig‘ish' : 'Barchasini ko‘rish'} <Icon name={showAll ? 'chevUp' : 'arrowRight'} size={15} /></button>}
+          </header>
+          {recent.length === 0
+            ? <Empty icon="clock" title="Hali topshiruv yo‘q" text="Test topshirilgach natijalar shu yerda ko‘rinadi." />
+            : (
+              <Table rows={showAll ? recent : recent.slice(0, 5)} onRow={(a) => { window.location.hash = `#/platform/tests/${a.testId}` }} cols={[
+                { key: 'n', label: '#', w: 44, render: (a) => recent.indexOf(a) + 1 },
+                ...(isStaff ? [{ key: 's', label: 'Talaba', render: (a) => { const s = db.users.find((u) => u.id === a.studentId); return <div className="pcell-user ptuser"><UAvatar user={s} size={30} /><b>{s?.name || '—'}</b></div> } }] : []),
+                { key: 't', label: 'Test nomi', render: (a) => <span className="ptname">{scope.tests.find((t) => t.id === a.testId)?.title}</span> },
+                { key: 'p', label: 'Natija', render: (a) => { const p = pct(a.score, a.total); return <span className={cx('ptpill', `ptpill--${gradeOf(p).tone}`)}>{p}%</span> } },
+                { key: 'd', label: 'Sana', render: (a) => <span className="ptdate">{fmtDateTime(a.finishedAt)}</span> },
+              ]} />
+            )}
+        </Card>
+
+        <Card id="pt-analytics" className="ptanalytics">
+          <header className="ptcard-h ptcard-h--in">
+            <h3 className="pdt"><span className="pdt__ico"><Icon name="chart" size={18} /></span>Natijalar tahlili</h3>
+            <label className="pdsel"><span>{PERIODS.find((p) => p.value === period).label}</span><Icon name="chevDown" size={16} />
+              <select value={period} onChange={(e) => setPeriod(e.target.value)} aria-label="Davr">{PERIODS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</select>
+            </label>
+          </header>
+          <div className="ptan">
+            <Donut parts={parts} center={inPeriod.length ? `${avgOf(inPeriod)}%` : '—'} sub="O‘rtacha natija" />
+            <ul className="ptlegend">
+              {parts.map((g) => <li key={g.key}><i style={{ background: g.color }} /><span>{g.label} <small>({g.range})</small></span><b>{g.value}</b></li>)}
+            </ul>
+          </div>
+          {inPeriod.length === 0 && <p className="pmuted ptan__empty">Tanlangan davrda topshiruv yo‘q.</p>}
+        </Card>
+      </div>
+
       <TestForm open={!!editing} test={editing} onClose={() => setEditing(null)} />
       <Confirm open={!!del} onClose={() => setDel(null)} danger title="Testni o‘chirish" text={`«${del?.title}» va uning barcha natijalari o‘chiriladi.`} confirmLabel="O‘chirish"
         onConfirm={() => { remove('tests', del.id); toast('Test o‘chirildi') }} />
     </>
+  )
+}
+
+function TestCard({ r, isStaff, menu }) {
+  const { t, my, groups, total, author, done, avg, expired } = r
+  const left = t.dueAt - Date.now()
+  const href = `#/platform/tests/${t.id}`
+  const myP = my && pct(my.score, my.total)
+  return (
+    <article className={cx('pcard', 'ptcardx', expired && 'is-expired')}>
+      <div className="ptcardx__top">
+        <span className="ptcardx__icon"><Icon name="clipboard" size={22} /></span>
+        <div className="ptcardx__ttl">
+          <h4><a href={href}>{t.title}</a></h4>
+          <span>{t.questions.length} savol · {t.timeLimit} daq · {author?.name}</span>
+        </div>
+        {my ? <span className={cx('ptpill', `ptpill--${gradeOf(myP).tone}`, 'ptpill--lg')}><Icon name="checkCircle" size={15} />{myP}%</span>
+          : expired ? <span className="ptdue ptdue--off"><Icon name="lock" size={15} />Yopilgan</span>
+            : <span className={cx('ptdue', left < D && 'ptdue--hot')}><Icon name="clock" size={15} />{fmtLeft(t.dueAt)}</span>}
+      </div>
+      {t.description && <p className="ptcardx__desc">{t.description}</p>}
+      <div className="ptcardx__meta">
+        {groups.map((g) => <span key={g.id} className="ptgrp" style={{ '--gc': g.color }}>{g.name}</span>)}
+        <span className="ptcardx__due"><Icon name="calendar" size={15} />Muddat: {fmtDateTime(t.dueAt)}</span>
+      </div>
+      {isStaff ? (
+        <div className="ptcardx__prog">
+          <div><span>Topshirganlar: <b>{done}/{total}</b></span><span>O‘rtacha: <b>{avg}%</b></span></div>
+          <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${pct(done, total)}%` }} /></span>
+        </div>
+      ) : my && (
+        <div className="ptcardx__prog">
+          <div><span>To‘g‘ri javoblar: <b>{my.score}/{my.total}</b></span><span>{fmtDateTime(my.finishedAt)}</span></div>
+          <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${myP}%`, background: GRADES.find((g) => g.key === gradeOf(myP).key).color }} /></span>
+        </div>
+      )}
+      <div className="ptcardx__foot">
+        {isStaff ? <Btn variant="soft" icon="chart" as="a" href={href}>Natijalar</Btn>
+          : my ? <Btn variant="soft" icon="eye" as="a" href={href}>Natijani ko‘rish</Btn>
+            : expired ? <span className="pmuted" style={{ fontSize: 13.5 }}>Test yopilgan</span>
+              : <Btn variant="primary" icon="play" as="a" href={href}>Testni boshlash</Btn>}
+        {menu && <Menu items={menu} trigger={<button type="button" className="ptmore" aria-label="Amallar"><Icon name="moreV" size={18} /></button>} />}
+      </div>
+    </article>
   )
 }
 
@@ -159,6 +305,7 @@ function TakeTest({ id }) {
   const [answers, setAnswers] = useState({})
   const [left, setLeft] = useState(0)
   const [result, setResult] = useState(existing || null)
+  const sending = useRef(false)
 
   useEffect(() => {
     if (!started || result) return
@@ -170,12 +317,20 @@ function TakeTest({ id }) {
 
   if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
 
-  const finish = (auto = false) => {
-    const score = t.questions.reduce((s, q) => s + (answers[q.id] === q.correct ? 1 : 0), 0)
-    const att = add('testAttempts', { testId: t.id, studentId: user.id, answers, score, total: t.questions.length, startedAt: Date.now() - (t.timeLimit * 60 - left) * 1000, finishedAt: Date.now() })
-    notify([t.authorId], `${user.name} «${t.title}» testini topshirdi: ${score}/${t.questions.length}`, `#/platform/tests/${t.id}`)
-    setResult(att)
-    toast(auto ? 'Vaqt tugadi, test avtomatik topshirildi' : 'Test topshirildi')
+  // Ball serverda hisoblanadi; to'g'ri javoblar topshirilgandan keyingina yuklanadi
+  const finish = async (auto = false) => {
+    if (sending.current) return
+    sending.current = true
+    try {
+      const [r] = await commit([{ col: 'testAttempts', op: 'insert', item: { id: uid('ta'), testId: t.id, studentId: user.id, answers, startedAt: Date.now() - (t.timeLimit * 60 - left) * 1000 } }])
+      await loadDB().catch(() => {})
+      notify([t.authorId], `${user.name} «${t.title}» testini topshirdi: ${r.item.score}/${r.item.total}`, `#/platform/tests/${t.id}`)
+      setResult(r.item)
+      toast(auto ? 'Vaqt tugadi, test avtomatik topshirildi' : 'Test topshirildi')
+    } catch (e) {
+      sending.current = false
+      toast(e.message, 'err')
+    }
   }
 
   if (result) {

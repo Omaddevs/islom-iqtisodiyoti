@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx } from '../ui/kit.jsx'
-import { DAYS_FULL, fmtWhen, fmtDate, pct } from '../ui/format.js'
+import { DAYS, DAYS_FULL, fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { UserForm } from './Users.jsx'
 import { MeetingForm, hashQuery } from './Meetings.jsx'
 import { HomeworkForm } from './Homework.jsx'
+import { HeroArt } from './Articles.jsx'
 
 const COLORS = ['#4aa3f8', '#8b5cf6', '#14b8a6', '#f59e0b', '#10b981', '#f43f5e', '#0ea5e9', '#6366f1']
 
@@ -21,41 +22,87 @@ function GroupList() {
   const [editing, setEditing] = useState(null)
   const [del, setDel] = useState(null)
   useEffect(() => { if (hashQuery().get('new') && can('groups.manage')) setEditing({}) }, [can])
+  const [view, setView] = useState(() => { try { return localStorage.getItem('ii_group_view') || 'grid' } catch { return 'grid' } })
+  const changeView = (v) => { setView(v); try { localStorage.setItem('ii_group_view', v) } catch { /* xotira */ } }
+  const canManage = can('groups.manage')
   const list = scope.groups.filter((g) => (g.name + g.course).toLowerCase().includes(q.toLowerCase()))
+  const rows = list.map((g) => ({
+    g,
+    teacher: db.users.find((u) => u.id === g.teacherId),
+    students: g.studentIds.map((id) => db.users.find((u) => u.id === id)).filter(Boolean),
+    held: db.meetings.filter((m) => m.groupId === g.id && m.status === 'ended').length,
+    hw: db.homework.filter((h) => h.groupId === g.id).length,
+    next: db.meetings.filter((m) => m.groupId === g.id && m.status !== 'ended').sort((a, b) => a.startsAt - b.startsAt)[0],
+  }))
+  const menuFor = (g) => canManage && [{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(g) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(g) }]
   return (
     <>
-      <PageHead icon="layers" title="Guruhlar" sub={`${scope.groups.length} ta guruh`} actions={can('groups.manage') && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Guruh yaratish</Btn>} />
-      <Search value={q} onChange={setQ} placeholder="Guruh yoki kurs…" className="ptop__search" />
-      {list.length === 0 ? <Card><Empty icon="layers" title="Guruh yo‘q" text="Guruh yarating, ustoz biriktiring va o‘quvchilarni qo‘shing." action={can('groups.manage') && <Btn variant="primary" onClick={() => setEditing({})}>Guruh yaratish</Btn>} /></Card> : (
-        <div className="pgrid pgrid--cards">
-          {list.map((g) => {
-            const t = db.users.find((u) => u.id === g.teacherId)
-            const students = g.studentIds.map((id) => db.users.find((u) => u.id === id)).filter(Boolean)
-            const next = db.meetings.filter((m) => m.groupId === g.id && m.status !== 'ended').sort((a, b) => a.startsAt - b.startsAt)[0]
-            return (
-              <article key={g.id} className="pgroup" style={{ '--gc': g.color }} onClick={() => (window.location.hash = `#/platform/groups/${g.id}`)}>
-                <div className="pgroup__head">
-                  <div><h4>{g.name}</h4><span>{g.course} · {g.level}</span></div>
-                  {can('groups.manage') && <span onClick={(e) => e.stopPropagation()}><Menu items={[{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(g) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(g) }]} /></span>}
-                </div>
-                <div className="pgroup__stats">
-                  <div><b>{students.length}</b><span>o‘quvchi</span></div>
-                  <div><b>{db.meetings.filter((m) => m.groupId === g.id && m.status === 'ended').length}</b><span>dars o‘tildi</span></div>
-                  <div><b>{db.homework.filter((h) => h.groupId === g.id).length}</b><span>vazifa</span></div>
-                </div>
-                <p className="pmuted" style={{ fontSize: 13 }}>{g.schedule.map((s) => `${DAYS_FULL[s.day].slice(0, 3)} ${s.time}`).join(' · ') || 'Jadval belgilanmagan'}{next && <><br /><Icon name="video" size={13} /> {next.status === 'live' ? 'Hozir jonli' : fmtWhen(next.startsAt)}</>}</p>
-                <div className="pgroup__foot">
-                  <div className="pgroup__teacher">{t ? <><UAvatar user={t} size={28} />{t.name}</> : <Badge tone="amber">Ustoz yo‘q</Badge>}</div>
-                  <AvatarStack users={students} max={3} size={26} />
-                </div>
-              </article>
-            )
-          })}
+      {/* Sarlavha banneri */}
+      <section className="pthero pahero">
+        <span className="pthero__icon"><Icon name="layers" size={34} /></span>
+        <div className="pthero__text">
+          <h1>Guruhlar</h1>
+          <p>{scope.groups.length} ta guruh · Ustozlar va o‘quvchilar bilan ta’lim jarayonini boshqaring</p>
+        </div>
+        <blockquote className="pthero__quote">“Ilm bilan yuksalgan jamiyat barhayotdir.”</blockquote>
+        <HeroArt />
+        {canManage && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Guruh yaratish</Btn>}
+      </section>
+
+      {/* Filtr paneli */}
+      <div className="pvtool">
+        <Search value={q} onChange={setQ} placeholder="Guruh yoki kurs…" className="pgtool__search" />
+        <div className="pseg pseg--blue" role="group" aria-label="Ko‘rinish">
+          <button className={cx(view === 'grid' && 'is-on')} onClick={() => changeView('grid')} aria-label="Kartalar" title="Kartalar"><Icon name="grid" size={17} /></button>
+          <button className={cx(view === 'list' && 'is-on')} onClick={() => changeView('list')} aria-label="Ro‘yxat" title="Ro‘yxat"><Icon name="list" size={17} /></button>
+        </div>
+      </div>
+
+      {rows.length === 0 ? (
+        <Card>
+          {q
+            ? <Empty icon="search" title="Hech narsa topilmadi" text="Qidiruv so‘rovingizga mos guruh yo‘q." action={<Btn icon="refresh" onClick={() => setQ('')}>Qidiruvni tozalash</Btn>} />
+            : <Empty icon="layers" title="Guruh yo‘q" text="Guruh yarating, ustoz biriktiring va o‘quvchilarni qo‘shing." action={canManage && <Btn variant="primary" onClick={() => setEditing({})}>Guruh yaratish</Btn>} />}
+        </Card>
+      ) : (
+        <div className={view === 'grid' ? 'pgroups' : 'pgroups pgroups--list'}>
+          {rows.map((r) => <GroupCard key={r.g.id} {...r} menu={menuFor(r.g)} />)}
         </div>
       )}
       <GroupForm open={!!editing} group={editing} onClose={() => setEditing(null)} />
       <Confirm open={!!del} onClose={() => setDel(null)} danger title="Guruhni o‘chirish" text={`${del?.name} guruhi o‘chiriladi. O‘quvchilar hisoblari saqlanib qoladi.`} confirmLabel="O‘chirish" onConfirm={() => { remove('groups', del.id); toast('Guruh o‘chirildi') }} />
     </>
+  )
+}
+
+const scheduleText = (g) => g.schedule.map((s) => `${DAYS[s.day]} ${s.time}`).join(' · ')
+
+function GroupCard({ g, teacher, students, held, hw, next, menu }) {
+  const open = () => { window.location.hash = `#/platform/groups/${g.id}` }
+  const live = next?.status === 'live'
+  return (
+    <article className="pgroup" style={{ '--gc': g.color }} onClick={open} onKeyDown={(e) => e.key === 'Enter' && open()} tabIndex={0}>
+      <div className="pgroup__head">
+        <div className="pgroup__ttl"><h4>{g.name}</h4><span>{g.course} · {g.level}</span></div>
+        {menu && <span className="pgroup__menu" onClick={(e) => e.stopPropagation()}><Menu items={menu} /></span>}
+      </div>
+      <div className="pgroup__stats">
+        <div><Icon name="users" size={20} /><b>{students.length}</b><span>o‘quvchi</span></div>
+        <div><Icon name="bookOpen" size={20} /><b>{held}</b><span>dars o‘tildi</span></div>
+        <div><Icon name="fileText" size={20} /><b>{hw}</b><span>vazifa</span></div>
+      </div>
+      <div className="pgroup__sched"><Icon name="calendar" size={16} />{scheduleText(g) || 'Jadval belgilanmagan'}</div>
+      <div className={cx('pgroup__next', live && 'is-live', !next && 'is-none')}>
+        <Icon name={live ? 'radio' : next ? 'video' : 'calendar'} size={16} />
+        {live ? 'Hozir jonli' : next ? fmtWhen(next.startsAt) : 'Dars rejalashtirilmagan'}
+      </div>
+      <div className="pgroup__foot">
+        {teacher
+          ? <div className="pgroup__teacher"><UAvatar user={teacher} size={38} /><div><b title={teacher.name}>{teacher.name}</b><span>Ustoz</span></div></div>
+          : <Badge tone="amber">Ustoz yo‘q</Badge>}
+        <AvatarStack users={students} max={3} size={30} />
+      </div>
+    </article>
   )
 }
 

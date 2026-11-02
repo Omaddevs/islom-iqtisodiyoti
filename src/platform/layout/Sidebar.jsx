@@ -29,7 +29,7 @@ export function navFor(user, scope, db) {
   if (user.role !== 'student') manage.push({ href: '#/platform/groups', label: 'Guruhlar', icon: 'layers' })
   if (user.role === 'teacher') manage.push({ href: '#/platform/users', label: 'O‘quvchilarim', icon: 'users' })
   if (user.role === 'org_admin' || user.role === 'superadmin') manage.push({ href: '#/platform/users', label: 'Foydalanuvchilar', icon: 'users' })
-  if (user.role === 'superadmin') manage.push({ href: '#/platform/organizations', label: 'Tashkilotlar', icon: 'building' })
+  if (user.role === 'superadmin') manage.push({ href: '#/platform/organizations', label: 'Tashkilotlar', icon: 'building' }, { href: '#/platform/leads', label: 'Arizalar', icon: 'mail' })
   const other = [{ href: '#/platform/settings', label: 'Sozlamalar', icon: 'settings' }]
   return { main, manage, other }
 }

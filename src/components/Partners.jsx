@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { PARTNERS } from '../data/content.js'
 import { Icon } from './ui.jsx'
+import { leadClick } from './LeadModal.jsx'
 
 // Hamkor logosi uchun belgi shakllari (40×40). Haqiqiy logo bo‘lsa `p.logo` rasmi ishlatiladi.
 const MARKS = {
@@ -134,7 +135,7 @@ export default function Partners() {
         </ul>
 
         <div className="partners__cta">
-          <a href="#aloqa" className="btn btn--primary">Hamkor bo‘lish</a>
+          <a href="#aloqa" className="btn btn--primary" onClick={leadClick({ kind: 'partner' })}>Hamkor bo‘lish</a>
           <span className="partners__note">
             <Icon name="check" size={14} /> Korporativ o‘qitish va birgalikdagi dasturlar
           </span>

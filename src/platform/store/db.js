@@ -1,36 +1,135 @@
-// Mijoz tomonidagi reaktiv ma'lumotlar ombori (localStorage). Backend ulanganda
-// shu modul API-ga so'rov yuboruvchi qatlam bilan almashtiriladi — sahifalar o'zgarmaydi.
+// Platforma ma'lumotlari ombori. Manba — server (PostgreSQL): kirishda yuklanadi, xotirada saqlanadi.
+// Sahifalar avvalgidek add / patch / remove / setDB chaqiradi: har bir o'zgarish darhol ekranda ko'rinadi,
+// farqi esa (insert / patch / delete) serverga navbat bilan yuboriladi. Server rad etsa — xato
+// ko'rsatiladi va holat serverdagi haqiqiy ma'lumot bilan qayta yuklanadi.
 import { useSyncExternalStore } from 'react'
-import { makeSeed } from './seed.js'
-import { uid, digits } from './ids.js'
+import { api } from '../api/client.js'
+import { uid } from './ids.js'
 
-const KEY = 'ii_platform_db_v1'
+// Tartib muhim: avval tashkilot, keyin foydalanuvchi, keyin guruh, keyin kontent
+export const COLLECTIONS = ['organizations', 'users', 'groups', 'videos', 'tests', 'testAttempts', 'vocabSets', 'vocabProgress', 'library', 'articles', 'homework', 'submissions', 'notifications', 'activity']
+// Darslar o'z API'si orqali sinxronlanadi (api/meetings.js) — bu yerdan serverga yuborilmaydi
+const LOCAL = ['meetings', 'messages']
+// Faqat qo'shiladigan jurnallar: ro'yxatni qisqartirish (slice) serverdan o'chirish degani emas
+const APPEND_ONLY = new Set(['activity', 'notifications'])
+
+const empty = () => ({ version: 1, ...Object.fromEntries([...COLLECTIONS, ...LOCAL].map((c) => [c, []])) })
+
+// Eski demo rejimdan brauzerda qolgan ma'lumotlar (baza, sessiya, arizalar) — tozalanadi
+try { ['ii_platform_db_v1', 'ii_session_v1', 'ii_leads'].forEach((k) => localStorage.removeItem(k)) } catch { /* ruxsat yo'q */ }
+
+let state = empty()
 const listeners = new Set()
-
-const load = () => {
-  try {
-    const raw = localStorage.getItem(KEY)
-    if (!raw) return null
-    const data = JSON.parse(raw)
-    return data && data.version === 1 ? data : null
-  } catch { return null }
-}
-const save = (s) => { try { localStorage.setItem(KEY, JSON.stringify(s)) } catch { /* xotira to'la */ } }
-
-let state = load() || makeSeed()
-if (!load()) save(state)
-
 const emit = () => listeners.forEach((l) => l())
 const subscribe = (l) => { listeners.add(l); return () => listeners.delete(l) }
 
 export const getDB = () => state
-export const setDB = (updater) => {
-  state = typeof updater === 'function' ? updater(state) : updater
-  save(state)
+export const useDB = () => useSyncExternalStore(subscribe, getDB)
+
+// ---- Xatolar va sessiya tugashi haqida xabar ----
+const errorSubs = new Set()
+export const onSyncError = (f) => { errorSubs.add(f); return () => errorSubs.delete(f) }
+const report = (e) => errorSubs.forEach((f) => f(e))
+
+// ---- Server bilan almashinuv ----
+// Ikki holat orasidagi farq → serverga yuboriladigan amallar
+function diff(prev, next) {
+  const up = [], del = []
+  for (const col of COLLECTIONS) {
+    const a = prev[col], b = next[col]
+    if (a === b || !a || !b) continue
+    const old = new Map(a.map((x) => [x.id, x]))
+    const seen = new Set()
+    for (const x of b) {
+      seen.add(x.id)
+      const o = old.get(x.id)
+      if (!o) { up.push({ col, op: 'insert', item: x }); continue }
+      if (o === x) continue
+      const changes = {}
+      for (const k of new Set([...Object.keys(o), ...Object.keys(x)])) if (o[k] !== x[k]) changes[k] = x[k]
+      if (Object.keys(changes).length) up.push({ col, op: 'patch', id: x.id, changes })
+    }
+    if (!APPEND_ONLY.has(col)) for (const o of a) if (!seen.has(o.id)) del.push({ col, op: 'delete', id: o.id })
+  }
+  // O'chirish teskari tartibda: avval bog'liq yozuvlar, keyin ularning egasi
+  return [...up, ...del.reverse()]
+}
+
+// Parol hech qachon xotirada qolmaydi — serverga yuborilgach olib tashlanadi
+const stripSecrets = (s) => (s.users.some((u) => 'password' in u || 'currentPassword' in u)
+  ? { ...s, users: s.users.map(({ password, currentPassword, ...u }) => u) } // eslint-disable-line no-unused-vars
+  : s)
+
+let chain = Promise.resolve()
+let gen = 0 // xatodan keyin navbatdagi eskirgan to'plamlar tashlab yuboriladi
+
+async function load() {
+  const { me, ...cols } = await api('/api/data')
+  state = { ...empty(), ...Object.fromEntries(COLLECTIONS.map((c) => [c, cols[c] || []])), meetings: state.meetings }
+  emit()
+  return me
+}
+
+// Server qaytargan yakuniy yozuvlar (masalan, serverda hisoblangan test bali) lokal nusxaning o'rniga qo'yiladi
+function applyResults(results) {
+  let s = state
+  for (const r of results) {
+    if (r.deleted) continue
+    const list = s[r.col]
+    const has = list.some((x) => x.id === r.id)
+    s = { ...s, [r.col]: !r.item ? list.filter((x) => x.id !== r.id) : has ? list.map((x) => (x.id === r.id ? r.item : x)) : [r.item, ...list] }
+  }
+  state = s
   emit()
 }
-export const resetDB = () => { state = makeSeed(); save(state); emit() }
-export const useDB = () => useSyncExternalStore(subscribe, getDB)
+
+function push(ops) {
+  const g = gen
+  chain = chain.then(async () => {
+    if (g !== gen) return
+    try {
+      const { results } = await api('/api/data', { method: 'POST', body: { ops } })
+      applyResults(results)
+    } catch (e) {
+      gen++
+      report(e)
+      await load().catch(() => {})
+    }
+  })
+  return chain
+}
+
+export const setDB = (updater) => {
+  const prev = state
+  const next = typeof updater === 'function' ? updater(prev) : updater
+  if (next === prev) return
+  const ops = diff(prev, next)
+  state = stripSecrets(next)
+  emit()
+  if (ops.length) push(ops)
+}
+
+// Natijasi kutiladigan amal (parol almashtirish, test topshirish): avval server tasdiqlaydi,
+// keyin lokal holat yangilanadi. Xato bo'lsa — chaqiruvchiga qaytariladi (forma ichida ko'rsatish uchun)
+export const commit = (ops) => {
+  const p = chain.then(async () => {
+    const { results } = await api('/api/data', { method: 'POST', body: { ops } })
+    applyResults(results)
+    return results
+  })
+  chain = p.catch(() => {})
+  return p
+}
+
+// Navbatdagi barcha o'zgarishlar serverga yetib borgunicha kutish
+export const flush = () => chain
+// Serverdan qayta yuklash (navbatdagi o'zgarishlardan keyin). `me` — joriy foydalanuvchi
+export const loadDB = () => {
+  const p = chain.then(load)
+  chain = p.catch(() => {}) // navbat hech qachon "rad etilgan" holatda qolmasin
+  return p
+}
+export const clearDB = () => { gen++; state = empty(); emit() }
 
 // ---- Umumiy CRUD ----
 export const add = (col, item) => {
@@ -46,17 +145,17 @@ export const byId = (col, id) => state[col].find((x) => x.id === id)
 export const logActivity = (orgId, userId, text, target) =>
   setDB((s) => ({ ...s, activity: [{ id: uid('ac'), orgId, userId, text, target, at: Date.now() }, ...s.activity].slice(0, 200) }))
 
-export const notify = (userIds, text, href) =>
+export const notify = (userIds, text, href) => {
+  const ids = [].concat(userIds).filter(Boolean)
+  if (!ids.length) return
   setDB((s) => ({
     ...s,
     notifications: [
-      ...[].concat(userIds).map((userId) => ({ id: uid('n'), userId, text, href, at: Date.now(), read: false })),
+      ...ids.map((userId) => ({ id: uid('n'), userId, text, href, at: Date.now(), read: false })),
       ...s.notifications,
     ].slice(0, 500),
   }))
-
-// ---- Autentifikatsiya yordamchilari ----
-export const findByPhone = (phone) => state.users.find((u) => digits(u.phone) === digits(phone))
+}
 
 // ---- Ko'rinish doirasi (scope) ----
 // Har bir rol qaysi ma'lumotlarni ko'rishini bitta joyda hisoblaymiz.
@@ -103,7 +202,8 @@ export function scopeFor(db, user, viewOrgId) {
   }
 }
 
-// Ruxsatlar: bitta jadval, sahifalarda `can('users.create')` tarzida ishlatiladi
+// Ruxsatlar: bitta jadval, sahifalarda `can('users.create')` tarzida ishlatiladi.
+// Bu faqat interfeys uchun — haqiqiy tekshiruv serverda (backend/lib/platform.js).
 const PERMS = {
   superadmin: ['*'],
   org_admin: ['users.create', 'users.manage', 'teachers.create', 'groups.manage', 'content.create', 'content.manage', 'org.settings', 'reports.view'],

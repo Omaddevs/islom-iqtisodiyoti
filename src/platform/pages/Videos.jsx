@@ -3,6 +3,7 @@ import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, Select, CopyBtn, cx } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtAgo, fmtNum } from '../ui/format.js'
+import { Cover, CoverPicker } from '../ui/media.jsx'
 
 export default function Videos({ param }) {
   if (param) return <VideoPlayer id={param} />
@@ -35,6 +36,9 @@ const KIND = { recording: { label: 'Yozuv', tone: 'red', icon: 'record' }, lesso
 const SORTS = [{ value: 'order', label: 'Dars tartibi' }, { value: 'new', label: 'Avval yangilari' }, { value: 'views', label: 'Ko‘p ko‘rilgan' }, { value: 'long', label: 'Uzun darslar' }, { value: 'short', label: 'Qisqa darslar' }]
 const sortFn = { order: (a, b) => a.createdAt - b.createdAt, new: (a, b) => b.createdAt - a.createdAt, views: (a, b) => b.views - a.views, long: (a, b) => b.duration - a.duration, short: (a, b) => a.duration - b.duration }
 const goTo = (id) => { window.location.hash = `#/platform/videos/${id}` }
+const THUMBS = ['#4aa3f8', '#6366f1', '#14b8a6', '#f59e0b', '#8b5cf6', '#ef4444', '#0f766e', '#1e3a5f']
+const ytId = (url = '') => url.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/)?.[1]
+const ytCover = (url) => { const id = ytId(url); return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '' }
 
 /* ---------- Ro'yxat sahifasi ---------- */
 
@@ -191,7 +195,8 @@ function ResumeCard({ v, p, author }) {
   const pct = pctOf(p, v)
   return (
     <a href={`#/platform/videos/${v.id}`} className="pvresume" style={{ '--vc': v.thumb }}>
-      <div className="pvresume__thumb">
+      <div className={cx('pvresume__thumb', v.cover && 'has-cover')}>
+        <Cover src={v.cover} />
         <span className="pvideo__play"><Icon name="play" size={24} /></span>
         <span className="pvideo__dur">{fmtDuration(v.duration - (p.pos || 0))} qoldi</span>
         <i className="pvideo__prog"><b style={{ width: `${pct}%` }} /></i>
@@ -216,7 +221,8 @@ function VideoCard({ v, idx, row, pct, done, author, groups, menu }) {
   const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goTo(v.id) } }
   return (
     <article className={cx('pvideo', row && 'pvideo--row', done && 'is-done')} style={{ '--vc': v.thumb }} onClick={open} onKeyDown={onKey} tabIndex={0} role="link" aria-label={v.title}>
-      <div className="pvideo__thumb">
+      <div className={cx('pvideo__thumb', v.cover && 'has-cover')}>
+        <Cover src={v.cover} />
         <span className="pvideo__idx">{String(idx).padStart(2, '0')}</span>
         <span className="pvideo__play"><Icon name="play" size={row ? 18 : 26} /></span>
         <span className="pvideo__dur">{fmtDuration(v.duration)}</span>
@@ -255,7 +261,7 @@ function VideoForm({ open, video, onClose }) {
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
   const modules = [...new Set(scope.videos.map((v) => v.module))].sort(byModule)
-  useEffect(() => { if (open) { setErr({}); setF(isNewV ? { title: '', module: modules[0] || '1-modul', groupIds: [], duration: 30, description: '', url: '', kind: 'lesson' } : { ...video, duration: Math.round(video.duration / 60) }) } }, [open, video, isNewV]) // eslint-disable-line
+  useEffect(() => { if (open) { setErr({}); setF(isNewV ? { title: '', module: modules[0] || '1-modul', groupIds: [], duration: 30, description: '', url: '', kind: 'lesson', cover: '', thumb: THUMBS[Math.floor(Math.random() * 5)] } : { ...video, cover: video.cover || '', duration: Math.round(video.duration / 60) }) } }, [open, video, isNewV]) // eslint-disable-line
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const submit = () => {
     const er = {}
@@ -263,10 +269,9 @@ function VideoForm({ open, video, onClose }) {
     if (!(f.duration > 0)) er.duration = 'Davomiylikni kiriting'
     if (f.url && !/^https?:\/\//i.test(f.url.trim())) er.url = 'Havola http(s):// bilan boshlanishi kerak'
     setErr(er); if (Object.keys(er).length) return
-    const data = { title: f.title.trim(), module: f.module?.trim() || 'Qo‘shimcha', groupIds: f.groupIds, duration: Number(f.duration) * 60, description: f.description?.trim(), url: f.url?.trim(), kind: f.kind || 'lesson' }
+    const data = { title: f.title.trim(), module: f.module?.trim() || 'Qo‘shimcha', groupIds: f.groupIds, duration: Number(f.duration) * 60, description: f.description?.trim(), url: f.url?.trim(), kind: f.kind || 'lesson', cover: f.cover || '', thumb: f.thumb || THUMBS[0] }
     if (isNewV) {
-      const colors = ['#4aa3f8', '#6366f1', '#14b8a6', '#f59e0b', '#8b5cf6']
-      add('videos', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id, thumb: colors[Math.floor(Math.random() * colors.length)], views: 0 })
+      add('videos', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id, views: 0 })
       const targets = scope.groups.filter((g) => f.groupIds.length === 0 || f.groupIds.includes(g.id)).flatMap((g) => g.studentIds)
       notify([...new Set(targets)], `Yangi video dars: «${data.title}»`, '#/platform/videos')
       logActivity(scope.orgId, user.id, 'video dars qo‘shdi', data.title)
@@ -292,11 +297,27 @@ function VideoForm({ open, video, onClose }) {
             ))}
           </div>
         </FField>
-        <FField label="Video havolasi" hint="Backend ulanganda fayl yuklash ham qo‘shiladi" error={err.url}><Input value={f.url || ''} onChange={(e) => set('url', e.target.value)} placeholder="https://youtube.com/watch?v=…" /></FField>
+        <div className={cx('pfield', err.cover && 'is-error')}>
+          <span className="pfield__label">Muqova</span>
+          <VideoCover value={f.cover} color={f.thumb} yt={ytCover(f.url)} onChange={(v) => set('cover', v)} onColor={(c) => set('thumb', c)} onError={(m) => setErr((e) => ({ ...e, cover: m }))} />
+          {err.cover ? <span className="pfield__error">{err.cover}</span> : <span className="pfield__hint">JPG, PNG yoki WEBP · 16:9 nisbat (masalan 1280×720) tavsiya etiladi. Rasm bo‘lmasa rangli fon ishlatiladi.</span>}
+        </div>
+        <FField label="Video havolasi" hint="YouTube havolasi yoki to‘g‘ridan-to‘g‘ri video fayl (.mp4) manzili" error={err.url}><Input value={f.url || ''} onChange={(e) => set('url', e.target.value)} placeholder="https://youtube.com/watch?v=…" /></FField>
         <FField label="Kimlar ko‘radi"><ChipSelect allLabel="Barcha guruhlar" value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>
         <FField label="Tavsif"><Textarea value={f.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Darsda nimalar o‘rganiladi…" /></FField>
       </div>
     </Modal>
+  )
+}
+
+// Video muqovasi: rasm yoki rang foni + YouTube'dan muqova olish
+function VideoCover({ value, color, yt, onChange, onColor, onError }) {
+  return (
+    <CoverPicker value={value} onChange={onChange} onError={onError} style={{ '--vc': color }} className="pvcpick__drop--video"
+      left={<div className="pvcpick__colors" role="radiogroup" aria-label="Fon rangi">
+        {THUMBS.map((c) => <button key={c} type="button" role="radio" aria-checked={color === c} aria-label={c} className={cx(color === c && 'is-on')} style={{ background: c }} onClick={() => onColor(c)} />)}
+      </div>}
+      extra={yt && value !== yt && <Btn size="sm" icon="youtube" onClick={() => { onError(''); onChange(yt) }}>YouTube muqovasi</Btn>} />
   )
 }
 
@@ -332,7 +353,7 @@ function VideoPlayer({ id }) {
     if (auto && next) setTimeout(() => goTo(next.id), 600)
   }, [id, v, auto, next, setProgress])
 
-  // Demo pleyer: taymer. Har 5 soniyada progress saqlanadi
+  // Havolasiz video: taymerli pleyer. Har 5 soniyada progress saqlanadi
   useEffect(() => {
     if (!playing || !v) return
     const t = setInterval(() => {
@@ -369,7 +390,7 @@ function VideoPlayer({ id }) {
   const groups = db.groups.filter((g) => v.groupIds.includes(g.id))
   const k = KIND[v.kind] || KIND.lesson
   const p = prog[id]
-  const yt = v.url && /youtu\.?be/.test(v.url) ? v.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/') : null
+  const yt = ytId(v.url) ? `https://www.youtube.com/embed/${ytId(v.url)}` : null
   const seek = (e) => { const r = e.currentTarget.getBoundingClientRect(); setPos(Math.max(0, Math.min(v.duration, ((e.clientX - r.left) / r.width) * v.duration))) }
   const markDone = () => { setProgress(id, { pos: v.duration, done: true }); setPlaying(false); toast('Ko‘rib bo‘lingan deb belgilandi') }
   const unmark = () => { setProgress(id, { pos: 0, done: false }); setPos(0); toast('Belgi olib tashlandi') }
@@ -386,11 +407,12 @@ function VideoPlayer({ id }) {
 
       <div className="pgrid pgrid--main pvplay">
         <div className="pstack-v" style={{ gap: 20 }}>
-          <div ref={stageRef} className={cx('pplayer', playing && 'is-playing', full && 'is-full')} style={{ '--vc': v.thumb }}>
+          <div ref={stageRef} className={cx('pplayer', playing && 'is-playing', full && 'is-full', v.cover && 'has-cover')} style={{ '--vc': v.thumb }}>
             {yt ? <iframe src={yt} title={v.title} className="pplayer__frame" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
-              : v.url ? <video src={v.url} controls className="pplayer__frame" />
+              : v.url ? <video src={v.url} poster={v.cover || undefined} controls className="pplayer__frame" />
                 : (
                   <>
+                    <Cover src={v.cover} />
                     <div className="pplayer__stage" onClick={() => setPlaying((x) => !x)}>
                       <span className="pplayer__idx">{at + 1} / {playlist.length}</span>
                       <button className="pplayer__big" aria-label={playing ? 'Pauza' : 'Ijro'} onClick={(e) => { e.stopPropagation(); setPlaying((x) => !x) }}>
@@ -414,7 +436,7 @@ function VideoPlayer({ id }) {
                         <button onClick={toggleFull} aria-label="To‘liq ekran"><Icon name="maximize" size={18} /></button>
                       </div>
                     </div>
-                    <span className="pplayer__demo">Demo pleyer · video fayl backend orqali ulanadi</span>
+                    <span className="pplayer__demo">Video havolasi hali qo‘shilmagan</span>
                   </>
                 )}
           </div>
@@ -464,7 +486,7 @@ function VideoPlayer({ id }) {
               return (
                 <a key={r.id} href={`#/platform/videos/${r.id}`} className={cx('pvitem', cur && 'is-cur', rp?.done && 'is-done')} style={{ '--vc': r.thumb }} aria-current={cur ? 'page' : undefined}>
                   <span className="pvitem__n">{rp?.done ? <Icon name="check" size={14} stroke={3} /> : cur ? <Icon name="play" size={13} /> : i + 1}</span>
-                  <span className="pvitem__thumb"><Icon name={KIND[r.kind]?.icon || 'play'} size={14} />{!rp?.done && pctOf(rp, r) > 0 && <i style={{ width: `${pctOf(rp, r)}%` }} />}</span>
+                  <span className={cx('pvitem__thumb', r.cover && 'has-cover')}><Cover src={r.cover} /><Icon name={KIND[r.kind]?.icon || 'play'} size={14} />{!rp?.done && pctOf(rp, r) > 0 && <i style={{ width: `${pctOf(rp, r)}%` }} />}</span>
                   <span className="pvitem__body">
                     <b>{r.title}</b>
                     <span>{fmtDuration(r.duration)} · {fmtNum(r.views || 0)} ko‘rish{cur && ' · hozir'}</span>

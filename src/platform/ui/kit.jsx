@@ -1,5 +1,6 @@
 // Platforma UI to'plami: karta, tugma, belgi, modal, jadval, tab, bo'sh holat, toast va h.k.
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, forwardRef, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from '../../components/ui.jsx'
 import { initials } from '../store/ids.js'
 
@@ -141,7 +142,7 @@ export function FField({ label, hint, error, children, className }) {
   )
 }
 export const Input = (p) => <input className="pinput" {...p} />
-export const Textarea = (p) => <textarea className="pinput pinput--area" {...p} />
+export const Textarea = forwardRef((p, ref) => <textarea ref={ref} className="pinput pinput--area" {...p} />)
 export function Select({ options, value, onChange, placeholder, ...rest }) {
   return (
     <span className="pselect">
@@ -212,28 +213,82 @@ export function Confirm({ open, onClose, onConfirm, title, text, danger, confirm
 }
 
 // ---------- Ochiluvchi menyu ----------
+// Ochiluvchi menyu. Ro'yxat body'ga portal orqali chiziladi — overflow:hidden kartalar va
+// aylantiriladigan jadvallar uni kesmaydi. Pastda joy yetmasa yuqoriga ochiladi, ekran chetidan chiqmaydi.
 export function Menu({ items, align = 'right', trigger }) {
   const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState(null)
   const ref = useRef(null)
+  const listRef = useRef(null)
+  const close = useCallback((refocus) => {
+    setOpen(false); setPos(null)
+    if (refocus) ref.current?.querySelector('button, [tabindex]')?.focus()
+  }, [])
+
+  const place = useCallback(() => {
+    const t = ref.current?.getBoundingClientRect(), l = listRef.current
+    if (!t || !l) return
+    // Trigger ekrandan chiqib ketsa (sahifa aylantirildi) — menyuni yopamiz
+    if (t.bottom < 0 || t.top > window.innerHeight) return close()
+    const GAP = 6, PAD = 8, vw = document.documentElement.clientWidth, vh = window.innerHeight
+    const w = l.offsetWidth, h = l.scrollHeight
+    const below = vh - t.bottom - GAP - PAD, above = t.top - GAP - PAD
+    const up = h > below && above > below
+    const left = Math.max(PAD, Math.min(align === 'left' ? t.left : t.right - w, vw - w - PAD))
+    setPos({ left, top: up ? Math.max(PAD, t.top - GAP - Math.min(h, above)) : t.bottom + GAP, maxHeight: up ? above : below, up })
+  }, [align, close])
+
+  useLayoutEffect(() => { if (open) place() }, [open, place])
   useEffect(() => {
     if (!open) return
-    const onDoc = (e) => !ref.current?.contains(e.target) && setOpen(false)
+    const onDoc = (e) => { if (!ref.current?.contains(e.target) && !listRef.current?.contains(e.target)) close() }
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(true) } }
+    const onMove = (e) => { if (!listRef.current?.contains(e.target)) place() }
     document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
-  }, [open])
+    document.addEventListener('keydown', onKey, true)
+    window.addEventListener('scroll', onMove, true)
+    window.addEventListener('resize', place)
+    listRef.current?.querySelector('.pmenu__item')?.focus({ preventScroll: true })
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('scroll', onMove, true)
+      window.removeEventListener('resize', place)
+    }
+  }, [open, place, close])
+
+  // Klaviatura: ↑/↓ — elementlar bo'ylab, Home/End, Tab — yopish
+  const onListKey = (e) => {
+    e.stopPropagation()
+    const btns = [...listRef.current.querySelectorAll('.pmenu__item')]
+    const i = btns.indexOf(document.activeElement)
+    const go = (n) => { e.preventDefault(); btns[(n + btns.length) % btns.length]?.focus() }
+    if (e.key === 'ArrowDown') go(i + 1)
+    else if (e.key === 'ArrowUp') go(i - 1)
+    else if (e.key === 'Home') go(0)
+    else if (e.key === 'End') go(btns.length - 1)
+    else if (e.key === 'Tab') close()
+  }
+  // Portal React daraxtida ota-ona ichida qoladi: bosish/klavishlar karta yoki jadval qatoriga o'tmasin
+  const stop = (e) => e.stopPropagation()
+
   return (
     <span className="pmenu" ref={ref}>
-      <span onClick={() => setOpen((v) => !v)}>{trigger || <Btn variant="ghost" icon="moreV" aria-label="Amallar" />}</span>
-      {open && (
-        <div className={cx('pmenu__list', `pmenu__list--${align}`)}>
+      <span onClick={(e) => { e.stopPropagation(); open ? close() : setOpen(true) }} aria-haspopup="menu" aria-expanded={open}>
+        {trigger || <Btn variant="ghost" icon="moreV" aria-label="Amallar" />}
+      </span>
+      {open && createPortal(
+        <div ref={listRef} role="menu" className={cx('pmenu__list', pos?.up && 'is-up')} onKeyDown={onListKey} onClick={stop} onMouseDown={stop}
+          style={pos ? { left: pos.left, top: pos.top, maxHeight: pos.maxHeight } : { left: -9999, top: 0, visibility: 'hidden' }}>
           {items.filter(Boolean).map((it, i) => it === 'sep'
-            ? <hr key={i} />
+            ? <hr key={i} role="separator" />
             : (
-              <button key={it.label} className={cx('pmenu__item', it.danger && 'is-danger')} onClick={() => { setOpen(false); it.onClick() }}>
+              <button key={it.label} type="button" role="menuitem" className={cx('pmenu__item', it.danger && 'is-danger')} onClick={() => { close(); it.onClick() }}>
                 {it.icon && <Icon name={it.icon} size={16} />}{it.label}
               </button>
             ))}
-        </div>
+        </div>,
+        document.body,
       )}
     </span>
   )
@@ -273,7 +328,8 @@ export function CopyBtn({ text, label = 'Nusxalash' }) {
 // Yaratilgan login/parolni ko'rsatish
 export function Credentials({ user, note }) {
   if (!user) return null
-  const text = `Platforma: ${location.origin}${location.pathname}#/kirish\nIsm: ${user.name}\nTelefon: ${user.phone}\nParol: ${user.password}`
+  // Saqlangan parol serverda shifrlangan — faqat hozirgina yaratilgan/yangilangan parol ko'rsatiladi
+  const text = `Platforma: ${location.origin}${location.pathname}#/kirish\nIsm: ${user.name}\nTelefon: ${user.phone}${user.password ? `\nParol: ${user.password}` : ''}`
   return (
     <div className="pcreds">
       <div className="pcreds__head">
@@ -286,7 +342,7 @@ export function Credentials({ user, note }) {
       <dl>
         <div><dt>Ism</dt><dd>{user.name}</dd></div>
         <div><dt>Telefon (login)</dt><dd className="mono">{user.phone}</dd></div>
-        <div><dt>Parol</dt><dd className="mono">{user.password}</dd></div>
+        <div><dt>Parol</dt>{user.password ? <dd className="mono">{user.password}</dd> : <dd className="pmuted">Yashirin — «Parolni yangilash» orqali yangisini bering</dd>}</div>
       </dl>
       <CopyBtn text={text} label="Hammasini nusxalash" />
     </div>

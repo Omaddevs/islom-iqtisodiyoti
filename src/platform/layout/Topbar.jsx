@@ -17,8 +17,10 @@ export default function Topbar({ title, sub, icon, onBurger, search, onSearch, h
   useEffect(() => {
     if (!notifOpen) return
     const onDoc = (e) => !ref.current?.contains(e.target) && setNotifOpen(false)
+    const onKey = (e) => { if (e.key === 'Escape') { setNotifOpen(false); ref.current?.querySelector('button')?.focus() } }
     document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey) }
   }, [notifOpen])
 
   const readAll = () => setDB((s) => ({ ...s, notifications: s.notifications.map((n) => (n.userId === user.id ? { ...n, read: true } : n)) }))
@@ -48,12 +50,12 @@ export default function Topbar({ title, sub, icon, onBurger, search, onSearch, h
         </label>
       )}
       <div style={{ position: 'relative' }} ref={ref}>
-        <button className="ptop__ibtn" onClick={() => setNotifOpen((v) => !v)} aria-label="Bildirishnomalar">
+        <button className="ptop__ibtn" onClick={() => setNotifOpen((v) => !v)} aria-label="Bildirishnomalar" aria-haspopup="dialog" aria-expanded={notifOpen}>
           <Icon name="bell" size={20} />
           {unread > 0 && <span className="dot" />}
         </button>
         {notifOpen && (
-          <div className="pnotif">
+          <div className="pnotif" role="dialog" aria-label="Bildirishnomalar">
             <div className="pnotif__head">
               <span>Bildirishnomalar {unread > 0 && <span className="pbadge pbadge--blue">{unread}</span>}</span>
               {unread > 0 && <button onClick={readAll}>Barchasini o‘qilgan qilish</button>}

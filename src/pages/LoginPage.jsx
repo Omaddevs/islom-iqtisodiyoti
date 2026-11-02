@@ -3,20 +3,17 @@ import { CONTACTS } from '../data/content.js'
 import { Field, Icon } from '../components/ui.jsx'
 import { formatPhone, isFullPhone } from '../utils/phone.js'
 import { useAuth } from '../platform/store/auth.jsx'
-import { ROLES } from '../platform/store/seed.js'
+
+// Kirgandan so'ng qaytish manzili: #/kirish?next=/join/abc-defg-hij
+const nextRoute = () => {
+  const next = new URLSearchParams(window.location.hash.split('?')[1] || '').get('next')
+  return next && next.startsWith('/') ? `#${next}` : '#/platform'
+}
 
 const PERKS = [
   'Jonli darslar, video darslar va testlar',
   'Uy vazifalari, lug‘at va kutubxona',
   'Ustozlar bilan bevosita muloqot',
-]
-
-// Demo hisoblar (backend ulanguncha)
-const DEMO = [
-  { role: 'superadmin', phone: '+998 90 000 00 01', password: 'admin123' },
-  { role: 'org_admin', phone: '+998 90 000 00 02', password: 'admin123' },
-  { role: 'teacher', phone: '+998 90 000 00 03', password: 'ustoz123' },
-  { role: 'student', phone: '+998 90 000 00 04', password: 'talaba123' },
 ]
 
 export default function LoginPage() {
@@ -34,7 +31,8 @@ export default function LoginPage() {
   }, [])
 
   // Allaqachon kirgan bo'lsa — to'g'ridan-to'g'ri platformaga
-  useEffect(() => { if (user) window.location.hash = '#/platform' }, [user])
+  // (kirish jarayonida emas — u holda server sessiyasi olinguncha kutamiz)
+  useEffect(() => { if (user && status !== 'sending') window.location.hash = nextRoute() }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -49,14 +47,11 @@ export default function LoginPage() {
     return e
   }
 
-  const doLogin = (phone, password) => {
+  const doLogin = async (phone, password) => {
     setStatus('sending')
-    // Backend ulanganda: await api.login(phone, password)
-    setTimeout(() => {
-      const r = login(phone, password)
-      if (!r.ok) { setErrors({ form: r.error }); setStatus('idle'); return }
-      window.location.hash = '#/platform'
-    }, 500)
+    const r = await login(phone, password)
+    if (!r.ok) { setErrors({ form: r.error }); setStatus('idle'); return }
+    window.location.hash = nextRoute()
   }
 
   const submit = (ev) => {
@@ -67,7 +62,6 @@ export default function LoginPage() {
     doLogin(form.phone, form.password)
   }
 
-  const quick = (d) => { setForm({ phone: d.phone, password: d.password }); setErrors({}); doLogin(d.phone, d.password) }
   const onPassKey = (e) => setCaps(e.getModifierState?.('CapsLock') ?? false)
 
   return (
@@ -130,19 +124,6 @@ export default function LoginPage() {
               {status === 'sending' ? 'Kirilmoqda…' : 'Kirish'}
             </button>
           </form>
-
-          <div className="auth__demo">
-            <b><Icon name="spark" size={15} /> Demo hisoblar</b>
-            <p>Rolni tanlang — avtomatik kirasiz. Har bir rol o‘z imkoniyatlariga ega.</p>
-            <div className="auth__demo-grid">
-              {DEMO.map((d) => (
-                <button key={d.role} type="button" onClick={() => quick(d)} disabled={status === 'sending'}>
-                  <i style={{ background: ROLES[d.role].color }} />
-                  <span><b>{ROLES[d.role].label}</b><span>{d.phone} · {d.password}</span></span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <p className="auth__help">
             Parolni unutdingizmi yoki hisobingiz yo‘qmi?{' '}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useRoute } from './router.js'
 import Header from './components/Header.jsx'
 import Hero from './components/Hero.jsx'
@@ -11,11 +11,15 @@ import Partners from './components/Partners.jsx'
 import Blog from './components/Blog.jsx'
 import Contact from './components/Contact.jsx'
 import CtaSection from './components/CtaSection.jsx'
+import StartSection from './components/StartSection.jsx'
 import Footer from './components/Footer.jsx'
+import LeadModal from './components/LeadModal.jsx'
 import BlogPage from './pages/BlogPage.jsx'
 import ArticlePage from './pages/ArticlePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import Platform from './platform/Platform.jsx'
+// Platforma va dars xonasi (WebRTC) faqat kerak bo'lganda yuklanadi — bosh sahifa tezroq ochiladi
+const Platform = lazy(() => import('./platform/Platform.jsx'))
+const MeetPage = lazy(() => import('./meet/MeetPage.jsx'))
 
 function Home() {
   useEffect(() => { document.title = 'Islom Iqtisodiyoti' }, [])
@@ -30,7 +34,7 @@ function Home() {
       <Partners />
       <Blog />
       <Contact />
-      <CtaSection />
+      <StartSection />
     </>
   )
 }
@@ -50,8 +54,10 @@ export default function App() {
 
   // Kirish sahifasi — header/footer'siz alohida sahifa
   if (path === '/kirish') return <LoginPage />
+  // Onlayn darsga havola orqali kirish — akkauntsiz mehmonlar uchun ham ochiq
+  if (path.startsWith('/join/')) return <Suspense fallback={null}><MeetPage key={path} code={decodeURIComponent(path.slice(6)).toLowerCase()} /></Suspense>
   // Platforma (dashboard) — o'z layoutiga ega, himoyalangan
-  if (path === '/platform' || path.startsWith('/platform/')) return <Platform path={path} />
+  if (path === '/platform' || path.startsWith('/platform/')) return <Suspense fallback={<div className="pf-boot"><span className="spinner" /></div>}><Platform path={path} /></Suspense>
 
   let page = <Home />
   if (path === '/blog') page = <BlogPage key={search} initialTag={new URLSearchParams(search).get('tag') || ''} />
@@ -63,6 +69,7 @@ export default function App() {
       <main>{page}</main>
       {path !== '/' && <CtaSection />}
       <Footer />
+      <LeadModal />
     </>
   )
 }

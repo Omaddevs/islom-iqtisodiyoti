@@ -1,0 +1,286 @@
+/* ===== Lead popup: kursga yozilish / hamkorlik / bepul boshlash ===== */
+.lead {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s ease, visibility .28s;
+}
+.lead.is-open { opacity: 1; visibility: visible; }
+
+.lead__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 27, 45, .55);
+  backdrop-filter: blur(6px);
+}
+
+.lead__dialog {
+  --lc: var(--c-primary);
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 32px 30px 26px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 40px 90px -30px rgba(15, 27, 45, .55), 0 0 0 1px rgba(15, 27, 45, .04);
+  transform: translateY(16px) scale(.97);
+  transition: transform .34s cubic-bezier(.2, .9, .3, 1.15);
+}
+.lead.is-open .lead__dialog { transform: none; }
+.lead__dialog.is-done { --lc: #16a34a; }
+/* yuqoridagi yumshoq rangli nur */
+.lead__dialog::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 150px;
+  background: radial-gradient(ellipse 80% 100% at 50% 0%, color-mix(in srgb, var(--lc) 16%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+.lead__grab { display: none; }
+
+.lead__close {
+  position: absolute;
+  top: 16px; right: 16px;
+  z-index: 1;
+  width: 38px; height: 38px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: var(--c-surface);
+  color: #5b6573;
+  cursor: pointer;
+  transition: background .2s, color .2s, transform .2s;
+}
+.lead__close:hover { background: #eaeef3; color: var(--c-text); transform: rotate(90deg); }
+
+.lead__head { position: relative; text-align: center; }
+.lead__badge {
+  display: inline-grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--lc) 75%, #fff), var(--lc));
+  box-shadow: 0 14px 28px -12px var(--lc);
+}
+.lead__eyebrow {
+  margin: 16px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--lc) 85%, #000);
+}
+.lead__title {
+  margin: 6px 0 0;
+  font-family: var(--f-head);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.6px;
+  line-height: 1.15;
+  color: var(--c-text);
+}
+.lead__text {
+  margin: 10px auto 0;
+  max-width: 360px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #6b7480;
+}
+
+/* tanlangan kurs */
+.lead__course {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 12px 14px 12px 12px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--lc) 7%, #fff);
+  border: 1px solid color-mix(in srgb, var(--lc) 18%, #fff);
+}
+.lead__course-icon {
+  flex-shrink: 0;
+  width: 46px; height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #fff;
+  color: var(--lc);
+  box-shadow: 0 6px 14px -8px rgba(15, 27, 45, .3);
+}
+.lead__course-body { flex: 1; min-width: 0; }
+.lead__course-body b { display: block; font-size: 14.5px; font-weight: 700; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lead__course-body small { display: block; margin-top: 3px; font-size: 12.5px; color: #7a838f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lead__course-price { flex-shrink: 0; font-family: var(--f-head); font-size: 15px; font-weight: 800; color: var(--c-text); }
+.lead__course-price.is-free { color: #16a34a; }
+
+.lead__perks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lead__perks li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--c-surface);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #3d4652;
+}
+.lead__perks svg { color: #16a34a; }
+
+/* forma */
+.lead__form { display: flex; flex-direction: column; gap: 16px; margin-top: 22px; }
+.lead-field { display: flex; flex-direction: column; gap: 7px; }
+.lead-field__label { font-size: 13px; font-weight: 600; color: var(--c-text); }
+.lead-field__control { position: relative; display: block; }
+.lead-field__icon {
+  position: absolute;
+  left: 15px; top: 50%;
+  transform: translateY(-50%);
+  color: #9aa3ae;
+  pointer-events: none;
+  transition: color .2s;
+}
+.lead-field input {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px 0 44px;
+  border: 1.5px solid #e6e9ee;
+  border-radius: 14px;
+  background: #fafbfc;
+  font: 500 15.5px var(--f-body);
+  color: var(--c-text);
+  outline: 0;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.lead-field input::placeholder { color: #a6adb6; font-weight: 400; }
+.lead-field input:hover { border-color: #d5dae1; }
+.lead-field input:focus { border-color: var(--c-primary); background: #fff; box-shadow: 0 0 0 4px rgba(74, 163, 248, .16); }
+.lead-field__control:focus-within .lead-field__icon { color: var(--c-primary-2); }
+.lead-field.is-error input { border-color: #f0a3a5; background: #fffafa; }
+.lead-field.is-error input:focus { box-shadow: 0 0 0 4px rgba(229, 72, 77, .12); }
+.lead-field.is-error .lead-field__icon { color: #e5484d; }
+.lead-field__err { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: #e5484d; animation: fadeUp .2s ease; }
+
+.lead__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 54px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #56adfa, var(--c-primary-2));
+  color: #fff;
+  font: 700 16px var(--f-head);
+  letter-spacing: .1px;
+  cursor: pointer;
+  box-shadow: 0 16px 30px -14px rgba(59, 142, 240, .9), inset 0 1px 0 rgba(255, 255, 255, .25);
+  transition: transform .15s, box-shadow .2s, filter .2s;
+}
+.lead__submit:hover { filter: brightness(1.04); box-shadow: 0 20px 34px -14px rgba(59, 142, 240, 1), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.lead__submit:active { transform: translateY(1px); }
+.lead__submit:disabled { cursor: progress; filter: saturate(.8); }
+.lead__submit svg { transition: transform .2s; }
+.lead__submit:hover svg { transform: translateX(3px); }
+
+.lead__note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12.5px;
+  color: #8a929c;
+}
+
+/* muvaffaqiyat holati */
+.lead__done { position: relative; padding: 12px 0 2px; text-align: center; }
+.lead__done-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #34d399, #16a34a);
+  box-shadow: 0 0 0 10px rgba(22, 163, 74, .1), 0 18px 34px -14px rgba(22, 163, 74, .8);
+  animation: leadPop .45s cubic-bezier(.2, .9, .3, 1.4);
+}
+.lead__done h3 { margin: 24px 0 0; font-family: var(--f-head); font-size: 26px; font-weight: 800; letter-spacing: -.5px; color: var(--c-text); }
+.lead__done p { margin: 10px auto 0; max-width: 340px; font-size: 15px; line-height: 1.55; color: #6b7480; }
+.lead__done p b { color: var(--c-text); white-space: nowrap; }
+.lead__done-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+.lead__tg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  border-radius: 14px;
+  background: var(--c-surface);
+  color: #229ed9;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background .2s;
+}
+.lead__tg:hover { background: #eaf4fb; }
+
+@keyframes leadPop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Telefon: pastdan chiqadigan sheet */
+@media (max-width: 640px) {
+  .lead { place-items: end stretch; padding: 0; }
+  .lead__dialog {
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    padding: 28px 20px calc(20px + env(safe-area-inset-bottom));
+    border-radius: 26px 26px 0 0;
+    transform: translateY(100%);
+    transition: transform .36s cubic-bezier(.2, .9, .3, 1);
+  }
+  .lead__grab {
+    display: block;
+    position: absolute;
+    top: 9px; left: 50%;
+    width: 40px; height: 4px;
+    margin-left: -20px;
+    border-radius: 4px;
+    background: #dde2e8;
+  }
+  .lead__close { top: 14px; right: 14px; width: 36px; height: 36px; }
+  .lead__badge { width: 50px; height: 50px; border-radius: 16px; }
+  .lead__title { font-size: 24px; }
+  .lead__text { font-size: 14px; }
+  .lead__course { margin-top: 18px; }
+  .lead__form { margin-top: 18px; gap: 14px; }
+  .lead-field input { font-size: 16px; } /* iOS zoom bo'lmasligi uchun */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lead, .lead__dialog { transition: none; }
+  .lead__done-icon { animation: none; }
+}

@@ -19,8 +19,11 @@ export default function Header({ route = '/' }) {
 
   const [active, setActive] = useState('')
 
+  // Scrollni html'da qulflaymiz: body'ga overflow:hidden berilsa (html'da overflow-x: clip bor)
+  // body alohida scroll-konteynerga aylanadi va sticky header sahifa bilan birga tepaga ketib qoladi
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
+    document.documentElement.style.overflow = open ? 'hidden' : ''
+    return () => { document.documentElement.style.overflow = '' }
   }, [open])
 
   // Ekrandagi bo'limga mos menyu bandini belgilash
@@ -39,7 +42,7 @@ export default function Header({ route = '/' }) {
   const isActive = (l) => (l.page ? route.startsWith(l.page) : false) || (route === '/' && active === l.section)
 
   return (
-    <header className="header">
+    <header className={`header ${open ? 'header--open' : ''}`}>
       <div className="header__inner">
         <Logo />
 

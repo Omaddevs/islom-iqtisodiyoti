@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, logActivity, notify } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search } from '../ui/kit.jsx'
+import { Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search } from '../ui/kit.jsx'
 import { fmtAgo, fmtDate } from '../ui/format.js'
 import { ROLES } from '../store/seed.js'
 import { genPassword, genPhone, prettyPhone, digits } from '../store/ids.js'
 import { formatPhone, isFullPhone } from '../../utils/phone.js'
 import { hashQuery } from './Meetings.jsx'
+import { HeroArt } from './Articles.jsx'
+import { StatSpark } from '../ui/charts.jsx'
 
 export default function Users() {
   const { user, db, scope, can } = useAuth()
@@ -29,39 +31,66 @@ export default function Users() {
 
   const resetPass = (u) => { const p = genPassword(); patch('users', u.id, { password: p }); setCreds({ ...u, password: p, _note: 'Parol yangilandi. Yangi parolni foydalanuvchiga yetkazing.' }) }
   const toggleBlock = (u) => { patch('users', u.id, { status: u.status === 'blocked' ? 'active' : 'blocked' }); toast(u.status === 'blocked' ? 'Hisob faollashtirildi' : 'Hisob bloklandi') }
+  // Server ham xuddi shu qoidani tekshiradi: org admini boshqa adminlarni, ustoz faqat o'quvchilarni boshqaradi
+  const manageable = (u) => u.id !== user.id && (user.role === 'superadmin' || (user.role === 'org_admin' ? u.role !== 'org_admin' : u.role === 'student'))
   const doDelete = (u) => {
     setDB((s) => ({ ...s, users: s.users.filter((x) => x.id !== u.id), groups: s.groups.map((g) => ({ ...g, studentIds: g.studentIds.filter((id) => id !== u.id), teacherId: g.teacherId === u.id ? null : g.teacherId })) }))
     toast('Foydalanuvchi o‘chirildi')
   }
 
+  const admins = scope.users.filter((u) => u.role === 'org_admin')
+  const canStudent = can('students.create') || can('users.create')
+  // 12 oylik o'sish: har oy oxirigacha yaratilgan hisoblar soni
+  const growth = (list) => Array.from({ length: 12 }, (_, i) => { const ts = Date.now() - (11 - i) * 30 * 864e5; return list.filter((u) => (u.createdAt || 0) <= ts).length })
   const title = isTeacher ? 'O‘quvchilarim' : 'Foydalanuvchilar'
   return (
     <>
-      <PageHead icon="users" title={title} sub={isTeacher ? `${scope.myStudents.length} nafar o‘quvchi guruhlaringizda` : `${scope.students.length} o‘quvchi · ${scope.teachers.length} ustoz${scope.users.filter((u) => u.role === 'org_admin').length ? ` · ${scope.users.filter((u) => u.role === 'org_admin').length} admin` : ''}`}
-        actions={<>
-          {can('students.create') || can('users.create') ? <Btn variant="primary" icon="userPlus" onClick={() => setCreating('student')}>O‘quvchi qo‘shish</Btn> : null}
-          {can('teachers.create') && <Btn icon="userPlus" onClick={() => setCreating('teacher')}>Ustoz qo‘shish</Btn>}
-          {user.role === 'superadmin' && scope.orgId && <Btn icon="userPlus" onClick={() => setCreating('org_admin')}>Admin qo‘shish</Btn>}
-        </>} />
-      <div className="prow prow--between">
-        {!isTeacher ? <Tabs value={role} onChange={setRole} items={[{ value: 'student', label: 'O‘quvchilar', icon: 'users', count: scope.students.length }, { value: 'teacher', label: 'Ustozlar', icon: 'user', count: scope.teachers.length }, { value: 'org_admin', label: 'Adminlar', icon: 'shield', count: scope.users.filter((u) => u.role === 'org_admin').length }]} /> : <span />}
-        <div className="prow">
-          <Select value={groupF} onChange={setGroupF} placeholder="Barcha guruhlar" options={scope.groups.map((g) => ({ value: g.id, label: g.name }))} style={{ height: 42, width: 180 }} />
-          <Search value={q} onChange={setQ} placeholder="Ism yoki telefon…" />
+      {/* Sarlavha banneri */}
+      <section className="pthero pahero puhero">
+        <span className="pthero__icon"><Icon name="users" size={34} /></span>
+        <div className="pthero__text">
+          <h1>{title}</h1>
+          <p>{isTeacher ? `${scope.myStudents.length} nafar o‘quvchi guruhlaringizda` : 'Ustozlar va o‘quvchilar'}</p>
+        </div>
+        <blockquote className="pthero__quote">“Ilm bilan yuksalgan jamiyat barhayotdir.”</blockquote>
+        <HeroArt />
+        {isTeacher && canStudent && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setCreating('student')}>O‘quvchi qo‘shish</Btn>}
+      </section>
+
+      {/* Statistika va amallar */}
+      {!isTeacher && (
+        <div className="pustats">
+          <StatSpark icon="users" tone="blue" color="#3b8ef0" value={scope.students.length} label="O‘quvchi" data={growth(scope.students)} onClick={() => setRole('student')} />
+          <StatSpark icon="user" tone="teal" color="#14b8a6" value={scope.teachers.length} label="Ustoz" data={growth(scope.teachers)} onClick={() => setRole('teacher')} />
+          <StatSpark icon="shield" tone="violet" color="#8b5cf6" value={admins.length} label="Admin" data={growth(admins)} onClick={() => setRole('org_admin')} />
+          <div className="pustats__acts">
+            {canStudent && <Btn variant="primary" icon="plus" onClick={() => setCreating('student')}>O‘quvchi qo‘shish</Btn>}
+            {can('teachers.create') && <Btn icon="plus" onClick={() => setCreating('teacher')}>Ustoz qo‘shish</Btn>}
+            {user.role === 'superadmin' && scope.orgId && <Btn icon="plus" onClick={() => setCreating('org_admin')}>Admin qo‘shish</Btn>}
+          </div>
+        </div>
+      )}
+
+      {/* Filtr paneli */}
+      <div className="pvtool">
+        {!isTeacher ? <Tabs value={role} onChange={setRole} className="pttabs putabs" items={[{ value: 'student', label: 'O‘quvchilar', icon: 'users', count: scope.students.length }, { value: 'teacher', label: 'Ustozlar', icon: 'user', count: scope.teachers.length }, { value: 'org_admin', label: 'Adminlar', icon: 'shield', count: admins.length }]} /> : <span />}
+        <div className="pvtool__right">
+          <Select value={groupF} onChange={setGroupF} placeholder="Barcha guruhlar" options={scope.groups.map((g) => ({ value: g.id, label: g.name }))} aria-label="Guruh" />
+          <Search value={q} onChange={setQ} placeholder="Ism yoki telefon…" className="pusearch" />
         </div>
       </div>
-      <Card pad={false}>
+      <Card pad={false} className="putable">
         <Table rows={rows} empty={<Empty icon="users" title="Foydalanuvchi topilmadi" text="Yangi foydalanuvchi qo‘shing — login va parol avtomatik yaratiladi." action={<Btn variant="primary" onClick={() => setCreating(isTeacher ? 'student' : role)}>Qo‘shish</Btn>} />} cols={[
-          { key: 'name', label: 'Foydalanuvchi', render: (u) => <div className="pcell-user"><UAvatar user={u} size={38} /><div><b>{u.name}</b><span>{u.title || ROLES[u.role].label}</span></div></div> },
+          { key: 'name', label: 'Foydalanuvchi', render: (u) => <div className="pcell-user"><UAvatar user={u} size={38} /><div><b>{u.name}</b><span>{u.role === 'student' ? ROLES[u.role].label : u.title || ROLES[u.role].label}</span></div></div> },
           { key: 'phone', label: 'Telefon (login)', render: (u) => <span className="mono" style={{ fontSize: 13.5 }}>{u.phone}</span> },
-          { key: 'groups', label: 'Guruhlar', render: (u) => u.groups.length ? <div className="prow" style={{ gap: 4 }}>{u.groups.map((g) => <a key={g.id} href={`#/platform/groups/${g.id}`}><Badge tone="gray"><i style={{ width: 7, height: 7, borderRadius: 4, background: g.color, display: 'inline-block' }} /> {g.name}</Badge></a>)}</div> : <span className="pmuted" style={{ fontSize: 13 }}>Biriktirilmagan</span> },
+          { key: 'groups', label: 'Guruhlar', render: (u) => u.groups.length ? <div className="pgchips">{u.groups.map((g) => <a key={g.id} href={`#/platform/groups/${g.id}`} className="pgchip" style={{ '--gc': g.color }}>{g.name}</a>)}</div> : <span className="pmuted" style={{ fontSize: 13 }}>Biriktirilmagan</span> },
           { key: 'status', label: 'Holat', render: (u) => u.status === 'blocked' ? <Badge tone="red" dot>Bloklangan</Badge> : <Badge tone="green" dot>Faol</Badge> },
           { key: 'lastSeen', label: 'Oxirgi faollik', render: (u) => <span className="pmuted" style={{ fontSize: 13 }}>{u.lastSeen ? fmtAgo(u.lastSeen) : '—'}</span> },
-          { key: 'act', label: '', align: 'right', render: (u) => (
+          { key: 'act', label: '', align: 'right', render: (u) => manageable(u) && (
             <Menu items={[
               { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(u) },
               { label: 'Parolni yangilash', icon: 'key', onClick: () => resetPass(u) },
-              { label: 'Kirish ma’lumotlari', icon: 'copy', onClick: () => setCreds({ ...u, _note: 'Joriy kirish ma’lumotlari.' }) },
+              { label: 'Kirish ma’lumotlari', icon: 'copy', onClick: () => setCreds({ ...u, _note: 'Parol xavfsizlik uchun shifrlangan holda saqlanadi. Yangi parol berish uchun «Parolni yangilash»ni tanlang.' }) },
               !isTeacher && 'sep',
               !isTeacher && { label: u.status === 'blocked' ? 'Blokdan chiqarish' : 'Bloklash', icon: u.status === 'blocked' ? 'lockOpen' : 'block', onClick: () => toggleBlock(u) },
               !isTeacher && { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(u) },
@@ -94,7 +123,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
     const taken = new Set(db.users.map((u) => digits(u.phone)))
     setF(isNew
       ? { name: '', phone: genPhone(taken), password: genPassword(), title: '', groupIds: defaultGroupId ? [defaultGroupId] : [] }
-      : { name: editUser.name, phone: editUser.phone, password: editUser.password, title: editUser.title || '', groupIds: db.groups.filter((g) => g.studentIds.includes(editUser.id) || g.teacherId === editUser.id).map((g) => g.id) })
+      : { name: editUser.name, phone: editUser.phone, password: '', title: editUser.title || '', groupIds: db.groups.filter((g) => g.studentIds.includes(editUser.id) || g.teacherId === editUser.id).map((g) => g.id) })
   }, [open, editUser, isNew, defaultGroupId, db.users, db.groups])
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
 
@@ -103,7 +132,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
     if (!f.name?.trim() || f.name.trim().split(' ').length < 2) er.name = 'Ism va familiyani kiriting'
     if (!isFullPhone(f.phone)) er.phone = 'Telefon raqamini to‘liq kiriting'
     else if (db.users.some((u) => digits(u.phone) === digits(f.phone) && u.id !== editUser?.id)) er.phone = 'Bu raqam allaqachon ro‘yxatdan o‘tgan'
-    if (!f.password || f.password.length < 6) er.password = 'Parol kamida 6 belgi'
+    if ((isNew || f.password) && (!f.password || f.password.length < 6)) er.password = 'Parol kamida 6 belgi'
     setErr(er); if (Object.keys(er).length) return
     const orgId = scope.orgId || scope.groups[0]?.orgId || me.orgId
     if (isNew) {
@@ -115,7 +144,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
       toast(`${ROLES[r].label} yaratildi`)
       onClose(); onCreated?.(u)
     } else {
-      patch('users', editUser.id, { name: f.name.trim(), phone: prettyPhone(f.phone), password: f.password, title: f.title?.trim() })
+      patch('users', editUser.id, { name: f.name.trim(), phone: prettyPhone(f.phone), title: f.title?.trim(), ...(f.password ? { password: f.password } : {}) })
       applyGroups(editUser.id, r, f.groupIds)
       toast('Saqlandi'); onClose()
     }
@@ -138,7 +167,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
         <FField label="Ism familiya" error={err.name}><Input value={f.name || ''} onChange={(e) => set('name', e.target.value)} placeholder="Jasur Aliyev" autoFocus /></FField>
         <div className="pform__row">
           <FField label="Telefon (login)" error={err.phone}><div className="prow" style={{ flexWrap: 'nowrap' }}><Input className="pinput mono" value={f.phone || ''} onChange={(e) => set('phone', formatPhone(e.target.value))} inputMode="tel" /><Btn icon="refresh" title="Yangi raqam" onClick={() => set('phone', genPhone(new Set(db.users.map((u) => digits(u.phone)))))} /></div></FField>
-          <FField label="Parol" error={err.password}><div className="prow" style={{ flexWrap: 'nowrap' }}><Input className="pinput mono" value={f.password || ''} onChange={(e) => set('password', e.target.value)} /><Btn icon="refresh" title="Yangi parol" onClick={() => set('password', genPassword())} /></div></FField>
+          <FField label="Parol" error={err.password}><div className="prow" style={{ flexWrap: 'nowrap' }}><Input className="pinput mono" value={f.password || ''} onChange={(e) => set('password', e.target.value)} placeholder={isNew ? '' : 'O‘zgarmaydi'} /><Btn icon="refresh" title="Yangi parol" onClick={() => set('password', genPassword())} /></div></FField>
         </div>
         {r !== 'student' && <FField label="Lavozim / mutaxassislik"><Input value={f.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Islom moliyasi ustozi" /></FField>}
         {r !== 'org_admin' && <FField label={r === 'student' ? 'Guruhlarga biriktirish' : 'Qaysi guruhlarga ustoz'}>{groupOpts.length ? <ChipSelect value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={groupOpts} /> : <span className="pmuted">Avval guruh yarating</span>}</FField>}

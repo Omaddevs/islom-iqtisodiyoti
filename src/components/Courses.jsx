@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { COURSES, LEVELS, dirById, formatNum, formatPrice } from '../data/content.js'
 import { Avatar, Icon, SectionHead, Stars } from './ui.jsx'
 import DirIcon from './DirIcons.jsx'
+import { leadClick } from './LeadModal.jsx'
 
 // Daraja ko‘rsatkichi: 1–3 ta to‘lgan ustuncha
 const LEVEL_STEP = { 'Boshlang‘ich': 1, 'O‘rta': 2, 'Yuqori': 3 }
@@ -55,7 +56,7 @@ export function CourseCard({ c }) {
             <small>Narxi</small>
             <b className={free ? 'is-free' : ''}>{formatPrice(c.price)}</b>
           </span>
-          <a href="#royxat" className="course__btn">
+          <a href="#royxat" className="course__btn" onClick={leadClick({ kind: 'course', course: c })}>
             Batafsil <Icon name="arrowRight" size={16} />
           </a>
         </div>

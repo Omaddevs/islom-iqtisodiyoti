@@ -1,3 +1,5 @@
+import { leadClick } from './LeadModal.jsx'
+
 const Svg = ({ children }) => (
   <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.6"
     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
@@ -82,7 +84,7 @@ export default function CtaSection() {
           bilimlarini amaliy ko‘nikmaga aylantirmoqda.
         </p>
         <div className="cta__actions">
-          <a href="#royxat" className="cbtn cbtn--light">Bepul boshlash</a>
+          <a href="#royxat" className="cbtn cbtn--light" onClick={leadClick({ kind: 'start' })}>Bepul boshlash</a>
           <a href="#ai-ustoz" className="cbtn cbtn--dark">AI Ustoz bilan boshlash</a>
         </div>
       </div>

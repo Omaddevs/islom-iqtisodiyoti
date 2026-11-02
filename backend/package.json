@@ -1,0 +1,26 @@
+{
+  "name": "islom-iqtisodiyoti-backend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env server.mjs",
+    "build": "next build",
+    "start": "node --env-file-if-exists=.env server.mjs --prod",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
+    "db:seed": "node --env-file-if-exists=.env scripts/seed.mjs",
+    "db:purge-demo": "node --env-file-if-exists=.env scripts/purge-demo.mjs",
+    "db:reset": "node --env-file-if-exists=.env scripts/migrate.mjs --reset && node --env-file-if-exists=.env scripts/seed.mjs",
+    "test:smoke": "node --env-file-if-exists=.env scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.12",
+    "next": "^16.3.7",
+    "pg": "^8.23.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "ws": "^8.22.0",
+    "zod": "^4.6.5"
+  }
+}

@@ -67,6 +67,7 @@ h1, h2, p { margin: 0; }
   background: rgba(255, 255, 255, .92);
   backdrop-filter: saturate(180%) blur(10px);
 }
+.header--open { background: #fff; }
 .header__inner {
   max-width: var(--max-w);
   margin: 0 auto;
