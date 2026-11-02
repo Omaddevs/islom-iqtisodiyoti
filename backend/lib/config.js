@@ -20,4 +20,6 @@ export const config = {
   get iceServers() { return parseIce(req('ICE_SERVERS', '[{"urls":["stun:stun.l.google.com:19302"]}]')) },
   get storageDir() { return req('STORAGE_DIR', './storage') },
   get isProd() { return process.env.NODE_ENV === 'production' },
+  // HTTPS bo'lmagan vaqtinchalik ishga tushirishda (faqat IP) COOKIE_SECURE=false — aks holda brauzer cookie'ni saqlamaydi
+  get cookieSecure() { return process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : this.isProd },
 }

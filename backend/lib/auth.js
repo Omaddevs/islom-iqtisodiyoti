@@ -23,7 +23,7 @@ export const sessionCookie = (token) => ({
   value: token,
   httpOnly: true,
   sameSite: 'lax',
-  secure: config.isProd,
+  secure: config.cookieSecure,
   path: '/',
   maxAge: SESSION_TTL,
 })
