@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
-# Har bir yangilanishda serverda ishga tushiriladi (kod /var/www/islom-iqtisodiyoti ga yuklangandan keyin):
-#   bash deploy/deploy.sh
-# Frontend build → dist/, backend build → migratsiya → bosh admin (bir marta) → xizmatni qayta ishga tushirish.
+# Serverda: GitHub'dan oxirgi kodni olib, hammasini yangilaydi.
+#   bash /var/www/islom-iqtisodiyoti/deploy/deploy.sh
+# git pull → frontend build → backend build → migratsiya → bosh admin (bir marta) → xizmatni qayta ishga tushirish.
+# .env, dist/, node_modules git'da yo'q — ularga tegilmaydi.
 set -euo pipefail
 APP=/var/www/islom-iqtisodiyoti
 cd "$APP"
+
+if [ "${1:-}" != "--no-pull" ]; then
+  git fetch -q origin main
+  git reset -q --hard origin/main
+  echo "• Kod: $(git log --oneline -1)"
+  # Skript o'zi yangilangan bo'lishi mumkin — yangi nusxasini ishga tushiramiz
+  exec bash "$APP/deploy/deploy.sh" --no-pull
+fi
 
 echo "• Frontend"
 npm ci --no-audit --no-fund --loglevel=error
