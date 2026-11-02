@@ -1,0 +1,17 @@
+# /etc/systemd/system/islom-backend.service — backend (API + WebSocket), server qayta yonganda o'zi ishga tushadi
+[Unit]
+Description=Islom Iqtisodiyoti backend (Next.js API + WebSocket)
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/var/www/islom-iqtisodiyoti/backend
+ExecStart=/usr/bin/node --env-file=.env server.mjs --prod
+Restart=always
+RestartSec=3
+Environment=NODE_OPTIONS=--max-old-space-size=768
+
+[Install]
+WantedBy=multi-user.target
