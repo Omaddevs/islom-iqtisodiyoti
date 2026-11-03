@@ -34,12 +34,14 @@ if [ ! -f /etc/systemd/system/islom-backend.service ]; then
 fi
 sudo systemctl restart islom-backend
 
-# nginx (birinchi marta) — domen ulangach deploy/nginx.conf (HTTPS) ga almashtiring
-if [ ! -f /etc/nginx/sites-enabled/islom-iqtisodiyoti ]; then
+# nginx: SSL sertifikati bo'lsa — HTTPS (deploy/nginx.conf), aks holda IP orqali HTTP (deploy/nginx-ip.conf)
+if sudo test -f /etc/letsencrypt/live/islom-iqtisodiyoti.uz/fullchain.pem; then
+  sudo cp "$APP/deploy/nginx.conf" /etc/nginx/sites-available/islom-iqtisodiyoti
+else
   sudo cp "$APP/deploy/nginx-ip.conf" /etc/nginx/sites-available/islom-iqtisodiyoti
-  sudo ln -sf /etc/nginx/sites-available/islom-iqtisodiyoti /etc/nginx/sites-enabled/islom-iqtisodiyoti
-  sudo rm -f /etc/nginx/sites-enabled/default
 fi
+sudo ln -sf /etc/nginx/sites-available/islom-iqtisodiyoti /etc/nginx/sites-enabled/islom-iqtisodiyoti
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t -q && sudo systemctl reload nginx
 
 for i in $(seq 1 30); do curl -sf http://127.0.0.1:4020/api/health >/dev/null && break; sleep 1; done
