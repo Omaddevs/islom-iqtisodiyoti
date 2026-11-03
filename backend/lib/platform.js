@@ -364,8 +364,9 @@ const recordOps = {
     }
     if (col === 'notifications') {
       const t = await row(c, 'SELECT id, org_id, role FROM users WHERE id = $1', [String(item.userId)])
-      if (!t) return null // foydalanuvchi o'chirilgan — bildirishnoma shunchaki yuborilmaydi
-      if (!isSA(u) && t.org_id !== u.org_id) deny()
+      // Foydalanuvchi o'chirilgan yoki boshqa tashkilotda — bildirishnoma jim o'tkazib yuboriladi (asosiy amal buzilmasin).
+      // Bosh admin muallif bo'lgan kontent bo'yicha xabarlar (test topshirildi va h.k.) unga yetadi.
+      if (!t || !(isSA(u) || t.org_id === u.org_id || t.role === 'superadmin')) return null
       return insertRec(c, col, id, t.org_id, t.id, safeLinks({
         userId: t.id, text: text(item.text, { min: 1, max: 500, label: 'Matn' }), href: item.href || null, at: now, read: false,
       }))

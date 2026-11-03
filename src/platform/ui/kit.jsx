@@ -1,5 +1,5 @@
 // Platforma UI to'plami: karta, tugma, belgi, modal, jadval, tab, bo'sh holat, toast va h.k.
-import { createContext, forwardRef, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Component, createContext, forwardRef, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Icon } from '../../components/ui.jsx'
 import { initials } from '../store/ids.js'
@@ -173,6 +173,23 @@ export function ChipSelect({ options, value = [], onChange, allLabel }) {
 }
 
 // ---------- Modal ----------
+// Bitta sahifadagi kutilmagan xato butun platformani oq ekranga aylantirmasin
+export class ErrorBoundary extends Component {
+  state = { error: null }
+  static getDerivedStateFromError(error) { return { error } }
+  componentDidCatch(error, info) { console.error('[sahifa xatosi]', error, info?.componentStack) }
+  render() {
+    if (!this.state.error) return this.props.children
+    return (
+      <Card>
+        <Empty icon="alertCircle" title="Sahifani ko‘rsatishda xatolik yuz berdi"
+          text="Sahifani yangilab ko‘ring. Muammo takrorlansa, administratorga xabar bering."
+          action={<Btn variant="primary" icon="refresh" onClick={() => window.location.reload()}>Sahifani yangilash</Btn>} />
+      </Card>
+    )
+  }
+}
+
 // Formani faqat ochilganda (yoki boshqa yozuv tanlanganda) to'ldiradi. Ma'lumotlar fonda yangilanganda
 // (har 30 soniyada serverdan) foydalanuvchi yozayotgan matn o'chib ketmaydi.
 export function useFormInit(open, key, init) {

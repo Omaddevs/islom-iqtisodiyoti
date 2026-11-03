@@ -269,6 +269,7 @@ export function HomeworkForm({ open, hw, onClose, defaultGroupId }) {
     if (!fromLocalInput(f.dueAt)) er.dueAt = 'Muddatni kiriting'
     setErr(er); if (Object.keys(er).length) return
     const g = db.groups.find((x) => x.id === f.groupId)
+    if (!g) return setErr({ groupId: 'Guruh topilmadi — qayta tanlang' })
     const data = { title: f.title.trim(), description: f.description?.trim(), groupId: f.groupId, dueAt: fromLocalInput(f.dueAt), maxGrade: Number(f.maxGrade) || 100 }
     if (isNew) {
       const h = add('homework', { ...data, orgId: g.orgId, authorId: user.id })

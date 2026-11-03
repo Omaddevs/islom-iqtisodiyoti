@@ -126,7 +126,8 @@ export const flush = () => chain
 // Serverdan qayta yuklash (navbatdagi o'zgarishlardan keyin). `me` — joriy foydalanuvchi
 export const loadDB = () => {
   const p = chain.then(load)
-  chain = p.catch(() => {}) // navbat hech qachon "rad etilgan" holatda qolmasin
+  // Sessiya tugagan yoki hisob bloklangan bo'lsa (davriy yangilanishda ham) — tizimdan chiqariladi
+  chain = p.catch((e) => { if (e.status === 401) report(e) }) // navbat hech qachon "rad etilgan" holatda qolmasin
   return p
 }
 export const clearDB = () => { gen++; state = empty(); emit() }

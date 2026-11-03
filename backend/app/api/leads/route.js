@@ -9,7 +9,8 @@ const out = (l) => ({ id: String(l.id), kind: l.kind, name: l.name, phone: l.pho
 // Saytdagi formalar — akkauntsiz, IP bo'yicha cheklangan
 export const POST = route(async (req) => {
   const ip = clientIp(req)
-  const rl = rateLimit(`lead:${ip}`, { limit: 6, windowMs: 10 * 60e3 })
+  // Mobil operatorlarda ko'p foydalanuvchi bitta IP'dan chiqadi (CGNAT) — limit yumshoq, botlarga esa yetarli to'siq
+  const rl = rateLimit(`lead:${ip}`, { limit: 30, windowMs: 10 * 60e3 })
   if (!rl.ok) fail(429, 'Juda ko‘p so‘rov. Birozdan so‘ng qayta urining')
   const d = await body(req, LeadCreate)
   if (d.website) return json({ ok: true }) // bot — jim qabul qilinadi, saqlanmaydi

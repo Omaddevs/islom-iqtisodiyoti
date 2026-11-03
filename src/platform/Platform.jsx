@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from './store/auth.jsx'
 import { loadDB, onSyncError } from './store/db.js'
-import { ToastProvider, useToast } from './ui/kit.jsx'
+import { ToastProvider, useToast, ErrorBoundary } from './ui/kit.jsx'
 import Sidebar from './layout/Sidebar.jsx'
 import Topbar from './layout/Topbar.jsx'
 import Dashboard from './pages/Dashboard.jsx'
@@ -93,7 +93,7 @@ export default function Platform({ path }) {
           <div className="pf__main">
             <Topbar title={title} sub={page.sub} icon={page.icon} home={key === ''} onBurger={() => setMenuOpen(true)} />
             <div className="pf__content" key={path}>
-              <Comp param={param} />
+              <ErrorBoundary><Comp param={param} /></ErrorBoundary>
             </div>
           </div>
         </div>

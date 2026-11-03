@@ -19,7 +19,7 @@ const login = (phone, password) => api('/api/auth/login', { method: 'POST', body
 const RUN = Date.now().toString(36)
 const ORG = `org_smoke${RUN}`
 let A
-const cleanup = async () => { if (A?.cookie) await ops(A.cookie, [{ col: 'organizations', op: 'delete', id: ORG }]).catch(() => {}) }
+const cleanup = async () => { if (A?.cookie) await ops(A.cookie, [{ col: 'organizations', op: 'delete', id: ORG }, { col: 'notifications', op: 'delete', id: `n1${RUN}` }]).catch(() => {}) }
 const ok = async (c, m) => { if (!c) { console.error('✗', m); await cleanup(); process.exit(1) } console.log('✓', m) }
 
 function client(ticket, name) {
@@ -95,12 +95,28 @@ const att0 = await ops(s.cookie, [{ col: 'testAttempts', op: 'insert', item: { i
 await ok(att0.status === 200 && att0.data.results[0].item.score === 1, 'test bali serverda hisoblandi (1/2, yuborilgan 99 e’tiborsiz)')
 await ok((await ops(s.cookie, [{ col: 'testAttempts', op: 'insert', item: { id: `ta2${RUN}`, testId: `t${RUN}`, answers: {} } }])).status === 409, 'testni ikkinchi marta topshirib bo‘lmaydi')
 await ok((await ops(s.cookie, [{ col: 'users', op: 'patch', id: `u_s1${RUN}`, changes: { password: 'yangi123', currentPassword: 'xato' } }])).status === 422, 'joriy parolsiz parol almashtirilmaydi')
+const s2 = await login(P.s1, 'parol123') // ikkinchi qurilma
 const goodPw = await ops(s.cookie, [{ col: 'users', op: 'patch', id: `u_s1${RUN}`, changes: { password: 'yangi123', currentPassword: 'parol123' } }])
 await ok(goodPw.status === 200 && (await login(P.s1, 'yangi123')).status === 200, 'o‘quvchi parolini almashtirdi va yangi parol bilan kirdi')
+await ok((await api('/api/data', { cookie: s2.cookie })).status === 401, 'parol almashgach boshqa qurilmadagi eski sessiya bekor bo‘ldi')
+await ok(goodPw.cookie && (await api('/api/data', { cookie: goodPw.cookie })).status === 200, 'parolni almashtirgan qurilmaga yangi sessiya berildi')
+s.cookie = goodPw.cookie
+const e1 = await fetch(B + '/api/data', { headers: { cookie: s.cookie } })
+const e2 = await fetch(B + '/api/data', { headers: { cookie: s.cookie, 'if-none-match': e1.headers.get('etag') } })
+await ok(e1.headers.get('etag') && e2.status === 304, 'o‘zgarmagan ma’lumot qayta yuklanmaydi (ETag → 304)')
 
+const nt = await ops(s.cookie, [{ col: 'notifications', op: 'insert', item: { id: `n1${RUN}`, userId: 'u_admin', text: 'Test topshirildi' } }, { col: 'notifications', op: 'insert', item: { id: `n2${RUN}`, userId: 'u_begona', text: 'x' } }])
+await ok(nt.status === 200 && nt.data.results[0].item && nt.data.results[1].item === null, 'bildirishnoma: bosh adminga yetadi, mavjud bo‘lmagan oluvchi jim o‘tkaziladi')
 await ok((await ops(OA.cookie, [{ col: 'users', op: 'patch', id: `u_s2${RUN}`, changes: { status: 'blocked' } }])).status === 200, 'admin o‘quvchini blokladi')
 await ok((await login(P.s2, 'parol123')).status === 403, 'bloklangan o‘quvchi kira olmaydi')
 await ok((await ops(t.cookie, [{ col: 'library', op: 'insert', item: { id: `l${RUN}`, orgId: ORG, title: 'X', url: 'javascript:alert(1)' } }])).status === 422, '`javascript:` havolasi rad etildi')
+
+// ---- Login cheklovi: faqat noto'g'ri urinishlar sanaladi ----
+let okLogins = 0
+for (let i = 0; i < 10; i++) if ((await login(P.t1, 'parol123')).status === 200) okLogins++
+await ok(okLogins === 10, 'ketma-ket 10 ta to‘g‘ri kirish cheklovga tushmadi')
+for (let i = 0; i < 8; i++) await login(P.t2, 'xato-parol')
+await ok((await login(P.t2, 'parol123')).status === 429, '8 ta noto‘g‘ri urinishdan keyin hisob vaqtincha bloklandi (429)')
 
 // ---- Saytdagi arizalar ----
 const lead = await api('/api/leads', { method: 'POST', body: { kind: 'course', name: `Smoke ${RUN}`, phone: '+998 90 123 45 67', course: 'Islom moliyasi' } })
@@ -191,9 +207,9 @@ for (const c of [S, H, G]) c.ws.close()
 
 // ---- Tashkilot to'xtatilsa — a'zolari kira olmaydi; o'chirilsa — hammasi bilan birga o'chadi ----
 await ops(A.cookie, [{ col: 'organizations', op: 'patch', id: ORG, changes: { status: 'suspended' } }])
-await ok((await login(P.t2, 'parol123')).status === 403, 'to‘xtatilgan tashkilot a’zosi kira olmaydi')
+await ok((await login(P.oa, 'parol123')).status === 403, 'to‘xtatilgan tashkilot a’zosi kira olmaydi')
 await ok((await api('/api/data', { cookie: t.cookie })).status === 401, 'to‘xtatilgan tashkilotdagi faol sessiya ham bekor bo‘ldi')
 await cleanup()
-await ok((await login(P.oa, 'parol123')).status === 401, 'tashkilot o‘chirildi — uning foydalanuvchilari ham')
+await ok((await login(P.s1, 'yangi123')).status === 401, 'tashkilot o‘chirildi — uning foydalanuvchilari ham')
 console.log('\nHammasi joyida ✔')
 process.exit(0)

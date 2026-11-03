@@ -9,5 +9,8 @@ export function rateLimit(key, { limit, windowMs }) {
   return b.count > limit ? { ok: false, retryAfter: Math.ceil((b.reset - now) / 1000) } : { ok: true }
 }
 
+// Muvaffaqiyatli amaldan keyin hisobni tozalash (masalan, to'g'ri parol bilan kirilganda)
+export const rateReset = (key) => { buckets.delete(key) }
+
 export const clientIp = (req) =>
   req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip') || 'local'
