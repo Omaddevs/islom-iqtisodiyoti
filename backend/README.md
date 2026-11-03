@@ -92,4 +92,23 @@ backend `npm ci && npm run build && npm run db:migrate`, so'ng qayta ishga tushi
 (avval nima o'chishini ko'rsatadi) → `npm run db:purge-demo -- --yes` → `npm run db:seed`.
 Bosh admin parolini unutib qo'yilsa: `.env` dagi `SUPERADMIN_PASSWORD` ni yangilab, `npm run db:seed -- --reset-password`.
 
-**Zaxira nusxa:** har kuni `pg_dump` (cron) va `STORAGE_DIR` papkasi.
+**Zaxira nusxa** avtomatik: har kuni 03:30 da `deploy/backup.sh` (cron, `deploy.sh` o'rnatadi).
+Baza — `/var/backups/islom-iqtisodiyoti/db/` (oxirgi 14 kun), fayllar — `/var/backups/islom-iqtisodiyoti/files/`.
+Jurnal: `/var/log/islom-backup.log`. Qo'lda: `sudo bash deploy/backup.sh`.
+
+Zaxira shu serverning o'zida turadi — server butunlay ishdan chiqsa yo'qolmasligi uchun vaqti-vaqti bilan
+kompyuterga ham ko'chirib oling:
+```bash
+scp -i ~/.ssh/islom_vds.rsa -r ubuntu@89.39.95.150:/var/backups/islom-iqtisodiyoti/db ./zaxira
+```
+
+**Zaxiradan tiklash:**
+```bash
+sudo systemctl stop islom-backend
+sudo -u postgres pg_restore --clean --if-exists -d islom_iqtisodiyoti /var/backups/islom-iqtisodiyoti/db/db-YYYYMMDD-HHMM.dump
+sudo rsync -a /var/backups/islom-iqtisodiyoti/files/ /var/www/islom-iqtisodiyoti-storage/
+sudo systemctl start islom-backend
+```
+
+**Rasmlar** (video muqovalari, maqola rasmlari) `STORAGE_DIR/uploads` da fayl sifatida saqlanadi, bazada faqat havola.
+Ishlatilmay qolganlari kunlik zaxira oldidan o'chiriladi (`npm run gc:uploads`).

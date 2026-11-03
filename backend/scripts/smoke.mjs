@@ -118,6 +118,18 @@ await ok(okLogins === 10, 'ketma-ket 10 ta to‘g‘ri kirish cheklovga tushmadi
 for (let i = 0; i < 8; i++) await login(P.t2, 'xato-parol')
 await ok((await login(P.t2, 'parol123')).status === 429, '8 ta noto‘g‘ri urinishdan keyin hisob vaqtincha bloklandi (429)')
 
+// ---- Rasmlar: fayl sifatida yuklanadi, bazaga faqat havola ----
+const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=', 'base64')
+const upload = (cookie, body, type = 'image/jpeg') => fetch(B + '/api/uploads', { method: 'POST', headers: { cookie, 'content-type': type }, body }).then(async (r) => ({ status: r.status, data: await r.json().catch(() => null) }))
+const up = await upload(t.cookie, JPG)
+await ok(up.status === 201 && /^\/api\/files\/img_[a-z0-9]+\.jpg$/.test(up.data?.url), 'ustoz rasm yukladi → fayl havolasi')
+const img = await fetch(B + up.data.url, { headers: { cookie: t.cookie } })
+await ok(img.status === 200 && img.headers.get('content-type') === 'image/jpeg', 'yuklangan rasm qaytariladi')
+await ok((await fetch(B + up.data.url)).status === 401, 'rasm tizimga kirmaganlarga berilmaydi')
+await ok((await upload(t.cookie, Buffer.from('<script>alert(1)</script>'))).status === 415, 'rasm niqobidagi boshqa fayl rad etildi')
+await ok((await upload(s.cookie, JPG)).status === 403, 'o‘quvchi rasm yuklay olmaydi')
+await ok((await ops(t.cookie, [{ col: 'videos', op: 'insert', item: { id: `vi${RUN}`, orgId: ORG, title: 'X', cover: 'data:image/jpeg;base64,' + 'A'.repeat(5000) } }])).status === 422, 'bazaga data-URL rasm yozilmaydi')
+
 // ---- Saytdagi arizalar ----
 const lead = await api('/api/leads', { method: 'POST', body: { kind: 'course', name: `Smoke ${RUN}`, phone: '+998 90 123 45 67', course: 'Islom moliyasi' } })
 await ok(lead.status === 201, 'saytdan ariza qabul qilindi (akkauntsiz)')

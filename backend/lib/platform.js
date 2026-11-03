@@ -50,6 +50,11 @@ const safeLinks = (o) => {
   }
   return o
 }
+// Rasmlar fayl sifatida (/api/uploads) saqlanadi — bazaga data-URL ko'rinishidagi katta rasm yozilmaydi
+const noInlineImages = (v) => {
+  if (typeof v === 'string') { if (v.length > 2048 && v.startsWith('data:')) fail(422, 'Rasm eski usulda yuborildi — sahifani yangilab, rasmni qayta yuklang'); return }
+  if (v && typeof v === 'object') for (const x of Object.values(v)) noInlineImages(x)
+}
 const sizeOk = (o) => { if (JSON.stringify(o).length > MAX_ITEM) fail(413, 'Ma’lumot hajmi juda katta (rasmlarni kichraytiring)') }
 const password = (v) => {
   if (typeof v !== 'string' || v.length < 6) fail(422, 'Parol kamida 6 belgidan iborat bo‘lishi kerak')
@@ -335,6 +340,7 @@ const recordOps = {
       const orgId = item.orgId
       if (!orgId || !inOrg(u, orgId) || !(await row(c, 'SELECT 1 FROM organizations WHERE id = $1', [orgId]))) fail(422, 'Avval tashkilotni tanlang')
       if (col === 'homework' && !(await row(c, 'SELECT 1 FROM groups WHERE id = $1 AND org_id = $2', [item.groupId, orgId]))) fail(422, 'Guruhni tanlang')
+      noInlineImages(item)
       return insertRec(c, col, id, orgId, u.id, safeLinks({ createdAt: now, ...item, orgId, authorId: u.id }))
     }
     if (col === 'testAttempts') {
@@ -399,6 +405,7 @@ const recordOps = {
         if (keys.includes('readBy')) next.readBy = [...new Set([...(d.readBy || []), u.id])]
         return updateRec(c, col, id, next)
       }
+      noInlineImages(changes)
       return updateRec(c, col, id, safeLinks({ ...d, ...noKeys({ ...changes }, ['id', 'orgId', 'authorId']) }))
     }
     if (col === 'submissions') {

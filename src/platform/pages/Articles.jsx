@@ -333,7 +333,7 @@ function ArticleForm({ open, article, onClose }) {
       setErr((e) => ({ ...e, body: '' }))
       const pos = (before ? before.length + 2 : 0) + insert.length
       requestAnimationFrame(() => { if (el) { el.focus(); el.setSelectionRange(pos, pos) } })
-    } catch { setErr((e) => ({ ...e, body: 'Rasmni o‘qib bo‘lmadi, boshqa fayl tanlang' })) } finally { setBusy(false) }
+    } catch (er) { setErr((e) => ({ ...e, body: er.message || 'Rasmni yuklab bo‘lmadi' })) } finally { setBusy(false) }
   }
   const removeImage = (k) => setF((x) => ({ ...x, body: (x.body || '').split(/\n\s*\n/).filter((p) => !p.includes(`(img:${k})`)).join('\n\n') }))
   const inBody = usedKeys(f.body || '').filter((k) => f.images?.[k])

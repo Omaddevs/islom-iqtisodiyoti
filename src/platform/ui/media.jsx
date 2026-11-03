@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { Btn, Icon, cx } from './kit.jsx'
+import { api } from '../api/client.js'
 
 // Rasm yuklash va ko'rsatish uchun umumiy yordamchilar (video muqovasi, maqola muqovasi va rasmlari).
-// Hozircha rasmlar localStorage'da data-URL ko'rinishida — shuning uchun yuklashda siqiladi.
+// Rasm brauzerda siqiladi va serverga fayl sifatida yuklanadi; bazaga faqat havolasi (/api/files/…) yoziladi.
 
 export const IMAGE_TYPES = 'image/jpeg,image/png,image/webp'
 const MAX_FILE = 10 * 1024 * 1024
@@ -14,12 +15,20 @@ export function checkImage(file) {
   return ''
 }
 
-// Rasmni maxW×maxH dan oshmaydigan JPEG'ga siqadi. PNG shaffofligi oq fonga tushadi
-export function readImage(file, { maxW = 1280, maxH = 720, budget = 350_000 } = {}) {
+// Rasmni maxW×maxH dan oshmaydigan JPEG'ga siqib, serverga yuklaydi. PNG shaffofligi oq fonga tushadi.
+// Natija: { src: '/api/files/…', w, h }
+export async function readImage(file, opts) {
+  const { blob, w, h } = await compress(file, opts)
+  const { url } = await api('/api/uploads', { method: 'POST', raw: true, body: blob, headers: { 'Content-Type': 'image/jpeg' } })
+  return { src: url, w, h }
+}
+
+const toBlob = (c, q) => new Promise((res) => c.toBlob(res, 'image/jpeg', q))
+function compress(file, { maxW = 1280, maxH = 720, budget = 350_000 } = {}) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file)
     const img = new Image()
-    img.onload = () => {
+    img.onload = async () => {
       const k = Math.min(1, maxW / img.width, maxH / img.height)
       const c = document.createElement('canvas')
       c.width = Math.round(img.width * k); c.height = Math.round(img.height * k)
@@ -27,11 +36,12 @@ export function readImage(file, { maxW = 1280, maxH = 720, budget = 350_000 } = 
       ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height)
       ctx.drawImage(img, 0, 0, c.width, c.height)
       URL.revokeObjectURL(url)
-      let data = c.toDataURL('image/jpeg', 0.82)
-      if (data.length > budget) data = c.toDataURL('image/jpeg', 0.65)
-      resolve({ src: data, w: c.width, h: c.height })
+      let blob = await toBlob(c, 0.82)
+      if (blob && blob.size > budget) blob = await toBlob(c, 0.65)
+      if (!blob) return reject(new Error('Rasmni o‘qib bo‘lmadi, boshqa fayl tanlang'))
+      resolve({ blob, w: c.width, h: c.height })
     }
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('read')) }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Rasmni o‘qib bo‘lmadi, boshqa fayl tanlang')) }
     img.src = url
   })
 }
@@ -50,7 +60,7 @@ export function CoverPicker({ value, onChange, onError, className, style, left, 
     const bad = checkImage(file)
     if (bad) return onError(bad)
     onError(''); setBusy(true)
-    try { onChange((await readImage(file)).src) } catch { onError('Rasmni o‘qib bo‘lmadi, boshqa fayl tanlang') } finally { setBusy(false) }
+    try { onChange((await readImage(file)).src) } catch (e) { onError(e.message || 'Rasmni yuklab bo‘lmadi') } finally { setBusy(false) }
   }
   const browse = () => input.current?.click()
   return (

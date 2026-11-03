@@ -34,6 +34,12 @@ if [ ! -f /etc/systemd/system/islom-backend.service ]; then
 fi
 sudo systemctl restart islom-backend
 
+# Kunlik zaxira (03:30) — cron bir marta o'rnatiladi
+if [ ! -f /etc/cron.d/islom-backup ]; then
+  echo "30 3 * * * root bash $APP/deploy/backup.sh >> /var/log/islom-backup.log 2>&1" | sudo tee /etc/cron.d/islom-backup >/dev/null
+  sudo chmod 644 /etc/cron.d/islom-backup
+fi
+
 # nginx: SSL sertifikati bo'lsa — HTTPS (deploy/nginx.conf), aks holda IP orqali HTTP (deploy/nginx-ip.conf)
 if sudo test -f /etc/letsencrypt/live/islom-iqtisodiyoti.uz/fullchain.pem; then
   sudo cp "$APP/deploy/nginx.conf" /etc/nginx/sites-available/islom-iqtisodiyoti
