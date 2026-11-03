@@ -1,8 +1,9 @@
+import { Fragment } from 'react'
 import { Icon, UAvatar, cx } from '../ui/kit.jsx'
 import { useAuth } from '../store/auth.jsx'
 import { ROLES } from '../store/seed.js'
 
-// Rolga qarab menyu. `count` — o'ng tarafdagi raqam, `live` — jonli dars belgisi.
+// Rolga qarab menyu bo'limlari. `count` — o'ng tarafdagi raqam, `live` — jonli dars belgisi.
 export function navFor(user, scope, db) {
   const liveCount = scope.meetings.filter((m) => m.status === 'live').length
   const pendingHw = user.role === 'teacher' || user.role === 'org_admin'
@@ -14,24 +15,59 @@ export function navFor(user, scope, db) {
     ? scope.tests.filter((t) => !db.testAttempts.some((a) => a.testId === t.id && a.studentId === user.id) && t.dueAt > Date.now()).length
     : 0
 
-  const main = [
-    { href: '#/platform', label: 'Bosh sahifa', icon: 'home', exact: true },
-    { href: '#/platform/meetings', label: 'Onlayn darslar', icon: 'video', live: liveCount },
-    { href: '#/platform/schedule', label: 'Dars jadvali', icon: 'calendar' },
-    { href: '#/platform/videos', label: 'Video darslar', icon: 'play' },
-    { href: '#/platform/tests', label: 'Testlar', icon: 'clipboard', count: pendingTests || undefined },
-    { href: '#/platform/homework', label: 'Uy vazifalari', icon: 'fileText', count: pendingHw || undefined },
-    { href: '#/platform/vocabulary', label: 'Lug‘at', icon: 'translate' },
-    { href: '#/platform/library', label: 'Kutubxona', icon: 'bookOpen' },
-    { href: '#/platform/articles', label: 'Maqolalar', icon: 'bookmark' },
-  ]
-  const manage = []
-  if (user.role !== 'student') manage.push({ href: '#/platform/groups', label: 'Guruhlar', icon: 'layers' })
-  if (user.role === 'teacher') manage.push({ href: '#/platform/users', label: 'O‘quvchilarim', icon: 'users' })
-  if (user.role === 'org_admin' || user.role === 'superadmin') manage.push({ href: '#/platform/users', label: 'Foydalanuvchilar', icon: 'users' })
-  if (user.role === 'superadmin') manage.push({ href: '#/platform/organizations', label: 'Tashkilotlar', icon: 'building' }, { href: '#/platform/leads', label: 'Arizalar', icon: 'mail' })
-  const other = [{ href: '#/platform/settings', label: 'Sozlamalar', icon: 'settings' }]
-  return { main, manage, other }
+  const L = {
+    home: { href: '#/platform', label: 'Bosh sahifa', icon: 'home', exact: true },
+    meetings: { href: '#/platform/meetings', label: 'Onlayn darslar', icon: 'video', live: liveCount },
+    schedule: { href: '#/platform/schedule', label: 'Dars jadvali', icon: 'calendar' },
+    groups: { href: '#/platform/groups', label: user.role === 'teacher' ? 'Guruhlarim' : 'Guruhlar', icon: 'layers' },
+    homework: { href: '#/platform/homework', label: 'Uy vazifalari', icon: 'fileText', count: pendingHw || undefined },
+    tests: { href: '#/platform/tests', label: 'Testlar', icon: 'clipboard', count: pendingTests || undefined },
+    videos: { href: '#/platform/videos', label: 'Video darslar', icon: 'play' },
+    vocabulary: { href: '#/platform/vocabulary', label: 'Lug‘at', icon: 'translate' },
+    library: { href: '#/platform/library', label: 'Kutubxona', icon: 'bookOpen' },
+    articles: { href: '#/platform/articles', label: 'Maqolalar', icon: 'bookmark' },
+    users: { href: '#/platform/users', label: user.role === 'teacher' ? 'O‘quvchilarim' : 'Foydalanuvchilar', icon: 'users' },
+    orgs: { href: '#/platform/organizations', label: 'Tashkilotlar', icon: 'building' },
+    leads: { href: '#/platform/leads', label: 'Arizalar', icon: 'mail' },
+    settings: { href: '#/platform/settings', label: 'Sozlamalar', icon: 'settings' },
+  }
+  const materials = { title: 'Materiallar', links: [L.videos, L.vocabulary, L.library, L.articles] }
+  // Har bir rol o'z vazifasiga mos menyuni ko'radi
+  let sections
+  if (user.role === 'superadmin' && !scope.orgId) {
+    // Barcha tashkilotlar rejimi: platforma boshqaruvi (o'quv bo'limlari tashkilot ichida)
+    sections = [{ title: 'Platforma', links: [L.home, L.orgs, L.leads, L.users] }]
+  } else if (user.role === 'superadmin' || user.role === 'org_admin') {
+    sections = [
+      { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
+      { title: 'O‘quv jarayoni', links: [L.groups, L.homework, L.tests] },
+      materials,
+      { title: 'Boshqaruv', links: user.role === 'superadmin' ? [L.users, L.orgs, L.leads] : [L.users] },
+    ]
+  } else if (user.role === 'teacher') {
+    sections = [
+      { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
+      { title: 'Mening sinfim', links: [L.groups, L.users, L.homework, L.tests] },
+      materials,
+    ]
+  } else {
+    sections = [
+      { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
+      { title: 'Topshiriqlar', links: [L.homework, L.tests] },
+      materials,
+    ]
+  }
+  sections.push({ title: 'Boshqa', links: [L.settings] })
+  return sections
+
+}
+
+// Tashkilot kartochkasidagi ikkinchi qator
+const orgSub = (user, scope) => {
+  if (user.role === 'superadmin' || user.role === 'org_admin') return scope.org.plan === 'pro' ? 'Pro tarif' : 'Boshlang‘ich tarif'
+  const names = scope.groups.map((g) => g.name)
+  if (!names.length) return user.role === 'teacher' ? 'Guruh biriktirilmagan' : 'Guruhga qo‘shilmagan'
+  return names.length > 2 ? `${names.slice(0, 2).join(', ')} +${names.length - 2}` : names.join(', ')
 }
 
 export default function Sidebar({ route, open, onClose }) {
@@ -59,19 +95,20 @@ export default function Sidebar({ route, open, onClose }) {
         {scope.org && (
           <div className="pside__org" title={scope.org.name}>
             <i style={{ background: scope.org.color }} />
-            <span>{scope.org.name}<small>{scope.org.plan === 'pro' ? 'Pro tarif' : 'Boshlang‘ich tarif'}</small></span>
+            {/* Tarif — faqat boshqaruvchilar uchun; ustoz/o'quvchi o'z guruhlarini ko'radi */}
+            <span>{scope.org.name}<small>{orgSub(user, scope)}</small></span>
           </div>
         )}
         {!scope.org && user.role === 'superadmin' && (
           <div className="pside__org"><i style={{ background: '#6366f1' }} /><span>Barcha tashkilotlar<small>Bosh boshqaruv</small></span></div>
         )}
         <nav className="pside__nav" aria-label="Platforma menyusi">
-          <div className="pside__group">Bosh menu</div>
-          {nav.main.map((l) => <Link key={l.href} l={l} />)}
-          {nav.manage.length > 0 && <div className="pside__group">Boshqaruv</div>}
-          {nav.manage.map((l) => <Link key={l.href} l={l} />)}
-          <div className="pside__group">Boshqa</div>
-          {nav.other.map((l) => <Link key={l.href} l={l} />)}
+          {nav.map((sec) => (
+            <Fragment key={sec.title}>
+              <div className="pside__group">{sec.title}</div>
+              {sec.links.map((l) => <Link key={l.href} l={l} />)}
+            </Fragment>
+          ))}
         </nav>
         <div className="pside__foot">
           <div className="pside__me">

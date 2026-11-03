@@ -96,7 +96,7 @@ function HomeworkList() {
       subs: subsAll.length,
       pending: subsAll.filter((s) => s.status === 'submitted').length,
       rate: rate(now),
-      avgGrade: avgGrade(graded),
+      avgGrade: graded.length ? `${avgGrade(graded)}%` : '—',
       sActive: series(14, (ts) => hwBy(ts).filter((r) => r.h.dueAt > ts).length),
       sSubs: series(14, (ts) => upto(ts).length),
       sPending: series(14, waiting),
@@ -140,7 +140,7 @@ function HomeworkList() {
           <StatSpark icon="fileText" tone="blue" color="#3b8ef0" value={count('active')} label="Bajarish kerak" data={stats.sActive} onClick={() => setTab('active')} />
           <StatSpark icon="checkCircle" tone="teal" color="#14b8a6" value={count('done')} label="Topshirilgan" data={stats.sSubs} onClick={() => setTab('done')} />
           <StatSpark icon="clock" tone="amber" color="#f5a524" value={stats.pending} label="Tekshirilmoqda" data={stats.sPending} onClick={() => scrollTo('phw-recent')} />
-          <StatSpark icon="award" tone="violet" color="#8b5cf6" value={`${stats.avgGrade}%`} label="O‘rtacha baho" data={stats.sGrade} onClick={() => scrollTo('phw-state')} />
+          <StatSpark icon="award" tone="violet" color="#8b5cf6" value={stats.avgGrade} label="O‘rtacha baho" data={stats.sGrade} onClick={() => scrollTo('phw-state')} />
         </>}
       </div>
 

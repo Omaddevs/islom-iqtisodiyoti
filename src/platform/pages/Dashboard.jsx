@@ -1,7 +1,9 @@
-// Bosh sahifa (dashboard): bitta umumiy dizayn, ma'lumotlar esa rolga qarab hisoblanadi
+// Bosh sahifa (dashboard): har bir rol o'z vazifasiga mos alohida ko'rinishga ega.
+// Bosh admin — platforma boshqaruvi, tashkilot admini — o'quv markazi, ustoz — darslar va baholash, o'quvchi — o'qish.
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { Card, Stat, Btn, Badge, UAvatar, Icon, Progress, Empty, Menu, cx } from '../ui/kit.jsx'
+import { Card, Stat, Btn, Badge, UAvatar, Icon, Progress, Empty, Menu, Table, cx } from '../ui/kit.jsx'
+import { leadsApi } from '../api/client.js'
 import { fmtWhen, fmtAgo, fmtLeft, fmtDateFull, pct, DAYS_FULL, MONTHS_FULL } from '../ui/format.js'
 import { DAY_MS, startOfDay, eventsForDay, lessonCountsFor } from '../ui/agenda.js'
 
@@ -59,147 +61,336 @@ const weatherIcon = (code) => (code <= 1 ? 'sun' : code <= 48 ? 'cloud' : (code 
 
 export default function Dashboard() {
   const { user, viewOrgId } = useAuth()
-  // Bosh admin tashkilot ichiga kirganda — tashkilot admini ko'rinishi
-  const role = user.role === 'superadmin' && viewOrgId ? 'org_admin' : user.role
-  const [day, setDay] = useState(() => startOfDay(Date.now()))
-  const data = useDashData(role)
+  // Bosh admin tashkilot ichiga kirganda — o'sha tashkilot boshqaruvi ko'rinadi
+  if (user.role === 'superadmin' && !viewOrgId) return <PlatformDash />
+  if (user.role === 'superadmin' || user.role === 'org_admin') return <OrgAdminDash />
+  if (user.role === 'teacher') return <TeacherDash />
+  return <StudentDash />
+}
 
+// Umumiy karkas: chapda asosiy ustunlar, o'ngda yon panel
+function Layout({ stats, left, right, side, notice }) {
   return (
     <div className="pdash">
       <div className="pdash__main">
         <HeroBanner />
-        <div className="pgrid pgrid--4 pdash__stats">
-          {data.stats.map((s) => <Stat key={s.label} {...s} />)}
-        </div>
+        {notice}
+        <div className="pgrid pgrid--4 pdash__stats">{stats.map((s) => <Stat key={s.label} {...s} />)}</div>
         <div className="pdash__cols">
-          <div className="pdash__col">
-            <TodayLessons day={day} setDay={setDay} />
-            <MyGroups groups={data.groups} role={role} />
-          </div>
-          <div className="pdash__col">
-            <QuickActions items={data.actions} />
-            <ActivityFeed items={data.activity} />
-          </div>
+          <div className="pdash__col">{left}</div>
+          <div className="pdash__col">{right}</div>
         </div>
       </div>
-      <aside className="pdash__side">
-        <MiniCalendar day={day} setDay={setDay} />
-        <Reminders items={data.reminders} />
-        <LibraryPromo />
-      </aside>
+      <aside className="pdash__side">{side}</aside>
     </div>
   )
 }
 
-/* ---------------- Rolga qarab ma'lumotlar ---------------- */
-function useDashData(role) {
-  const { user, db, scope } = useAuth()
-  return useMemo(() => {
-    const now = Date.now()
-    const weekAgo = now - 7 * DAY_MS
-    const live = scope.meetings.filter((m) => m.status === 'live').length
-    const ended = scope.meetings.filter((m) => m.status === 'ended').length
-    const liveHint = live ? `${live} ta jonli dars` : undefined
-    let stats, actions, groups = scope.groups, activity = scope.activity
+const useDay = () => useState(() => startOfDay(Date.now()))
+const todayCount = (scope, db) => eventsForDay(scope, db, startOfDay(Date.now())).length
+const plusWeek = (list, since) => { const n = list.filter((x) => x.createdAt > since).length; return n ? `+${n} bu hafta` : undefined }
 
-    if (role === 'superadmin') {
-      const users = db.users.filter((u) => u.role !== 'superadmin')
-      const fresh = users.filter((u) => u.createdAt > weekAgo).length
-      stats = [
-        { icon: 'bank', label: 'Tashkilotlar', value: db.organizations.length, tone: 'violet', href: '#/platform/organizations' },
-        { icon: 'users', label: 'Foydalanuvchilar', value: users.length, trend: fresh ? `+${fresh} bu hafta` : undefined, tone: 'blue', href: '#/platform/users' },
-        { icon: 'layers', label: 'Guruhlar', value: db.groups.length, tone: 'green', href: '#/platform/groups' },
-        { icon: 'video', label: 'Jami darslar', value: db.meetings.length, hint: liveHint, tone: 'red', href: '#/platform/meetings' },
-      ]
-      actions = [
-        { label: 'Tashkilot qo‘shish', icon: 'bank', tone: 'violet', href: '#/platform/organizations?new=1' },
-        { label: 'Foydalanuvchi qo‘shish', icon: 'userPlus', tone: 'green', href: '#/platform/users?new=1' },
-        { label: 'Guruh yaratish', icon: 'layers', tone: 'amber', href: '#/platform/groups?new=1' },
-        { label: 'Yangi dars yaratish', icon: 'plus', tone: 'blue', href: '#/platform/meetings?new=1' },
-      ]
-      groups = db.groups; activity = db.activity
-    } else if (role === 'org_admin') {
-      const fresh = scope.users.filter((u) => u.createdAt > weekAgo).length
-      stats = [
-        { icon: 'users', label: 'O‘quvchilar', value: scope.students.length, trend: fresh ? `+${fresh} bu hafta` : undefined, tone: 'blue', href: '#/platform/users' },
-        { icon: 'user', label: 'Ustozlar', value: scope.teachers.length, tone: 'teal', href: '#/platform/users?role=teacher' },
-        { icon: 'layers', label: 'Guruhlar', value: scope.groups.length, tone: 'green', href: '#/platform/groups' },
-        { icon: 'video', label: 'Jami darslar', value: scope.meetings.length, hint: liveHint, tone: 'red', href: '#/platform/meetings' },
-      ]
-      actions = [
-        { label: 'Yangi dars yaratish', icon: 'plus', tone: 'blue', href: '#/platform/meetings?new=1' },
-        { label: 'Foydalanuvchi qo‘shish', icon: 'userPlus', tone: 'green', href: '#/platform/users?new=1' },
-        { label: 'Material yuklash', icon: 'upload', tone: 'violet', href: '#/platform/library' },
-        { label: 'Guruh yaratish', icon: 'layers', tone: 'amber', href: '#/platform/groups?new=1' },
-      ]
-    } else if (role === 'teacher') {
-      const toGrade = db.submissions.filter((s) => s.status === 'submitted' && scope.homework.some((h) => h.id === s.homeworkId)).length
-      stats = [
-        { icon: 'layers', label: 'Guruhlarim', value: scope.groups.length, tone: 'blue', href: '#/platform/groups' },
-        { icon: 'users', label: 'O‘quvchilarim', value: scope.myStudents.length, tone: 'teal', href: '#/platform/users' },
-        { icon: 'fileText', label: 'Baholash kutmoqda', value: toGrade, tone: 'amber', href: '#/platform/homework' },
-        { icon: 'video', label: 'O‘tkazilgan darslar', value: ended, hint: liveHint, tone: 'violet', href: '#/platform/meetings' },
-      ]
-      actions = [
-        { label: 'Dars rejalashtirish', icon: 'plus', tone: 'blue', href: '#/platform/meetings?new=1' },
-        { label: 'Test yaratish', icon: 'clipboard', tone: 'violet', href: '#/platform/tests' },
-        { label: 'Vazifa berish', icon: 'fileText', tone: 'amber', href: '#/platform/homework' },
-        { label: 'Material yuklash', icon: 'upload', tone: 'green', href: '#/platform/library' },
-      ]
-    } else {
-      const attempts = db.testAttempts.filter((a) => a.studentId === user.id)
-      const avg = attempts.length ? Math.round(attempts.reduce((s, a) => s + pct(a.score, a.total), 0) / attempts.length) : 0
-      const pendingHw = scope.homework.filter((h) => !db.submissions.some((s) => s.homeworkId === h.id && s.studentId === user.id) && h.dueAt > now).length
-      const learned = db.vocabProgress.filter((p) => p.studentId === user.id).reduce((s, p) => s + p.learned.length, 0)
-      const totalTerms = scope.vocabSets.reduce((s, v) => s + v.terms.length, 0)
-      stats = [
-        { icon: 'layers', label: 'Guruhlarim', value: scope.groups.length, tone: 'blue', href: '#/platform/schedule' },
-        { icon: 'award', label: 'Testlar o‘rtachasi', value: `${avg}%`, hint: attempts.length ? `${attempts.length} ta topshirilgan` : undefined, tone: 'green', href: '#/platform/tests' },
-        { icon: 'fileText', label: 'Kutilayotgan vazifa', value: pendingHw, tone: 'amber', href: '#/platform/homework' },
-        { icon: 'translate', label: 'O‘rganilgan so‘zlar', value: `${learned}/${totalTerms}`, tone: 'violet', href: '#/platform/vocabulary' },
-      ]
-      actions = [
-        { label: 'Testlarga o‘tish', icon: 'clipboard', tone: 'blue', href: '#/platform/tests' },
-        { label: 'Uy vazifalari', icon: 'fileText', tone: 'amber', href: '#/platform/homework' },
-        { label: 'Lug‘atni mashq qilish', icon: 'translate', tone: 'violet', href: '#/platform/vocabulary' },
-        { label: 'Kutubxona', icon: 'bookOpen', tone: 'green', href: '#/platform/library' },
-      ]
-    }
-
-    return { stats, actions, groups, activity, reminders: buildReminders(role, user, db, scope) }
-  }, [role, user, db, scope])
+/* ================= Bosh administrator (barcha tashkilotlar) ================= */
+function PlatformDash() {
+  const { db } = useAuth()
+  const [leads, setLeads] = useState(null)
+  useEffect(() => { leadsApi.list().then((r) => setLeads(r.leads)).catch(() => setLeads([])) }, [])
+  const users = db.users.filter((u) => u.role !== 'superadmin')
+  const students = users.filter((u) => u.role === 'student')
+  const freshLeads = (leads || []).filter((l) => l.status === 'new')
+  const stats = [
+    { icon: 'bank', label: 'Tashkilotlar', value: db.organizations.length, hint: `${db.organizations.filter((o) => o.status === 'active').length} ta faol`, tone: 'violet', href: '#/platform/organizations' },
+    { icon: 'users', label: 'O‘quvchilar', value: students.length, trend: plusWeek(students, Date.now() - 7 * DAY_MS), tone: 'blue', href: '#/platform/users' },
+    { icon: 'user', label: 'Ustozlar', value: users.filter((u) => u.role === 'teacher').length, tone: 'teal', href: '#/platform/users?role=teacher' },
+    { icon: 'mail', label: 'Yangi arizalar', value: leads ? freshLeads.length : '…', hint: leads ? `jami ${leads.length} ta` : undefined, tone: 'amber', href: '#/platform/leads' },
+  ]
+  const actions = [
+    { label: 'Tashkilot qo‘shish', icon: 'bank', tone: 'violet', href: '#/platform/organizations?new=1' },
+    { label: 'Arizalarni ko‘rish', icon: 'mail', tone: 'amber', href: '#/platform/leads' },
+    { label: 'Foydalanuvchilar', icon: 'users', tone: 'green', href: '#/platform/users' },
+    { label: 'Sozlamalar', icon: 'settings', tone: 'blue', href: '#/platform/settings' },
+  ]
+  return (
+    <Layout stats={stats}
+      left={<OrgOverview />}
+      right={<><QuickActions items={actions} /><LeadsWidget leads={freshLeads} loading={!leads} /></>}
+      side={<ActivityFeed items={db.activity} title="Platforma faoliyati" />} />
+  )
 }
 
-// Eslatmalar: yaqin darslar + rolga xos muddatlar + o'qilmagan bildirishnomalar
-function buildReminders(role, user, db, scope) {
+/* ================= Tashkilot admini ================= */
+function OrgAdminDash() {
+  const { db, scope } = useAuth()
+  const [day, setDay] = useDay()
+  const live = scope.meetings.filter((m) => m.status === 'live').length
+  const stats = [
+    { icon: 'users', label: 'O‘quvchilar', value: scope.students.length, trend: plusWeek(scope.students, Date.now() - 7 * DAY_MS), tone: 'blue', href: '#/platform/users' },
+    { icon: 'user', label: 'Ustozlar', value: scope.teachers.length, tone: 'teal', href: '#/platform/users?role=teacher' },
+    { icon: 'layers', label: 'Guruhlar', value: scope.groups.length, tone: 'green', href: '#/platform/groups' },
+    { icon: 'video', label: 'Bugungi darslar', value: todayCount(scope, db), hint: live ? `${live} ta jonli` : undefined, tone: 'red', href: '#/platform/schedule' },
+  ]
+  const actions = [
+    { label: 'O‘quvchi qo‘shish', icon: 'userPlus', tone: 'green', href: '#/platform/users?new=1' },
+    { label: 'Guruh yaratish', icon: 'layers', tone: 'amber', href: '#/platform/groups?new=1' },
+    { label: 'Dars rejalashtirish', icon: 'plus', tone: 'blue', href: '#/platform/meetings?new=1' },
+    { label: 'Material yuklash', icon: 'upload', tone: 'violet', href: '#/platform/library' },
+  ]
+  return (
+    <Layout stats={stats}
+      left={<><TodayLessons day={day} setDay={setDay} /><GroupsHealth /></>}
+      right={<><Attention /><QuickActions items={actions} /></>}
+      side={<><MiniCalendar day={day} setDay={setDay} /><ActivityFeed items={scope.activity} /></>} />
+  )
+}
+
+/* ================= Ustoz ================= */
+function TeacherDash() {
+  const { user, db, scope } = useAuth()
+  const [day, setDay] = useDay()
+  const queue = gradingQueue(db, scope)
+  const stats = [
+    { icon: 'video', label: 'Bugungi darslarim', value: todayCount(scope, db), tone: 'blue', href: '#/platform/schedule' },
+    { icon: 'edit', label: 'Baholash kutmoqda', value: queue.length, tone: 'amber', href: '#/platform/homework' },
+    { icon: 'users', label: 'O‘quvchilarim', value: scope.myStudents.length, tone: 'teal', href: '#/platform/users' },
+    { icon: 'layers', label: 'Guruhlarim', value: scope.groups.length, tone: 'green', href: '#/platform/groups' },
+  ]
+  const actions = [
+    { label: 'Dars rejalashtirish', icon: 'plus', tone: 'blue', href: '#/platform/meetings?new=1' },
+    { label: 'Vazifa berish', icon: 'fileText', tone: 'amber', href: '#/platform/homework' },
+    { label: 'Test yaratish', icon: 'clipboard', tone: 'violet', href: '#/platform/tests' },
+    { label: 'Video qo‘shish', icon: 'upload', tone: 'green', href: '#/platform/videos' },
+  ]
+  // Faqat o'z o'quvchilari va o'zining harakatlari — admin amallari ustozga ko'rsatilmaydi
+  const mine = new Set([user.id, ...scope.myStudents.map((s) => s.id)])
+  return (
+    <Layout stats={stats}
+      notice={!scope.groups.length && <NoGroups text="Sizga hali guruh biriktirilmagan. Administrator guruhga biriktirgach, darslar va o‘quvchilaringiz shu yerda ko‘rinadi." />}
+      left={<><TodayLessons day={day} setDay={setDay} /><MyGroups groups={scope.groups} staff /></>}
+      right={<><QuickActions items={actions} /><GradingQueue items={queue} /></>}
+      side={<><MiniCalendar day={day} setDay={setDay} /><Reminders items={teacherReminders(db, scope, user)} /><ActivityFeed items={scope.activity.filter((a) => mine.has(a.userId))} title="O‘quvchilar faolligi" /></>} />
+  )
+}
+
+/* ================= O'quvchi ================= */
+function StudentDash() {
+  const { user, db, scope } = useAuth()
+  const [day, setDay] = useDay()
+  const now = Date.now()
+  const attempts = db.testAttempts.filter((a) => a.studentId === user.id)
+  const avg = attempts.length ? Math.round(attempts.reduce((s, a) => s + pct(a.score, a.total), 0) / attempts.length) : null
+  const pendingHw = scope.homework.filter((h) => h.dueAt > now && !db.submissions.some((s) => s.homeworkId === h.id && s.studentId === user.id))
+  const pendingTests = scope.tests.filter((t) => t.dueAt > now && !attempts.some((a) => a.testId === t.id))
+  const learned = db.vocabProgress.filter((p) => p.studentId === user.id).reduce((s, p) => s + p.learned.length, 0)
+  const totalTerms = scope.vocabSets.reduce((s, v) => s + v.terms.length, 0)
+  const stats = [
+    { icon: 'fileText', label: 'Kutilayotgan vazifalar', value: pendingHw.length, tone: 'amber', href: '#/platform/homework' },
+    { icon: 'clipboard', label: 'Topshirilmagan testlar', value: pendingTests.length, tone: 'violet', href: '#/platform/tests' },
+    { icon: 'award', label: 'Testlar o‘rtachasi', value: avg === null ? '—' : `${avg}%`, hint: attempts.length ? `${attempts.length} ta topshirilgan` : 'hali topshirilmagan', tone: 'green', href: '#/platform/tests' },
+    { icon: 'translate', label: 'O‘rganilgan so‘zlar', value: `${learned}/${totalTerms}`, tone: 'blue', href: '#/platform/vocabulary' },
+  ]
+  return (
+    <Layout stats={stats}
+      notice={!scope.groups.length && <NoGroups text="Siz hali guruhga biriktirilmagansiz. Administrator sizni guruhga qo‘shgach, darslar, vazifalar va testlar shu yerda paydo bo‘ladi." />}
+      left={<><TodayLessons day={day} setDay={setDay} /><MyGroups groups={scope.groups} /></>}
+      right={<><Deadlines homework={pendingHw} tests={pendingTests} /><RecentGrades /></>}
+      side={<><MiniCalendar day={day} setDay={setDay} /><NewMaterials /><LibraryPromo /></>} />
+  )
+}
+
+// Baholanishi kerak bo'lgan javoblar (eng eskisi birinchi)
+const gradingQueue = (db, scope) => db.submissions
+  .filter((s) => s.status === 'submitted' && scope.homework.some((h) => h.id === s.homeworkId))
+  .sort((a, b) => a.submittedAt - b.submittedAt)
+
+// Ustoz eslatmalari: yaqin darslar, muddati yaqin vazifalar, o'qilmagan bildirishnomalar
+function teacherReminders(db, scope, user) {
   const now = Date.now()
   const items = []
-  scope.meetings
-    .filter((m) => m.status !== 'ended' && m.startsAt > now - 30 * 60e3 && m.startsAt < now + 2 * DAY_MS)
-    .forEach((m) => {
-      const g = db.groups.find((x) => x.id === m.groupId)
-      items.push({ id: m.id, at: m.startsAt, icon: 'video', tone: m.status === 'live' ? 'red' : 'blue', title: m.title, sub: `${m.status === 'live' ? 'Hozir jonli' : fmtWhen(m.startsAt)} · ${g?.name || ''}`, href: `#/platform/meetings/${m.id}/room` })
-    })
-  if (role === 'student') {
-    scope.homework.filter((h) => h.dueAt > now && !db.submissions.some((s) => s.homeworkId === h.id && s.studentId === user.id))
-      .forEach((h) => items.push({ id: h.id, at: h.dueAt, icon: 'fileText', tone: 'amber', title: h.title, sub: `Muddat: ${fmtWhen(h.dueAt)}`, href: `#/platform/homework/${h.id}` }))
-    scope.tests.filter((t) => t.dueAt > now && !db.testAttempts.some((a) => a.testId === t.id && a.studentId === user.id))
-      .forEach((t) => items.push({ id: t.id, at: t.dueAt, icon: 'clipboard', tone: 'violet', title: t.title, sub: `Test muddati: ${fmtWhen(t.dueAt)}`, href: `#/platform/tests/${t.id}` }))
-  }
-  if (role === 'teacher' || role === 'org_admin') {
-    const toGrade = db.submissions.filter((s) => s.status === 'submitted' && scope.homework.some((h) => h.id === s.homeworkId))
-    if (toGrade.length) items.push({ id: 'grade', at: now, icon: 'edit', tone: 'amber', title: `${toGrade.length} ta vazifa baholashni kutmoqda`, sub: 'Uy vazifalari bo‘limi', href: '#/platform/homework' })
-    scope.homework.filter((h) => h.dueAt > now && h.dueAt < now + 2 * DAY_MS)
-      .forEach((h) => items.push({ id: h.id, at: h.dueAt, icon: 'fileText', tone: 'teal', title: h.title, sub: `Topshirish muddati: ${fmtWhen(h.dueAt)}`, href: `#/platform/homework/${h.id}` }))
-  }
-  if (role === 'org_admin' || role === 'superadmin') {
-    scope.groups.filter((g) => !g.teacherId)
-      .forEach((g) => items.push({ id: g.id, at: now, icon: 'alertCircle', tone: 'red', title: `${g.name} guruhiga ustoz biriktirilmagan`, sub: g.course, href: `#/platform/groups/${g.id}` }))
-  }
+  scope.meetings.filter((m) => m.status !== 'ended' && m.startsAt > now - 30 * 60e3 && m.startsAt < now + 2 * DAY_MS)
+    .forEach((m) => items.push({ id: m.id, at: m.startsAt, icon: 'video', tone: m.status === 'live' ? 'red' : 'blue', title: m.title, sub: m.status === 'live' ? 'Hozir jonli' : fmtWhen(m.startsAt), href: m.code ? `#/join/${m.code}` : '#/platform/meetings' }))
+  scope.homework.filter((h) => h.dueAt > now && h.dueAt < now + 2 * DAY_MS)
+    .forEach((h) => items.push({ id: h.id, at: h.dueAt, icon: 'fileText', tone: 'teal', title: h.title, sub: `Topshirish muddati: ${fmtWhen(h.dueAt)}`, href: `#/platform/homework/${h.id}` }))
   db.notifications.filter((n) => n.userId === user.id && !n.read).slice(0, 2)
     .forEach((n) => items.push({ id: n.id, at: n.at, icon: 'bell', tone: 'gray', title: n.text, sub: fmtAgo(n.at), href: n.href }))
   return items.sort((a, b) => a.at - b.at).slice(0, 4)
 }
+
+/* ---------------- Rolga xos vidjetlar ---------------- */
+function NoGroups({ text }) {
+  return (
+    <div className="pdnote">
+      <span className="pdr__ico" style={toneStyle('amber')}><Icon name="info" size={20} /></span>
+      <p>{text}</p>
+    </div>
+  )
+}
+
+const MoreBtn = ({ href }) => <Btn size="sm" variant="ghost" icon="arrowRight" as="a" href={href} style={{ flexDirection: 'row-reverse' }}>Barchasi</Btn>
+
+// Bosh admin: tashkilotlar holati
+function OrgOverview() {
+  const { db, setViewOrg } = useAuth()
+  const rows = db.organizations.map((o) => {
+    const us = db.users.filter((u) => u.orgId === o.id)
+    return { ...o, students: us.filter((u) => u.role === 'student').length, teachers: us.filter((u) => u.role === 'teacher').length, groups: db.groups.filter((g) => g.orgId === o.id).length }
+  })
+  const enter = (o) => { setViewOrg(o.id); window.location.hash = '#/platform' }
+  return (
+    <Card pad={false} title={<CardTitle icon="bank">Tashkilotlar</CardTitle>} action={<MoreBtn href="#/platform/organizations" />}>
+      <Table rows={rows} empty={<Empty icon="bank" title="Hali tashkilot yo‘q" text="Birinchi tashkilotni yarating — shundan so‘ng ustoz, o‘quvchi va materiallar qo‘shiladi." action={<Btn variant="primary" icon="plus" as="a" href="#/platform/organizations?new=1">Tashkilot qo‘shish</Btn>} />} cols={[
+        { key: 'name', label: 'Tashkilot', render: (o) => <div className="pcell-user"><span className="pdorg__dot" style={{ background: o.color || '#4aa3f8' }}>{o.name[0]}</span><div><b>{o.name}</b><span>{o.plan === 'pro' ? 'Pro tarif' : 'Boshlang‘ich tarif'}</span></div></div> },
+        { key: 'students', label: 'O‘quvchi', align: 'center' },
+        { key: 'teachers', label: 'Ustoz', align: 'center' },
+        { key: 'groups', label: 'Guruh', align: 'center' },
+        { key: 'status', label: 'Holat', render: (o) => o.status === 'active' ? <Badge tone="green" dot>Faol</Badge> : <Badge tone="red" dot>To‘xtatilgan</Badge> },
+        { key: 'go', label: '', align: 'right', render: (o) => <Btn size="sm" variant="soft" icon="logIn" onClick={() => enter(o)}>Kirish</Btn> },
+      ]} />
+    </Card>
+  )
+}
+
+// Bosh admin: yangi arizalar
+function LeadsWidget({ leads, loading }) {
+  return (
+    <Card title={<CardTitle icon="mail">Yangi arizalar</CardTitle>} action={<MoreBtn href="#/platform/leads" />}>
+      {loading ? <p className="pmuted">Yuklanmoqda…</p> : leads.length ? leads.slice(0, 5).map((l) => (
+        <a key={l.id} href="#/platform/leads" className="pdr">
+          <span className="pdr__ico" style={toneStyle('amber')}><Icon name={l.kind === 'contact' ? 'mail' : 'userPlus'} size={19} /></span>
+          <div className="pdr__body"><b>{l.name || l.phone || l.email}</b><span>{l.course || l.topic || l.phone || l.email} · {fmtAgo(l.createdAt)}</span></div>
+        </a>
+      )) : <Empty icon="checkCircle" title="Yangi ariza yo‘q" text="Saytdagi formalar orqali kelgan arizalar shu yerda ko‘rinadi." />}
+    </Card>
+  )
+}
+
+// Tashkilot admini: guruhlar holati
+function GroupsHealth() {
+  const { db, scope } = useAuth()
+  const rows = scope.groups.map((g) => ({ ...g, teacher: db.users.find((u) => u.id === g.teacherId) }))
+  return (
+    <Card pad={false} title={<CardTitle icon="layers">Guruhlar</CardTitle>} action={<MoreBtn href="#/platform/groups" />}>
+      <Table rows={rows.slice(0, 6)} onRow={(g) => { window.location.hash = `#/platform/groups/${g.id}` }}
+        empty={<Empty icon="layers" title="Hali guruh yo‘q" text="Guruh yarating, ustoz va o‘quvchilarni biriktiring." action={<Btn variant="primary" icon="plus" as="a" href="#/platform/groups?new=1">Guruh yaratish</Btn>} />} cols={[
+          { key: 'name', label: 'Guruh', render: (g) => <div><b style={{ color: g.color }}>{g.name}</b><div className="pmuted" style={{ fontSize: 12.5 }}>{g.course}</div></div> },
+          { key: 'teacher', label: 'Ustoz', render: (g) => g.teacher ? g.teacher.name : <Badge tone="red">Biriktirilmagan</Badge> },
+          { key: 'n', label: 'O‘quvchi', align: 'center', render: (g) => g.studentIds.length || <Badge tone="amber">0</Badge> },
+        ]} />
+    </Card>
+  )
+}
+
+// Tashkilot admini: e'tibor talab qiladigan holatlar
+function Attention() {
+  const { db, scope } = useAuth()
+  const items = []
+  scope.groups.filter((g) => !g.teacherId).forEach((g) => items.push({ id: `t${g.id}`, icon: 'alertCircle', tone: 'red', title: `${g.name}: ustoz biriktirilmagan`, sub: g.course, href: `#/platform/groups/${g.id}` }))
+  scope.groups.filter((g) => !g.studentIds.length).forEach((g) => items.push({ id: `s${g.id}`, icon: 'users', tone: 'amber', title: `${g.name}: o‘quvchi yo‘q`, sub: 'O‘quvchilarni guruhga qo‘shing', href: `#/platform/groups/${g.id}` }))
+  const idle = scope.teachers.filter((t) => !scope.groups.some((g) => g.teacherId === t.id))
+  if (idle.length) items.push({ id: 'idle', icon: 'user', tone: 'gray', title: `${idle.length} ta ustozga guruh biriktirilmagan`, sub: idle.map((t) => t.name).slice(0, 2).join(', '), href: '#/platform/users?role=teacher' })
+  const lonely = scope.students.filter((s) => !scope.groups.some((g) => g.studentIds.includes(s.id)))
+  if (lonely.length) items.push({ id: 'lonely', icon: 'userPlus', tone: 'amber', title: `${lonely.length} ta o‘quvchi guruhsiz`, sub: 'Ular dars va vazifalarni ko‘rmaydi', href: '#/platform/users' })
+  const queue = gradingQueue(db, scope)
+  if (queue.length) items.push({ id: 'grade', icon: 'edit', tone: 'teal', title: `${queue.length} ta javob baholanmagan`, sub: 'Uy vazifalari', href: '#/platform/homework' })
+  return (
+    <Card title={<CardTitle icon="alertCircle">Diqqat talab</CardTitle>}>
+      {items.length ? items.slice(0, 5).map((r) => <ReminderRow key={r.id} r={r} />)
+        : <Empty icon="checkCircle" title="Hammasi joyida" text="Guruhlar, ustozlar va o‘quvchilar to‘g‘ri biriktirilgan." />}
+    </Card>
+  )
+}
+
+// Ustoz: baholash navbati
+function GradingQueue({ items }) {
+  const { db } = useAuth()
+  return (
+    <Card title={<CardTitle icon="edit">Baholash kutmoqda</CardTitle>} action={<MoreBtn href="#/platform/homework" />}>
+      {items.length ? items.slice(0, 5).map((s) => {
+        const st = db.users.find((u) => u.id === s.studentId)
+        const h = db.homework.find((x) => x.id === s.homeworkId)
+        return (
+          <a key={s.id} href={`#/platform/homework/${s.homeworkId}`} className="pdr">
+            <UAvatar user={st} size={40} />
+            <div className="pdr__body"><b>{st?.name || 'O‘quvchi'}</b><span>{h?.title} · {fmtAgo(s.submittedAt)}</span></div>
+            <Badge tone="amber">Baholash</Badge>
+          </a>
+        )
+      }) : <Empty icon="checkCircle" title="Hammasi baholangan" text="Yangi javoblar kelganda shu yerda ko‘rinadi." />}
+    </Card>
+  )
+}
+
+// O'quvchi: muddati yaqin vazifa va testlar
+function Deadlines({ homework, tests }) {
+  const items = [
+    ...homework.map((h) => ({ id: h.id, at: h.dueAt, icon: 'fileText', tone: 'amber', title: h.title, kind: 'Uy vazifa', href: `#/platform/homework/${h.id}` })),
+    ...tests.map((t) => ({ id: t.id, at: t.dueAt, icon: 'clipboard', tone: 'violet', title: t.title, kind: 'Test', href: `#/platform/tests/${t.id}` })),
+  ].sort((a, b) => a.at - b.at)
+  return (
+    <Card title={<CardTitle icon="clock">Topshiriqlarim</CardTitle>}>
+      {items.length ? items.slice(0, 6).map((r) => (
+        <a key={r.id} href={r.href} className="pdr">
+          <span className="pdr__ico" style={toneStyle(r.tone)}><Icon name={r.icon} size={19} /></span>
+          <div className="pdr__body"><b>{r.title}</b><span>{r.kind} · muddat {fmtWhen(r.at)}</span></div>
+          <Badge tone={r.at - Date.now() < DAY_MS ? 'red' : 'gray'}>{fmtLeft(r.at)}</Badge>
+        </a>
+      )) : <Empty icon="checkCircle" title="Barcha topshiriqlar bajarilgan" text="Yangi vazifa yoki test berilganda shu yerda ko‘rinadi." />}
+    </Card>
+  )
+}
+
+// O'quvchi: so'nggi baholar (vazifa va testlar)
+function RecentGrades() {
+  const { user, db } = useAuth()
+  const items = [
+    ...db.submissions.filter((s) => s.studentId === user.id && s.status === 'graded').map((s) => {
+      const h = db.homework.find((x) => x.id === s.homeworkId)
+      const max = h?.maxGrade || 100
+      return { id: s.id, at: s.gradedAt || s.submittedAt, title: h?.title || 'Uy vazifa', score: `${s.grade}/${max}`, p: pct(s.grade, max), note: s.feedback, href: `#/platform/homework/${s.homeworkId}` }
+    }),
+    ...db.testAttempts.filter((a) => a.studentId === user.id).map((a) => {
+      const t = db.tests.find((x) => x.id === a.testId)
+      return { id: a.id, at: a.finishedAt, title: t?.title || 'Test', score: `${a.score}/${a.total}`, p: pct(a.score, a.total), href: `#/platform/tests/${a.testId}` }
+    }),
+  ].sort((a, b) => b.at - a.at)
+  return (
+    <Card title={<CardTitle icon="award">So‘nggi baholarim</CardTitle>}>
+      {items.length ? items.slice(0, 4).map((r) => (
+        <a key={r.id} href={r.href} className="pdr">
+          <span className="pdr__ico pdr__score" style={toneStyle(r.p >= 80 ? 'green' : r.p >= 60 ? 'amber' : 'red')}>{r.p}%</span>
+          <div className="pdr__body"><b>{r.title}</b><span>{r.score}{r.note ? ` · ${r.note}` : ''} · {fmtAgo(r.at)}</span></div>
+        </a>
+      )) : <Empty icon="award" title="Hali baho yo‘q" text="Test topshirganingizda yoki vazifangiz baholanganda shu yerda ko‘rinadi." />}
+    </Card>
+  )
+}
+
+// O'quvchi: yangi materiallar (video, maqola, kutubxona, lug'at)
+function NewMaterials() {
+  const { scope } = useAuth()
+  const items = [
+    ...scope.videos.map((x) => ({ ...x, icon: 'play', tone: 'blue', kind: 'Video dars', href: `#/platform/videos/${x.id}` })),
+    ...scope.articles.filter((x) => x.published).map((x) => ({ ...x, icon: 'bookmark', tone: 'green', kind: 'Maqola', href: `#/platform/articles/${x.id}` })),
+    ...scope.library.map((x) => ({ ...x, icon: 'bookOpen', tone: 'violet', kind: 'Kutubxona', href: '#/platform/library' })),
+    ...scope.vocabSets.map((x) => ({ ...x, icon: 'translate', tone: 'teal', kind: 'Lug‘at', href: `#/platform/vocabulary/${x.id}` })),
+  ].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  return (
+    <Card title={<CardTitle icon="spark">Yangi materiallar</CardTitle>}>
+      {items.length ? items.slice(0, 4).map((r) => (
+        <a key={`${r.kind}${r.id}`} href={r.href} className="pdr">
+          <span className="pdr__ico" style={toneStyle(r.tone)}><Icon name={r.icon} size={19} /></span>
+          <div className="pdr__body"><b>{r.title}</b><span>{r.kind} · {fmtAgo(r.createdAt)}</span></div>
+        </a>
+      )) : <Empty icon="bookOpen" title="Hali material yo‘q" text="Ustozingiz video, maqola yoki kitob qo‘shganda shu yerda ko‘rinadi." />}
+    </Card>
+  )
+}
+
+const ReminderRow = ({ r }) => (
+  <a href={r.href || '#/platform'} className="pdr">
+    <span className="pdr__ico" style={toneStyle(r.tone)}><Icon name={r.icon} size={19} /></span>
+    <div className="pdr__body"><b>{r.title}</b><span>{r.sub}</span></div>
+  </a>
+)
 
 /* ---------------- Salomlashuv banneri ---------------- */
 function HeroBanner() {
@@ -294,12 +485,11 @@ function LessonRow({ e }) {
 }
 
 /* ---------------- Guruhlar ---------------- */
-function MyGroups({ groups, role }) {
+function MyGroups({ groups, staff = false }) {
   const { db } = useAuth()
-  const staff = role !== 'student'
   const shown = groups.slice(0, 3)
   return (
-    <Card title={<CardTitle icon="users">{role === 'superadmin' || role === 'org_admin' ? 'Guruhlar' : 'Mening guruhlarim'}</CardTitle>}
+    <Card title={<CardTitle icon="users">Mening guruhlarim</CardTitle>}
       action={<Btn size="sm" variant="ghost" icon="arrowRight" as="a" href={staff ? '#/platform/groups' : '#/platform/schedule'} style={{ flexDirection: 'row-reverse' }}>Barchasi</Btn>}>
       {shown.length ? (
         <div className="pdg-grid">
@@ -310,13 +500,15 @@ function MyGroups({ groups, role }) {
               <a key={g.id} href={staff ? `#/platform/groups/${g.id}` : '#/platform/schedule'} className="pdg" style={{ '--gc': g.color }} title={`${g.name} · ${g.course}`}>
                 <b>{g.name}</b>
                 <span>{g.course}</span>
-                <small><Icon name="users" size={14} /> {g.studentIds.length} talaba</small>
+                <small>{staff
+                  ? <><Icon name="users" size={14} /> {g.studentIds.length} o‘quvchi</>
+                  : <><Icon name="user" size={14} /> {db.users.find((u) => u.id === g.teacherId)?.name || 'Ustoz biriktirilmagan'}</>}</small>
                 <div className="pdg__prog" title="O‘tilgan darslar ulushi"><Progress value={p} size="sm" /><em>{p}%</em></div>
               </a>
             )
           })}
         </div>
-      ) : <Empty icon="layers" title="Hali guruh yo‘q" />}
+      ) : <Empty icon="layers" title="Hali guruh yo‘q" text={staff ? 'Guruh biriktirilganda shu yerda ko‘rinadi.' : 'Administrator sizni guruhga qo‘shgach shu yerda ko‘rinadi.'} />}
     </Card>
   )
 }
@@ -335,10 +527,10 @@ function QuickActions({ items }) {
 /* ---------------- So'nggi faoliyat ---------------- */
 const kindOf = (t) => /test/i.test(t) ? ['Test', 'violet'] : /vazifa/i.test(t) ? ['Uy vazifa', 'amber'] : /dars/i.test(t) ? ['Dars', 'blue'] : /guruh|o‘quvchi|foydalanuvchi|ustoz|tashkilot/i.test(t) ? ['Guruh', 'teal'] : ['Material', 'green']
 
-function ActivityFeed({ items }) {
+function ActivityFeed({ items, title = 'So‘nggi faoliyat' }) {
   const { db } = useAuth()
   return (
-    <Card title={<CardTitle icon="clock">So‘nggi faoliyat</CardTitle>}>
+    <Card title={<CardTitle icon="clock">{title}</CardTitle>}>
       {items.length ? items.slice(0, 5).map((a) => {
         const u = db.users.find((x) => x.id === a.userId)
         const [label, tone] = kindOf(a.text)
@@ -405,12 +597,7 @@ function MiniCalendar({ day, setDay }) {
 function Reminders({ items }) {
   return (
     <Card title={<CardTitle icon="bell">Eslatmalar</CardTitle>} action={<Btn size="sm" variant="ghost" icon="arrowRight" as="a" href="#/platform/schedule" style={{ flexDirection: 'row-reverse' }}>Barchasi</Btn>}>
-      {items.length ? items.map((r) => (
-        <a key={r.id} href={r.href || '#/platform'} className="pdr">
-          <span className="pdr__ico" style={toneStyle(r.tone)}><Icon name={r.icon} size={19} /></span>
-          <div className="pdr__body"><b>{r.title}</b><span>{r.sub}</span></div>
-        </a>
-      )) : <Empty icon="checkCircle" title="Eslatmalar yo‘q" text="Hozircha kutilayotgan ish yo‘q." />}
+      {items.length ? items.map((r) => <ReminderRow key={r.id} r={r} />) : <Empty icon="checkCircle" title="Eslatmalar yo‘q" text="Hozircha kutilayotgan ish yo‘q." />}
     </Card>
   )
 }

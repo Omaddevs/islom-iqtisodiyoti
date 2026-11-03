@@ -31,7 +31,7 @@ const PAGES = {
   vocabulary: { comp: Vocabulary, icon: 'translate', title: 'Lug‘at', sub: 'Atamalar va so‘z boyligi' },
   library: { comp: Library, icon: 'bookOpen', title: 'Kutubxona', sub: 'Kitoblar, maqolalar, audio va boshqa manbalar' },
   articles: { comp: Articles, icon: 'bookmark', title: 'Maqolalar', sub: 'O‘quv materiallari va maqolalar' },
-  groups: { comp: Groups, icon: 'layers', title: 'Guruhlar', sub: 'Guruhlar, ustozlar va o‘quvchilar' },
+  groups: { comp: Groups, icon: 'layers', title: 'Guruhlar', sub: 'Guruhlar, ustozlar va o‘quvchilar', roles: ['superadmin', 'org_admin', 'teacher'] },
   users: { comp: Users, icon: 'users', title: 'Foydalanuvchilar', sub: 'Ustozlar va o‘quvchilar', roles: ['superadmin', 'org_admin', 'teacher'] },
   organizations: { comp: Organizations, icon: 'building', title: 'Tashkilotlar', sub: 'Platformadan foydalanuvchi tashkilotlar', roles: ['superadmin'] },
   leads: { comp: Leads, icon: 'mail', title: 'Arizalar', sub: 'Saytdan kelgan so‘rovlar', roles: ['superadmin'] },
@@ -82,7 +82,7 @@ export default function Platform({ path }) {
   const allowed = PAGES[key] && (!PAGES[key].roles || PAGES[key].roles.includes(user.role))
   const page = allowed ? PAGES[key] : PAGES['']
   const Comp = page.comp
-  const title = key === 'users' && user.role === 'teacher' ? 'O‘quvchilarim' : page.title
+  const title = user.role === 'teacher' && key === 'users' ? 'O‘quvchilarim' : user.role === 'teacher' && key === 'groups' ? 'Guruhlarim' : page.title
 
   return (
     <ToastProvider>

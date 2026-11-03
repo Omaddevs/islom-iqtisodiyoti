@@ -118,6 +118,8 @@ export async function loadState(u) {
         }
       }
       if (['testAttempts', 'submissions', 'vocabProgress'].includes(r.collection) && r.owner_id !== u.id) continue
+      // Boshqaruv jurnali (kim kimni qo'shdi va h.k.) o'quvchilarga yuborilmaydi
+      if (r.collection === 'activity') continue
     }
     state[r.collection].push(item)
   }

@@ -47,7 +47,7 @@ export default function Settings() {
             <div className="pform">
               <div className="pform__row">
                 <FField label="Ism familiya"><Input value={p.name} onChange={(e) => setP({ ...p, name: e.target.value })} /></FField>
-                <FField label="Lavozim"><Input value={p.title} onChange={(e) => setP({ ...p, title: e.target.value })} placeholder={user.role === 'student' ? 'O‘quvchi' : 'Ustoz'} /></FField>
+                {user.role !== 'student' && <FField label="Lavozim"><Input value={p.title} onChange={(e) => setP({ ...p, title: e.target.value })} placeholder={user.role === 'teacher' ? 'Islom moliyasi ustozi' : 'O‘quv bo‘limi boshlig‘i'} /></FField>}
               </div>
               {user.role !== 'student' && <FField label="Qisqacha ma’lumot"><Textarea value={p.bio} onChange={(e) => setP({ ...p, bio: e.target.value })} style={{ minHeight: 80 }} /></FField>}
               <FField label="Avatar rangi"><div className="pswatches">{COLORS.map((c) => <button key={c} type="button" className={cx(p.avatarColor === c && 'is-on')} style={{ background: c }} onClick={() => setP({ ...p, avatarColor: c })} aria-label={c} />)}</div></FField>

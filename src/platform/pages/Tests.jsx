@@ -50,7 +50,7 @@ function TestList() {
     const groups = db.groups.filter((g) => t.groupIds.includes(g.id))
     const total = new Set(groups.flatMap((g) => g.studentIds)).size
     const author = db.users.find((u) => u.id === t.authorId)
-    return { t, my, groups, total, author, done: ta.length, avg: avgOf(ta), expired: t.dueAt < now }
+    return { t, my, groups, total, author, done: ta.length, avg: ta.length ? `${avgOf(ta)}%` : '—', expired: t.dueAt < now }
   }).sort((a, b) => (a.expired - b.expired) || (a.expired ? b.t.dueAt - a.t.dueAt : a.t.dueAt - b.t.dueAt)), [scope.tests, attempts, db.groups, db.users, user.id, now])
 
   const is = {
@@ -76,7 +76,7 @@ function TestList() {
     return {
       active: count('active'),
       takers,
-      avg: avgOf(attempts),
+      avg: attempts.length ? `${avgOf(attempts)}%` : '—',
       sActive: series(14, (ts) => scope.tests.filter((t) => t.createdAt <= endOfDay(ts) && t.dueAt > ts).length),
       sTakers: series(14, (ts) => new Set(upto(ts).map((a) => a.studentId)).size),
       sAvg: series(14, (ts) => avgOf(upto(ts))),
@@ -108,11 +108,11 @@ function TestList() {
         {isStaff ? <>
           <StatSpark icon="clipboard" tone="blue" color="#3b8ef0" value={stats.active} label="Faol testlar" data={stats.sActive} onClick={() => setTab('active')} />
           <StatSpark icon="users" tone="teal" color="#14b8a6" value={stats.takers} label="Topshiruvchilar" data={stats.sTakers} onClick={() => scrollTo('pt-recent')} />
-          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={`${stats.avg}%`} label="O‘rtacha natija" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={stats.avg} label="O‘rtacha natija" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
         </> : <>
           <StatSpark icon="clipboard" tone="blue" color="#3b8ef0" value={count('active')} label="Topshirish kerak" data={stats.sActive} onClick={() => setTab('active')} />
           <StatSpark icon="checkCircle" tone="teal" color="#14b8a6" value={count('done')} label="Topshirilgan testlar" data={series(14, (ts) => attempts.filter((a) => a.finishedAt <= endOfDay(ts)).length)} onClick={() => setTab('done')} />
-          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={`${stats.avg}%`} label="O‘rtacha natijam" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={stats.avg} label="O‘rtacha natijam" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
         </>}
       </div>
 
@@ -208,7 +208,7 @@ function TestCard({ r, isStaff, menu }) {
       </div>
       {isStaff ? (
         <div className="ptcardx__prog">
-          <div><span>Topshirganlar: <b>{done}/{total}</b></span><span>O‘rtacha: <b>{avg}%</b></span></div>
+          <div><span>Topshirganlar: <b>{done}/{total}</b></span><span>O‘rtacha: <b>{avg}</b></span></div>
           <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${pct(done, total)}%` }} /></span>
         </div>
       ) : my && (
@@ -429,7 +429,7 @@ function TestResults({ id }) {
   const students = [...new Set(groups.flatMap((g) => g.studentIds))].map((sid) => db.users.find((u) => u.id === sid)).filter(Boolean)
   const rows = students.map((s) => ({ id: s.id, s, a: db.testAttempts.find((x) => x.testId === id && x.studentId === s.id) })).sort((x, y) => (y.a ? pct(y.a.score, y.a.total) : -1) - (x.a ? pct(x.a.score, x.a.total) : -1))
   const done = rows.filter((r) => r.a)
-  const avg = done.length ? Math.round(done.reduce((s, r) => s + pct(r.a.score, r.a.total), 0) / done.length) : 0
+  const avg = done.length ? `${Math.round(done.reduce((s, r) => s + pct(r.a.score, r.a.total), 0) / done.length)}%` : '—'
   // Savollar bo'yicha qiyinlik
   const qStats = t.questions.map((q) => ({ q, ok: done.filter((r) => r.a.answers?.[q.id] === q.correct).length }))
   return (
@@ -437,7 +437,7 @@ function TestResults({ id }) {
       <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddat ${fmtDateTime(t.dueAt)}`} />
       <div className="pgrid pgrid--4">
         <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="users" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.length}/{students.length}</span><span className="pstat__label">Topshirdi</span></span></div>
-        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="award" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg}%</span><span className="pstat__label">O‘rtacha ball</span></span></div>
+        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="award" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg}</span><span className="pstat__label">O‘rtacha ball</span></span></div>
         <div className="pstat pstat--violet"><span className="pstat__icon"><Icon name="star" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.filter((r) => pct(r.a.score, r.a.total) >= 80).length}</span><span className="pstat__label">A’lo (80%+)</span></span></div>
         <div className="pstat pstat--red"><span className="pstat__icon"><Icon name="alertCircle" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.filter((r) => pct(r.a.score, r.a.total) < 60).length}</span><span className="pstat__label">Qoniqarsiz</span></span></div>
       </div>
