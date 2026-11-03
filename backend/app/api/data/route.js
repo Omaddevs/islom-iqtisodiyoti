@@ -12,7 +12,9 @@ export const GET = route(async (req) => {
   const body = JSON.stringify(await loadState(u))
   const etag = `"${createHash('sha1').update(body).digest('base64url')}"`
   const headers = { 'Cache-Control': 'private, no-cache', ETag: etag, Vary: 'Cookie' }
-  if (req.headers.get('if-none-match') === etag) return new NextResponse(null, { status: 304, headers })
+  // nginx gzip ETag'ni kuchsiz (W/"…") ko'rinishga o'tkazadi — solishtirishda prefiks e'tiborga olinmaydi
+  const sent = (req.headers.get('if-none-match') || '').split(',').map((t) => t.trim().replace(/^W\//, ''))
+  if (sent.includes(etag)) return new NextResponse(null, { status: 304, headers })
   return new NextResponse(body, { headers: { ...headers, 'Content-Type': 'application/json' } })
 })
 
