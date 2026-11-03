@@ -24,8 +24,9 @@ export function AuthProvider({ children }) {
   const user = useMemo(() => (meId ? db.users.find((u) => u.id === meId) || null : null), [db.users, meId])
 
   // Bosh admin qaysi tashkilot ichida ishlayotgani (null = barcha tashkilotlar)
+  // Yagona tashkilot bo'lsa — avtomatik o'sha tanlanadi (bosh admin darhol kontent qo'sha oladi)
   const viewOrgId = user?.role === 'superadmin'
-    ? (viewOrg && db.organizations.some((o) => o.id === viewOrg) ? viewOrg : null)
+    ? (viewOrg && db.organizations.some((o) => o.id === viewOrg) ? viewOrg : db.organizations.length === 1 ? db.organizations[0].id : null)
     : user?.orgId ?? null
 
   const login = useCallback(async (phone, password) => {

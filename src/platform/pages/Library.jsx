@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity } from '../store/db.js'
+import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, ChipSelect, Empty, Icon, Confirm, Menu, useToast, cx } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtNum } from '../ui/format.js'
 
@@ -418,7 +418,8 @@ function LibForm({ open, item, onClose, categories }) {
       tags: (f.tags || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 6), groupIds: f.groupIds || [],
     }
     if (isNew) {
-      add('library', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id, downloads: 0, cover: COVERS[Math.floor(Math.random() * COVERS.length)] })
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      add('library', { ...data, orgId: scope.orgId, authorId: user.id, downloads: 0, cover: COVERS[Math.floor(Math.random() * COVERS.length)] })
       notify([...new Set(scope.groups.filter((g) => !data.groupIds.length || data.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Kutubxonaga yangi material: «${data.title}»`, '#/platform/library')
       logActivity(scope.orgId, user.id, 'kutubxonaga material qo‘shdi', data.title)
       toast('Material qo‘shildi')

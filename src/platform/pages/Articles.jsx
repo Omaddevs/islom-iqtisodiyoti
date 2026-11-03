@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity } from '../store/db.js'
+import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
 import { Card, Btn, Badge, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, cx } from '../ui/kit.jsx'
 import { fmtDate } from '../ui/format.js'
 import { StatBars, endOfDay } from '../ui/charts.jsx'
@@ -307,7 +307,8 @@ function ArticleForm({ open, article, onClose }) {
     const images = Object.fromEntries(Object.entries(f.images || {}).filter(([k]) => keep.has(k)))
     const data = { title: f.title.trim(), excerpt: f.excerpt?.trim() || (text.length > 140 ? text.slice(0, 140) + '…' : text), body, tags: f.tags.split(',').map((t) => t.trim()).filter(Boolean), groupIds: f.groupIds || [], published: !!f.published, readTime: Math.max(1, Math.round(text.split(/\s+/).length / 180)), cover: f.cover || '', images }
     if (isNew) {
-      const a = add('articles', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id })
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      const a = add('articles', { ...data, orgId: scope.orgId, authorId: user.id })
       if (data.published) { notify([...new Set(scope.groups.filter((g) => !data.groupIds.length || data.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Yangi maqola: «${a.title}»`, `#/platform/articles/${a.id}`); logActivity(scope.orgId, user.id, 'maqola chop etdi', a.title) }
       toast(data.published ? 'Maqola chop etildi' : 'Qoralama saqlandi')
     } else { patch('articles', article.id, data); toast('Saqlandi') }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity } from '../store/db.js'
+import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, Select, CopyBtn, cx } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtAgo, fmtNum } from '../ui/format.js'
 import { Cover, CoverPicker } from '../ui/media.jsx'
@@ -271,7 +271,8 @@ function VideoForm({ open, video, onClose }) {
     setErr(er); if (Object.keys(er).length) return
     const data = { title: f.title.trim(), module: f.module?.trim() || 'Qo‘shimcha', groupIds: f.groupIds, duration: Number(f.duration) * 60, description: f.description?.trim(), url: f.url?.trim(), kind: f.kind || 'lesson', cover: f.cover || '', thumb: f.thumb || THUMBS[0] }
     if (isNewV) {
-      add('videos', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id, views: 0 })
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      add('videos', { ...data, orgId: scope.orgId, authorId: user.id, views: 0 })
       const targets = scope.groups.filter((g) => f.groupIds.length === 0 || f.groupIds.includes(g.id)).flatMap((g) => g.studentIds)
       notify([...new Set(targets)], `Yangi video dars: «${data.title}»`, '#/platform/videos')
       logActivity(scope.orgId, user.id, 'video dars qo‘shdi', data.title)

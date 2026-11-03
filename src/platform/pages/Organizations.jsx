@@ -58,7 +58,7 @@ export default function Organizations() {
         <StatSpark icon="users" tone="amber" color="#f59e0b" value={byRole('student').length} label="O‘quvchi" data={growth(byRole('student'))} />
       </div>
 
-      {db.organizations.length === 0 && <Card><Empty icon="building" title="Tashkilotlar yo‘q" text="Birinchi tashkilotni qo‘shing — u bilan birga admin ham yaratiladi." /></Card>}
+      {db.organizations.length === 0 && <Card><Empty icon="building" title="Tashkilotlar yo‘q" text="Birinchi tashkilotni qo‘shing — shundan so‘ng video, test va boshqa materiallar qo‘shish mumkin bo‘ladi." /></Card>}
       <div className="porgs">
         {db.organizations.map((o) => {
           const us = db.users.filter((u) => u.orgId === o.id)
@@ -151,7 +151,8 @@ function OrgForm({ open, org, onClose, onCreds }) {
   const submit = () => {
     const er = {}
     if (!f.name?.trim()) er.name = 'Nomini kiriting'
-    const needAdmin = isNew || addAdmin
+    // Yangi tashkilotda admin ixtiyoriy: ism kiritilmasa — tashkilotni bosh adminning o'zi boshqaradi
+    const needAdmin = addAdmin || (isNew && !!f.adminName?.trim())
     if (needAdmin) {
       if (!f.adminName?.trim()) er.adminName = 'Admin ismini kiriting'
       if (!isFullPhone(f.adminPhone)) er.adminPhone = 'Telefonni to‘liq kiriting'
@@ -171,7 +172,7 @@ function OrgForm({ open, org, onClose, onCreds }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} width={640} title={isNew ? 'Yangi tashkilot' : addAdmin ? `${org.name}: admin qo‘shish` : 'Tashkilotni tahrirlash'} sub={isNew ? 'Tashkilot bilan birga uning birinchi admini yaratiladi' : undefined}
+    <Modal open={open} onClose={onClose} width={640} title={isNew ? 'Yangi tashkilot' : addAdmin ? `${org.name}: admin qo‘shish` : 'Tashkilotni tahrirlash'} sub={isNew ? 'Kerak bo‘lsa, tashkilot bilan birga uning adminini ham yarating' : undefined}
       footer={<><Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" onClick={submit}>{isNew ? 'Yaratish' : addAdmin ? 'Admin yaratish' : 'Saqlash'}</Btn></>}>
       <div className="pform">
         {!addAdmin && (
@@ -193,7 +194,8 @@ function OrgForm({ open, org, onClose, onCreds }) {
         )}
         {(isNew || addAdmin) && (
           <div className="pqb">
-            <b style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}><Icon name="shield" size={18} /> Tashkilot admini</b>
+            <b style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: isNew ? 4 : 12 }}><Icon name="shield" size={18} /> Tashkilot admini{isNew && <span className="pmuted" style={{ fontWeight: 500 }}>(ixtiyoriy)</span>}</b>
+            {isNew && <p className="pmuted" style={{ fontSize: 13, marginBottom: 12 }}>Bo‘sh qoldirsangiz, tashkilotni o‘zingiz boshqarasiz. Adminni keyin ham qo‘shish mumkin.</p>}
             <div className="pform">
               <FField label="Ism familiya" error={err.adminName}><Input value={f.adminName || ''} onChange={(e) => set('adminName', e.target.value)} autoFocus={addAdmin} /></FField>
               <div className="pform__row">

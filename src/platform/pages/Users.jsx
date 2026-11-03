@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, setDB, logActivity, notify } from '../store/db.js'
+import { add, patch, remove, setDB, logActivity, notify, NO_ORG } from '../store/db.js'
 import { Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search } from '../ui/kit.jsx'
 import { fmtAgo, fmtDate } from '../ui/format.js'
 import { ROLES } from '../store/seed.js'
@@ -134,8 +134,9 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
     else if (db.users.some((u) => digits(u.phone) === digits(f.phone) && u.id !== editUser?.id)) er.phone = 'Bu raqam allaqachon ro‘yxatdan o‘tgan'
     if ((isNew || f.password) && (!f.password || f.password.length < 6)) er.password = 'Parol kamida 6 belgi'
     setErr(er); if (Object.keys(er).length) return
-    const orgId = scope.orgId || scope.groups[0]?.orgId || me.orgId
+    const orgId = scope.orgId
     if (isNew) {
+      if (!scope.orgId) return toast(NO_ORG, 'err')
       const colors = ['#4aa3f8', '#6366f1', '#14b8a6', '#f59e0b', '#10b981', '#f43f5e', '#8b5cf6', '#0ea5e9']
       const u = add('users', { orgId, role: r, name: f.name.trim(), phone: prettyPhone(f.phone), password: f.password, title: f.title?.trim(), avatarColor: colors[Math.floor(Math.random() * colors.length)], status: 'active', createdBy: me.id, lastSeen: null })
       applyGroups(u.id, r, f.groupIds)

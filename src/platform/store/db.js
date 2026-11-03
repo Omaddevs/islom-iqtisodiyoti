@@ -157,6 +157,9 @@ export const notify = (userIds, text, href) => {
   }))
 }
 
+// Bosh admin «Barcha tashkilotlar» rejimida kontent yaratsa — u qaysi tashkilotga tegishli ekani noma'lum
+export const NO_ORG = 'Avval tashkilotni tanlang: yuqoridagi «Barcha tashkilotlar» menyusidan (tashkilot bo‘lmasa — «Tashkilotlar» bo‘limida yarating)'
+
 // ---- Ko'rinish doirasi (scope) ----
 // Har bir rol qaysi ma'lumotlarni ko'rishini bitta joyda hisoblaymiz.
 export function scopeFor(db, user, viewOrgId) {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity, commit, loadDB } from '../store/db.js'
+import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx } from '../ui/kit.jsx'
 import { fmtDate, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
@@ -250,7 +250,8 @@ function TestForm({ open, test, onClose }) {
     for (const q of qs) if (q.options.filter((o) => o.trim()).length < 2 || !q.options[q.correct]?.trim()) return setErr('Har bir savolda kamida 2 ta variant va to‘g‘ri javob bo‘lishi kerak')
     const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: Number(f.timeLimit) || 10, dueAt: fromLocalInput(f.dueAt), questions: qs.map((q) => ({ ...q, options: q.options.filter((o) => o.trim()) })) }
     if (isNew) {
-      const t = add('tests', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id })
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      const t = add('tests', { ...data, orgId: scope.orgId, authorId: user.id })
       notify([...new Set(scope.groups.filter((g) => f.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Yangi test: «${t.title}» — muddat ${fmtDate(t.dueAt)}`, '#/platform/tests')
       logActivity(scope.orgId, user.id, 'yangi test yaratdi', t.title)
       toast('Test yaratildi, o‘quvchilarga xabar yuborildi')

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, setDB, notify, logActivity } from '../store/db.js'
+import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search } from '../ui/kit.jsx'
 import { pct } from '../ui/format.js'
 import { uid } from '../store/ids.js'
@@ -71,7 +71,8 @@ export function VocabForm({ open, set: vs, onClose }) {
     if (!terms.length) return setErr('Kamida bitta so‘z va tarjimasini kiriting')
     const data = { title: f.title.trim(), lang: f.lang?.trim() || '—', groupIds: f.groupIds || [], terms }
     if (isNew) {
-      add('vocabSets', { ...data, orgId: scope.orgId || scope.groups[0]?.orgId, authorId: user.id })
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      add('vocabSets', { ...data, orgId: scope.orgId, authorId: user.id })
       notify([...new Set(scope.groups.filter((g) => !f.groupIds.length || f.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Yangi lug‘at to‘plami: «${data.title}»`, '#/platform/vocabulary')
       logActivity(scope.orgId, user.id, 'lug‘at to‘plami qo‘shdi', data.title)
       toast('To‘plam yaratildi')

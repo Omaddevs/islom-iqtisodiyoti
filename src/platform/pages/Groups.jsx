@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, setDB, notify, logActivity } from '../store/db.js'
+import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx } from '../ui/kit.jsx'
 import { DAYS, DAYS_FULL, fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { UserForm } from './Users.jsx'
@@ -123,7 +123,8 @@ export function GroupForm({ open, group, onClose }) {
     setErr(er); if (Object.keys(er).length) return
     const data = { name: f.name.trim(), course: f.course.trim(), level: f.level, teacherId: f.teacherId || null, room: f.room?.trim(), color: f.color, schedule: f.schedule.filter((s) => s.time) }
     if (isNew) {
-      const orgId = scope.orgId || user.orgId
+      if (!scope.orgId) return toast(NO_ORG, 'err')
+      const orgId = scope.orgId
       const g = add('groups', { ...data, orgId, studentIds: [] })
       if (g.teacherId && g.teacherId !== user.id) notify([g.teacherId], `Siz ${g.name} guruhiga ustoz etib biriktirildingiz`, `#/platform/groups/${g.id}`)
       logActivity(orgId, user.id, 'guruh yaratdi', g.name)
