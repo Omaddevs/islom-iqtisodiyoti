@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, Select, CopyBtn, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, Select, CopyBtn, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtAgo, fmtNum } from '../ui/format.js'
 import { Cover, CoverPicker } from '../ui/media.jsx'
 
@@ -261,7 +261,7 @@ function VideoForm({ open, video, onClose }) {
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
   const modules = [...new Set(scope.videos.map((v) => v.module))].sort(byModule)
-  useEffect(() => { if (open) { setErr({}); setF(isNewV ? { title: '', module: modules[0] || '1-modul', groupIds: [], duration: 30, description: '', url: '', kind: 'lesson', cover: '', thumb: THUMBS[Math.floor(Math.random() * 5)] } : { ...video, cover: video.cover || '', duration: Math.round(video.duration / 60) }) } }, [open, video, isNewV]) // eslint-disable-line
+  useFormInit(open, video?.id, () => { setErr({}); setF(isNewV ? { title: '', module: modules[0] || '1-modul', groupIds: [], duration: 30, description: '', url: '', kind: 'lesson', cover: '', thumb: THUMBS[Math.floor(Math.random() * 5)] } : { ...video, cover: video.cover || '', duration: Math.round(video.duration / 60) }) }) // eslint-disable-line
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const submit = () => {
     const er = {}

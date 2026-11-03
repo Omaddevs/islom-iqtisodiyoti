@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search, useFormInit } from '../ui/kit.jsx'
 import { pct } from '../ui/format.js'
 import { uid } from '../store/ids.js'
 
@@ -62,7 +62,7 @@ export function VocabForm({ open, set: vs, onClose }) {
   const isNew = !vs?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState('')
-  useEffect(() => { if (open) { setErr(''); setF(isNew ? { title: '', lang: 'ar → uz', groupIds: [], terms: [emptyTerm(), emptyTerm(), emptyTerm()] } : { ...vs, terms: vs.terms.map((t) => ({ ...t })) }) } }, [open, vs, isNew])
+  useFormInit(open, vs?.id, () => { setErr(''); setF(isNew ? { title: '', lang: 'ar → uz', groupIds: [], terms: [emptyTerm(), emptyTerm(), emptyTerm()] } : { ...vs, terms: vs.terms.map((t) => ({ ...t })) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setT = (i, k, v) => setF((x) => ({ ...x, terms: x.terms.map((t, j) => (j === i ? { ...t, [k]: v } : t)) }))
   const submit = () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { DAYS, DAYS_FULL, fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { UserForm } from './Users.jsx'
 import { MeetingForm, hashQuery } from './Meetings.jsx'
@@ -112,7 +112,7 @@ export function GroupForm({ open, group, onClose }) {
   const isNew = !group?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useEffect(() => { if (open) { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherId: user.role === 'teacher' ? user.id : '', room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length], schedule: [{ day: 1, time: '19:00' }, { day: 3, time: '19:00' }] } : { ...group, schedule: group.schedule.map((s) => ({ ...s })) }) } }, [open, group, isNew, user, db.groups.length])
+  useFormInit(open, group?.id, () => { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherId: user.role === 'teacher' ? user.id : '', room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length], schedule: [{ day: 1, time: '19:00' }, { day: 3, time: '19:00' }] } : { ...group, schedule: group.schedule.map((s) => ({ ...s })) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setS = (i, k, v) => setF((x) => ({ ...x, schedule: x.schedule.map((s, j) => (j === i ? { ...s, [k]: v } : s)) }))
   const teachers = db.users.filter((u) => u.role === 'teacher' && u.orgId === (scope.orgId || user.orgId))

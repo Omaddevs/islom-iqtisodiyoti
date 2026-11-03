@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, logActivity, notify, NO_ORG } from '../store/db.js'
-import { Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search } from '../ui/kit.jsx'
+import { Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search, useFormInit } from '../ui/kit.jsx'
 import { fmtAgo, fmtDate } from '../ui/format.js'
 import { ROLES } from '../store/seed.js'
 import { genPassword, genPhone, prettyPhone, digits } from '../store/ids.js'
@@ -117,14 +117,13 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
   const r = editUser?.role || role || 'student'
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useEffect(() => {
-    if (!open) return
+  useFormInit(open, `${editUser?.id}|${role}`, () => {
     setErr({})
     const taken = new Set(db.users.map((u) => digits(u.phone)))
     setF(isNew
       ? { name: '', phone: genPhone(taken), password: genPassword(), title: '', groupIds: defaultGroupId ? [defaultGroupId] : [] }
       : { name: editUser.name, phone: editUser.phone, password: '', title: editUser.title || '', groupIds: db.groups.filter((g) => g.studentIds.includes(editUser.id) || g.teacherId === editUser.id).map((g) => g.id) })
-  }, [open, editUser, isNew, defaultGroupId, db.users, db.groups])
+  })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
 
   const submit = () => {

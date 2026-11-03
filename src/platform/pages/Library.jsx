@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, ChipSelect, Empty, Icon, Confirm, Menu, useToast, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, ChipSelect, Empty, Icon, Confirm, Menu, useToast, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtNum } from '../ui/format.js'
 
 /* ---------- Ma'lumotnomalar ---------- */
@@ -395,13 +395,12 @@ function LibForm({ open, item, onClose, categories }) {
   const isNew = !item?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useEffect(() => {
-    if (!open) return
+  useFormInit(open, item?.id, () => {
     setErr({})
     setF(isNew
       ? { title: '', author: '', type: 'book', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
       : { ...item, minutes: item.duration ? Math.round(item.duration / 60) : '', tags: (item.tags || []).join(', ') })
-  }, [open, item, isNew])
+  })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setType = (v) => setF((x) => ({ ...x, type: v, format: DEFAULT_FORMAT[v] || (DEFAULT_FORMAT[x.type] ? 'PDF' : x.format) }))
   const timed = f.type === 'audio' || f.type === 'video'

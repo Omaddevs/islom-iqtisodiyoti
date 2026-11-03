@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, commit, loadDB, logActivity } from '../store/db.js'
-import { Card, Btn, Badge, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Credentials, cx } from '../ui/kit.jsx'
+import { Card, Btn, Badge, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Credentials, cx, useFormInit } from '../ui/kit.jsx'
 import { genPassword, genPhone, prettyPhone, digits } from '../store/ids.js'
 import { formatPhone, isFullPhone } from '../../utils/phone.js'
 import { hashQuery } from './Meetings.jsx'
@@ -138,13 +138,12 @@ function OrgForm({ open, org, onClose, onCreds }) {
   const addAdmin = !!org?._addAdmin
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useEffect(() => {
-    if (!open) return
+  useFormInit(open, `${org?.id}|${org?._addAdmin}`, () => {
     setErr({})
     const taken = new Set(db.users.map((u) => digits(u.phone)))
     const adminPart = { adminName: '', adminPhone: genPhone(taken), adminPassword: genPassword() }
     setF(isNew ? { name: '', slug: '', plan: 'basic', color: COLORS[db.organizations.length % COLORS.length], phone: '+998 ', email: '', description: '', ...adminPart } : { ...org, ...adminPart })
-  }, [open, org, isNew, db.users, db.organizations.length])
+  })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const slugify = (s) => s.toLowerCase().replace(/[‘’'ʼ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 

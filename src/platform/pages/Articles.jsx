@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
-import { Card, Btn, Badge, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, cx } from '../ui/kit.jsx'
+import { Card, Btn, Badge, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate } from '../ui/format.js'
 import { StatBars, endOfDay } from '../ui/charts.jsx'
 import { Cover, CoverPicker, IMAGE_TYPES, checkImage, readImage } from '../ui/media.jsx'
@@ -293,7 +293,7 @@ function ArticleForm({ open, article, onClose }) {
   const bodyRef = useRef(null)
   const fileRef = useRef(null)
   const [busy, setBusy] = useState(false)
-  useEffect(() => { if (open) { setErr({}); setF(isNew ? { title: '', excerpt: '', body: '', tags: '', groupIds: [], published: true, cover: '', images: {} } : { ...article, cover: article.cover || '', images: { ...(article.images || {}) }, tags: article.tags.join(', ') }) } }, [open, article, isNew])
+  useFormInit(open, article?.id, () => { setErr({}); setF(isNew ? { title: '', excerpt: '', body: '', tags: '', groupIds: [], published: true, cover: '', images: {} } : { ...article, cover: article.cover || '', images: { ...(article.images || {}) }, tags: article.tags.join(', ') }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const submit = () => {
     const er = {}

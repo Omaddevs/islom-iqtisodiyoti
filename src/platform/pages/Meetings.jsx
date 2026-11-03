@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { notify, logActivity, getDB } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Search, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtTime, fmtDateTime, fmtDateShort, isToday, isTomorrow, DAYS, MONTHS, toLocalInput, fromLocalInput } from '../ui/format.js'
 import { meetingsApi, syncMeetings, useServerStatus, joinLink, recordingUrl } from '../api/meetings.js'
 import InviteModal, { copyText } from '../../meet/Invite.jsx'
@@ -193,14 +193,13 @@ export function MeetingForm({ open, meeting, onClose, defaultGroupId, onCreated 
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
   const [busy, setBusy] = useState(false)
-  useEffect(() => {
-    if (!open) return
+  useFormInit(open, meeting?.id, () => {
     setErr({})
     setBusy(false)
     setF(isNew
       ? { title: '', topic: '', groupId: defaultGroupId || scope.groups[0]?.id || '', startsAt: toLocalInput(Date.now() + 3600e3), durationMin: 60, description: '', usePass: false, passcode: genPasscode(), allowGuests: true, waitingRoom: true, muteOnEntry: false }
       : { ...meeting, startsAt: toLocalInput(meeting.startsAt), usePass: meeting.hasPasscode, passcode: meeting.passcode || genPasscode() })
-  }, [open, meeting, isNew, defaultGroupId, scope.groups])
+  })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
 
   const submit = async (e) => {

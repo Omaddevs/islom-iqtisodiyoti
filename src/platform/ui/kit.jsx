@@ -173,6 +173,19 @@ export function ChipSelect({ options, value = [], onChange, allLabel }) {
 }
 
 // ---------- Modal ----------
+// Formani faqat ochilganda (yoki boshqa yozuv tanlanganda) to'ldiradi. Ma'lumotlar fonda yangilanganda
+// (har 30 soniyada serverdan) foydalanuvchi yozayotgan matn o'chib ketmaydi.
+export function useFormInit(open, key, init) {
+  const last = useRef(null)
+  useEffect(() => {
+    if (!open) { last.current = null; return }
+    const k = String(key ?? '')
+    if (last.current === k) return
+    last.current = k
+    init()
+  })
+}
+
 export function Modal({ open, onClose, title, sub, children, footer, width = 560 }) {
   useEffect(() => {
     if (!open) return

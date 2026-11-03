@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Search, cx } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDateTime, fmtLeft, fmtAgo, toLocalInput, fromLocalInput, pct } from '../ui/format.js'
 import { StatSpark, Donut, series, endOfDay } from '../ui/charts.jsx'
 
@@ -260,7 +260,7 @@ export function HomeworkForm({ open, hw, onClose, defaultGroupId }) {
   const isNew = !hw?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useEffect(() => { if (open) { setErr({}); setF(isNew ? { title: '', description: '', groupId: defaultGroupId || scope.groups[0]?.id || '', dueAt: toLocalInput(Date.now() + 3 * 864e5), maxGrade: 100 } : { ...hw, dueAt: toLocalInput(hw.dueAt) }) } }, [open, hw, isNew, defaultGroupId, scope.groups])
+  useFormInit(open, hw?.id, () => { setErr({}); setF(isNew ? { title: '', description: '', groupId: defaultGroupId || scope.groups[0]?.id || '', dueAt: toLocalInput(Date.now() + 3 * 864e5), maxGrade: 100 } : { ...hw, dueAt: toLocalInput(hw.dueAt) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const submit = () => {
     const er = {}
