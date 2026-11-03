@@ -18,6 +18,9 @@ export const config = {
   },
   get appOrigins() { return req('APP_ORIGIN', 'http://localhost:2026').split(',').map((s) => s.trim()) },
   get iceServers() { return parseIce(req('ICE_SERVERS', '[{"urls":["stun:stun.l.google.com:19302"]}]')) },
+  // O'z TURN serverimiz (deploy/turn-setup.sh). Bo'sh bo'lsa faqat ICE_SERVERS ishlatiladi
+  get turnSecret() { return process.env.TURN_SECRET || '' },
+  get turnHost() { return process.env.TURN_HOST || '' },
   get storageDir() { return req('STORAGE_DIR', './storage') },
   get isProd() { return process.env.NODE_ENV === 'production' },
   // HTTPS bo'lmagan vaqtinchalik ishga tushirishda (faqat IP) COOKIE_SECURE=false — aks holda brauzer cookie'ni saqlamaydi

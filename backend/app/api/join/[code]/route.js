@@ -6,9 +6,9 @@ import { z } from 'zod'
 import { json, route, body, fail } from '@/lib/http.js'
 import { currentUser, publicUser, signRoomTicket } from '@/lib/auth.js'
 import { getMeetingByCode, isMember, canManage } from '@/lib/meetings.js'
-import { config } from '@/lib/config.js'
 import { rateLimit, clientIp } from '@/lib/rateLimit.js'
 import { isMeetingCode } from '@/lib/ids.js'
+import { iceServersFor } from '@/lib/turn.js'
 
 async function load(code) {
   if (!isMeetingCode(code)) fail(404, 'Havola noto‘g‘ri')
@@ -72,5 +72,5 @@ export const POST = route(async (req, { code }) => {
     guest: !u,
     member,
   })
-  return json({ ticket, iceServers: config.iceServers, role: host ? 'host' : 'participant', meetingId: m.id })
+  return json({ ticket, iceServers: iceServersFor(u?.id ?? 'guest'), role: host ? 'host' : 'participant', meetingId: m.id })
 })
