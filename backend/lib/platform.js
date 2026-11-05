@@ -280,7 +280,9 @@ const groupOps = {
   async insert(c, u, { item }, id) {
     const orgId = item.orgId
     if (!orgId || !(await row(c, 'SELECT 1 FROM organizations WHERE id = $1', [orgId]))) fail(422, 'Avval tashkilotni tanlang')
-    if (!adminOf(u, orgId)) deny('Guruhni faqat administrator yaratadi')
+    // Ustoz o'z tashkilotida faqat o'zi dars beradigan guruhni yaratadi
+    const ownTeacher = u.role === 'teacher' && u.org_id === orgId && item.teacherId === u.id
+    if (!adminOf(u, orgId) && !ownTeacher) deny('Ustoz faqat o‘zi dars beradigan guruhni yaratadi')
     const ids = await validMembers(c, orgId, item.teacherId, item.studentIds || [])
     const r = await row(c, `INSERT INTO groups (id, org_id, name, course, teacher_id, color, data) VALUES ($1,$2,$3,$4,$5,$6,$7)
       ON CONFLICT (id) DO NOTHING RETURNING id`,

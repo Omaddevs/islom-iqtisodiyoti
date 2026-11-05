@@ -28,6 +28,12 @@ export const MEETING_COLUMNS = {
 
 // Saytdagi ochiq formalar (kurs arizasi, aloqa, obuna) — telefon yoki email shart
 const opt = (max) => z.string().trim().max(max).optional().nullable().transform((v) => v || null)
+export const PartnerInput = z.object({
+  name: z.string().trim().min(2, 'Hamkor nomini kiriting').max(80, 'Nom juda uzun'),
+  type: opt(80),
+  logo: z.string().regex(/^\/api\/files\/img_[a-z0-9]+\.(jpg|png|webp)$/, 'Logotip noto‘g‘ri').nullable().optional().transform((v) => v || null),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Rang noto‘g‘ri'),
+})
 export const LeadCreate = z.object({
   kind: z.string().trim().regex(/^[a-z_]{2,20}$/, 'Ariza turi noto‘g‘ri'),
   name: opt(100),

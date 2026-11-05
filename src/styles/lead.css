@@ -46,7 +46,89 @@
   pointer-events: none;
 }
 
+.lead__dialog:focus { outline: 0; }
 .lead__grab { display: none; }
+
+.lead__back {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  margin: -16px 0 8px -12px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font: 600 14px var(--f-body);
+  color: #5b6573;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.lead__back:hover { background: var(--c-surface); color: var(--c-text); }
+
+/* kurs tafsiloti */
+.lead__dialog--info { --pb: 26px; max-width: 640px; padding-bottom: var(--pb); }
+.linfo__head { position: relative; display: flex; align-items: flex-start; gap: 14px; padding-right: 40px; }
+.linfo__head .lead__eyebrow { margin: 0; }
+.linfo__title {
+  margin: 4px 0 0;
+  font-family: var(--f-head);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.4px;
+  line-height: 1.2;
+  color: var(--c-text);
+}
+.linfo__facts {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  margin: 22px 0 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--lc) 18%, #fff);
+  border: 1px solid color-mix(in srgb, var(--lc) 18%, #fff);
+}
+.linfo__facts div { padding: 12px 14px; background: color-mix(in srgb, var(--lc) 5%, #fff); }
+.linfo__facts div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.linfo__facts dt { font-size: 12px; color: #7a838f; }
+.linfo__facts dd { margin: 3px 0 0; font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--c-text); }
+.linfo__h { margin: 22px 0 8px; font-family: var(--f-head); font-size: 16px; font-weight: 700; color: var(--c-text); }
+.linfo__text { margin: 0; font-size: 15px; line-height: 1.6; color: #3d4652; }
+.linfo__list { display: flex; flex-direction: column; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.linfo__list li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.5; color: #3d4652; }
+.linfo__list li::before {
+  content: "";
+  position: absolute;
+  left: 2px; top: .6em;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--lc);
+}
+.linfo__note {
+  display: flex;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--c-surface);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #5b6573;
+}
+.linfo__note svg { flex-shrink: 0; margin-top: 1px; color: var(--c-muted); }
+/* uzun matnda ham tugma doim ko'rinadi */
+.linfo__cta {
+  position: sticky;
+  bottom: calc(var(--pb) * -1);
+  z-index: 1;
+  margin: 8px 0 calc(var(--pb) * -1);
+  padding: 14px 0 var(--pb);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff 14px);
+}
+.linfo__cta .lead__submit { margin-top: 0; }
 
 .lead__close {
   position: absolute;
@@ -124,8 +206,6 @@
 .lead__course-body { flex: 1; min-width: 0; }
 .lead__course-body b { display: block; font-size: 14.5px; font-weight: 700; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lead__course-body small { display: block; margin-top: 3px; font-size: 12.5px; color: #7a838f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lead__course-price { flex-shrink: 0; font-family: var(--f-head); font-size: 15px; font-weight: 800; color: var(--c-text); }
-.lead__course-price.is-free { color: #16a34a; }
 
 .lead__perks {
   display: flex;
@@ -272,6 +352,9 @@
     background: #dde2e8;
   }
   .lead__close { top: 14px; right: 14px; width: 36px; height: 36px; }
+  .lead__dialog--info { --pb: calc(20px + env(safe-area-inset-bottom)); max-width: none; }
+  .linfo__title { font-size: 21px; }
+  .linfo__facts { grid-template-columns: 1fr; }
   .lead__badge { width: 50px; height: 50px; border-radius: 16px; }
   .lead__title { font-size: 24px; }
   .lead__text { font-size: 14px; }

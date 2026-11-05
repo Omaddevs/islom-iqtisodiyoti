@@ -77,6 +77,14 @@ await ok(t.status === 200 && t.cookie, `ustoz kirdi: ${t.data?.user?.name}`)
 await ok((await ops(t.cookie, [mk(`u_t3${RUN}`, 'teacher', 'Soxta Ustoz', `+99877${rnd()}`)])).status === 403, 'ustoz boshqa ustoz yarata olmaydi')
 await ok((await ops(t.cookie, [{ col: 'users', op: 'patch', id: `u_s2${RUN}`, changes: { name: 'Begona Odam' } }])).status === 403, 'ustoz boshqa guruh o‘quvchisini tahrirlay olmaydi')
 await ok((await ops(t.cookie, [{ col: 'groups', op: 'patch', id: G1, changes: { teacherId: `u_t2${RUN}` } }])).status === 403, 'ustoz guruhga boshqa ustozni biriktira olmaydi')
+const G3 = `g3${RUN}`
+await ok((await ops(t.cookie, [{ col: 'groups', op: 'insert', item: { id: `${G3}x`, orgId: ORG, name: 'SM-X', course: 'Begona', teacherId: `u_t2${RUN}`, schedule: [] } }])).status === 403, 'ustoz boshqa ustoz nomidan guruh yarata olmaydi')
+await ok((await ops(t.cookie, [{ col: 'groups', op: 'insert', item: { id: `${G3}y`, orgId: ORG, name: 'SM-Y', course: 'Ustozsiz', schedule: [] } }])).status === 403, 'ustoz o‘zini biriktirmasdan guruh yarata olmaydi')
+const ownGroup = await ops(t.cookie, [{ col: 'groups', op: 'insert', item: { id: G3, orgId: ORG, name: 'SM-3', course: 'Ustoz kursi', teacherId: `u_t1${RUN}`, schedule: [] } }])
+await ok(ownGroup.status === 200 && ownGroup.data.results[0].item.teacherId === `u_t1${RUN}`, 'ustoz o‘z guruhini yaratdi')
+await ok((await ops(t.cookie, [{ col: 'groups', op: 'patch', id: G3, changes: { name: 'SM-3b' } }])).status === 200, 'ustoz o‘z guruhini tahrirladi')
+await ok((await ops(t.cookie, [{ col: 'groups', op: 'delete', id: G3 }])).status === 403, 'ustoz guruhni o‘chira olmaydi')
+await ok((await ops(OA.cookie, [{ col: 'groups', op: 'delete', id: G3 }])).status === 200, 'admin ustoz guruhini o‘chirdi')
 
 const test = await ops(t.cookie, [{ col: 'tests', op: 'insert', item: { id: `t${RUN}`, orgId: ORG, groupIds: [G1], authorId: 'u_admin', title: 'Smoke test', timeLimit: 5, questions: [
   { id: 'q1', text: '2+2?', options: ['3', '4'], correct: 1 }, { id: 'q2', text: '3+3?', options: ['6', '7'], correct: 0 }] } }])
@@ -141,6 +149,27 @@ const myLead = leads.data?.leads?.find((l) => l.name === `Smoke ${RUN}`)
 await ok(myLead, 'bosh admin arizani ko‘rdi')
 await ok((await api('/api/leads', { cookie: OA.cookie })).status === 403, 'tashkilot admini arizalarni ko‘ra olmaydi')
 await api(`/api/leads/${myLead.id}`, { method: 'DELETE', cookie: A.cookie })
+
+// ---- Saytdagi hamkorlar: ro'yxat ochiq, boshqaruv faqat bosh adminda ----
+const pBefore = await api('/api/partners')
+await ok(pBefore.status === 200 && Array.isArray(pBefore.data.partners), 'hamkorlar ro‘yxati akkauntsiz ochiq')
+const pLogo = await upload(A.cookie, JPG)
+const pBody = { name: `Hamkor ${RUN}`, type: 'Islom banki', logo: pLogo.data.url, color: '#4aa3f8' }
+await ok((await fetch(B + pLogo.data.url)).status === 401, 'logo hamkorga biriktirilmaguncha ochiq emas')
+await ok((await api('/api/partners', { method: 'POST', body: pBody })).status === 401, 'akkauntsiz hamkor qo‘shib bo‘lmaydi')
+await ok((await api('/api/partners', { method: 'POST', cookie: OA.cookie, body: pBody })).status === 403, 'tashkilot admini hamkor qo‘sha olmaydi')
+await ok((await api('/api/partners', { method: 'POST', cookie: A.cookie, body: { ...pBody, logo: 'https://evil.example/x.jpg' } })).status === 422, 'tashqi havola logo sifatida rad etildi')
+const pNew = await api('/api/partners', { method: 'POST', cookie: A.cookie, body: pBody })
+await ok(pNew.status === 201 && pNew.data.partner.logo === pBody.logo, 'bosh admin hamkor qo‘shdi')
+await ok((await api('/api/partners')).data.partners.some((x) => x.id === pNew.data.partner.id), 'yangi hamkor ochiq ro‘yxatda')
+await ok((await fetch(B + pLogo.data.url)).status === 200, 'hamkor logosi akkauntsiz ochiladi')
+await ok((await fetch(B + up.data.url)).status === 401, 'boshqa rasmlar avvalgidek yopiq')
+await ok((await api(`/api/partners/${pNew.data.partner.id}`, { method: 'PATCH', cookie: OA.cookie, body: pBody })).status === 403, 'tashkilot admini hamkorni tahrirlay olmaydi')
+await ok((await api(`/api/partners/${pNew.data.partner.id}`, { method: 'PATCH', cookie: A.cookie, body: { ...pBody, type: 'Takaful' } })).data.partner.type === 'Takaful', 'hamkor tahrirlandi')
+await ok((await api(`/api/partners/${pNew.data.partner.id}`, { method: 'DELETE', cookie: OA.cookie })).status === 403, 'tashkilot admini hamkorni o‘chira olmaydi')
+await api(`/api/partners/${pNew.data.partner.id}`, { method: 'DELETE', cookie: A.cookie })
+await ok(!(await api('/api/partners')).data.partners.some((x) => x.id === pNew.data.partner.id), 'hamkor o‘chirildi')
+await ok((await fetch(B + pLogo.data.url)).status === 401, 'o‘chirilgan hamkor logosi yana yopiq')
 
 // ---- Onlayn darslar va real vaqt xonasi ----
 const list = await api('/api/meetings', { cookie: t.cookie })

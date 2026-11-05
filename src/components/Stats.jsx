@@ -1,6 +1,6 @@
 const STATS = [
   { value: '50 000+', label: "Jami tahsil olayotgan o‘quvchilarimiz" },
-  { value: '50+', label: 'Platformamizda mavjud kurslar soni' },
+  { value: '5', label: 'Fundamental kurs va 4 ta malaka sertifikati' },
   { value: '30+', label: 'Uzoq yillik tajribaga ega ustozlarimiz' },
 ]
 

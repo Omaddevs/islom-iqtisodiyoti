@@ -18,6 +18,7 @@ import Groups from './pages/Groups.jsx'
 import Users from './pages/Users.jsx'
 import Organizations from './pages/Organizations.jsx'
 import Leads from './pages/Leads.jsx'
+import Partners from './pages/Partners.jsx'
 import Schedule from './pages/Schedule.jsx'
 import Settings from './pages/Settings.jsx'
 
@@ -35,6 +36,7 @@ const PAGES = {
   users: { comp: Users, icon: 'users', title: 'Foydalanuvchilar', sub: 'Ustozlar va o‘quvchilar', roles: ['superadmin', 'org_admin', 'teacher'] },
   organizations: { comp: Organizations, icon: 'building', title: 'Tashkilotlar', sub: 'Platformadan foydalanuvchi tashkilotlar', roles: ['superadmin'] },
   leads: { comp: Leads, icon: 'mail', title: 'Arizalar', sub: 'Saytdan kelgan so‘rovlar', roles: ['superadmin'] },
+  partners: { comp: Partners, icon: 'briefcase', title: 'Hamkorlar', sub: 'Saytdagi hamkorlar bo‘limi', roles: ['superadmin'] },
   settings: { comp: Settings, icon: 'settings', title: 'Sozlamalar', sub: 'Profil va tizim sozlamalari' },
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { CONTACTS, dirById, formatPrice } from '../data/content.js'
+import { CONTACTS } from '../data/content.js'
 import { Icon, SocialIcon } from './ui.jsx'
 import DirIcon from './DirIcons.jsx'
 import { formatPhone, isFullPhone } from '../utils/phone.js'
@@ -15,10 +15,10 @@ export const leadClick = (detail) => (e) => { e.preventDefault(); openLead(detai
 const VARIANTS = {
   course: {
     icon: 'book',
-    eyebrow: 'Kursga yozilish',
-    title: 'Kursga yoziling',
-    text: 'Ma’lumotlaringizni qoldiring — menejerimiz kurs dasturi, boshlanish sanasi va to‘lov bo‘yicha bog‘lanadi.',
-    submit: 'Kursga yozilish',
+    eyebrow: 'Dasturga ariza',
+    title: 'Ariza qoldiring',
+    text: 'Ma’lumotlaringizni qoldiring — boshlanish sanasi, tartibi va to‘lov belgilangach menejerimiz siz bilan bog‘lanadi.',
+    submit: 'Ariza yuborish',
   },
   partner: {
     icon: 'briefcase',
@@ -45,6 +45,7 @@ const TG = CONTACTS.telegram
 export default function LeadModal() {
   const [ctx, setCtx] = useState(null) // { kind, course? }
   const [open, setOpen] = useState(false)
+  const [step, setStep] = useState('form') // info (kurs tafsiloti) | form
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle') // idle | sending | sent
@@ -57,6 +58,7 @@ export default function LeadModal() {
     const onOpen = (e) => {
       trigger.current = document.activeElement
       setCtx(e.detail)
+      setStep(e.detail.course ? 'info' : 'form')
       setForm(EMPTY)
       setErrors({})
       setStatus('idle')
@@ -74,7 +76,7 @@ export default function LeadModal() {
     if (!open) return
     const root = document.documentElement
     root.style.overflow = 'hidden'
-    const t = setTimeout(() => nameInput.current?.focus({ preventScroll: true }), 60)
+    const t = setTimeout(() => (nameInput.current ?? dialog.current)?.focus({ preventScroll: true }), 60)
 
     const onKey = (e) => {
       if (e.key === 'Escape') return close()
@@ -92,6 +94,13 @@ export default function LeadModal() {
       trigger.current?.focus?.({ preventScroll: true })
     }
   }, [open])
+
+  // Tafsilot ↔ forma almashganda: yuqoridan boshlanadi, fokus yo'qolmaydi
+  useEffect(() => {
+    if (!open || !dialog.current) return
+    dialog.current.scrollTop = 0
+    ;(nameInput.current ?? dialog.current).focus({ preventScroll: true })
+  }, [step]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!ctx) return null
   const v = VARIANTS[ctx.kind] ?? VARIANTS.start
@@ -127,8 +136,8 @@ export default function LeadModal() {
     <div className={`lead ${open ? 'is-open' : ''}`} onTransitionEnd={(e) => { if (!open && e.target === e.currentTarget) setCtx(null) }}>
       <div className="lead__backdrop" onClick={close} />
 
-      <div className={`lead__dialog ${status === 'sent' ? 'is-done' : ''}`} ref={dialog} role="dialog" aria-modal="true" aria-labelledby={titleId}
-        style={course && status !== 'sent' ? { '--lc': dirById(course.dir).color } : undefined}>
+      <div className={`lead__dialog ${status === 'sent' ? 'is-done' : ''} ${step === 'info' ? 'lead__dialog--info' : ''}`} ref={dialog} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={titleId}
+        style={course && status !== 'sent' ? { '--lc': course.color } : undefined}>
         <span className="lead__grab" aria-hidden="true" />
         <button type="button" className="lead__close" onClick={close} aria-label="Yopish">
           <Icon name="x" size={20} />
@@ -148,8 +157,15 @@ export default function LeadModal() {
               </a>
             </div>
           </div>
+        ) : step === 'info' ? (
+          <CourseInfo course={course} titleId={titleId} onApply={() => setStep('form')} />
         ) : (
           <>
+            {course && (
+              <button type="button" className="lead__back" onClick={() => setStep('info')}>
+                <Icon name="arrowLeft" size={16} /> Orqaga
+              </button>
+            )}
             <div className="lead__head">
               <span className="lead__badge"><Icon name={v.icon} size={22} /></span>
               <p className="lead__eyebrow">{v.eyebrow}</p>
@@ -159,15 +175,10 @@ export default function LeadModal() {
 
             {course && (
               <div className="lead__course">
-                <span className="lead__course-icon"><DirIcon name={dirById(course.dir).icon} size={28} /></span>
+                <span className="lead__course-icon"><DirIcon name={course.icon} size={28} /></span>
                 <span className="lead__course-body">
                   <b>{course.title}</b>
-                  <small>
-                    {course.lessons} dars · {course.hours} soat · {course.teacher}
-                  </small>
-                </span>
-                <span className={`lead__course-price ${course.price === 0 ? 'is-free' : ''}`}>
-                  {formatPrice(course.price)}
+                  <small>{course.kind} · {course.stage}</small>
                 </span>
               </div>
             )}
@@ -203,6 +214,52 @@ export default function LeadModal() {
       </div>
     </div>,
     document.body,
+  )
+}
+
+function CourseInfo({ course, titleId, onApply }) {
+  const facts = [
+    ['Bosqich', course.stage],
+    ['Asos talabi', course.prereq],
+    ['Asosiy soha', course.field],
+    course.volume && ['Namunaviy hajm', course.volume],
+  ].filter(Boolean)
+  return (
+    <>
+      <div className="linfo__head">
+        <span className="lead__course-icon"><DirIcon name={course.icon} size={28} /></span>
+        <div>
+          <p className="lead__eyebrow">{course.kind}</p>
+          <h3 className="linfo__title" id={titleId}>{course.title}</h3>
+        </div>
+      </div>
+
+      <dl className="linfo__facts">
+        {facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+      </dl>
+
+      <h4 className="linfo__h">Maqsadi</h4>
+      <p className="linfo__text">{course.goal}</p>
+
+      <h4 className="linfo__h">Kimlar uchun</h4>
+      <ul className="linfo__list">{course.audience.map((t) => <li key={t}>{t}</li>)}</ul>
+
+      <h4 className="linfo__h">Bosqich va talablar</h4>
+      <ul className="linfo__list">{course.requirements.map((t) => <li key={t}>{t}</li>)}</ul>
+
+      <p className="linfo__note">
+        <Icon name="info" size={16} />
+        {course.kind === 'Sertifikat'
+          ? 'Kurs hajmi, o‘qish muddati, imtihon tartibi va to‘lov miqdori Nizom tasdiqlangandan so‘ng belgilanadi.'
+          : 'Hajmi, muddati va to‘lov miqdori tez orada e’lon qilinadi.'}
+      </p>
+
+      <div className="linfo__cta">
+        <button type="button" className="lead__submit" onClick={onApply}>
+          Ariza qoldirish <Icon name="arrowRight" size={18} />
+        </button>
+      </div>
+    </>
   )
 }
 

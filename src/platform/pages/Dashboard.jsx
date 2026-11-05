@@ -164,7 +164,7 @@ function TeacherDash() {
   const mine = new Set([user.id, ...scope.myStudents.map((s) => s.id)])
   return (
     <Layout stats={stats}
-      notice={!scope.groups.length && <NoGroups text="Sizga hali guruh biriktirilmagan. Administrator guruhga biriktirgach, darslar va o‘quvchilaringiz shu yerda ko‘rinadi." />}
+      notice={!scope.groups.length && <NoGroups text="Hali guruhingiz yo‘q. Guruh yarating yoki administrator biriktirishini kuting — darslar va o‘quvchilaringiz shu yerda ko‘rinadi." action={<Btn size="sm" variant="primary" icon="plus" as="a" href="#/platform/groups?new=1">Guruh yaratish</Btn>} />}
       left={<><TodayLessons day={day} setDay={setDay} /><MyGroups groups={scope.groups} staff /></>}
       right={<><QuickActions items={actions} /><GradingQueue items={queue} /></>}
       side={<><MiniCalendar day={day} setDay={setDay} /><Reminders items={teacherReminders(db, scope, user)} /><ActivityFeed items={scope.activity.filter((a) => mine.has(a.userId))} title="O‘quvchilar faolligi" /></>} />
@@ -216,11 +216,12 @@ function teacherReminders(db, scope, user) {
 }
 
 /* ---------------- Rolga xos vidjetlar ---------------- */
-function NoGroups({ text }) {
+function NoGroups({ text, action }) {
   return (
     <div className="pdnote">
       <span className="pdr__ico" style={toneStyle('amber')}><Icon name="info" size={20} /></span>
       <p>{text}</p>
+      {action}
     </div>
   )
 }

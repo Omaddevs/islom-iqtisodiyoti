@@ -1,60 +1,41 @@
-import { useMemo, useState } from 'react'
-import { COURSES, LEVELS, dirById, formatNum, formatPrice } from '../data/content.js'
-import { Avatar, Icon, SectionHead, Stars } from './ui.jsx'
+import { COURSES } from '../data/content.js'
+import { Icon, SectionHead } from './ui.jsx'
 import DirIcon from './DirIcons.jsx'
 import { leadClick } from './LeadModal.jsx'
 
-// Daraja ko‘rsatkichi: 1–3 ta to‘lgan ustuncha
-const LEVEL_STEP = { 'Boshlang‘ich': 1, 'O‘rta': 2, 'Yuqori': 3 }
+const byId = (id) => COURSES.find((c) => c.id === id)
 
-export function CourseCard({ c }) {
-  const d = dirById(c.dir)
-  const free = c.price === 0
+function CourseCard({ c }) {
   return (
-    <article className="course" style={{ '--cc': d.color }}>
-      {/* Fikrlar kartasidagi kabi gradient sarlavha + logo belgisi */}
+    <article className="course" style={{ '--cc': c.color }}>
       <div className="course__head">
         <img src="/logo/logo-mark.png" alt="" className="cover__mark" aria-hidden="true" />
         <div className="course__tags">
-          <span className="course__level">
-            <span className="course__signal" aria-hidden="true">
-              {[1, 2, 3].map((i) => <i key={i} className={i <= LEVEL_STEP[c.level] ? 'on' : ''} />)}
-            </span>
-            {c.level}
+          <span className="course__stage">{c.stage}</span>
+          <span className="course__kind">
+            <Icon name={c.kind === 'Sertifikat' ? 'award' : 'bookOpen'} size={14} /> {c.kind}
           </span>
-          {free && <span className="course__free">Bepul</span>}
         </div>
         <div className="course__dir">
-          <span className="course__icon"><DirIcon name={d.icon} size={36} /></span>
+          <span className="course__icon"><DirIcon name={c.icon} size={36} /></span>
           <span className="course__dirname">
-            <small>Yo‘nalish</small>
-            {d.title}
+            <small>Asosiy soha</small>
+            {c.field}
           </span>
         </div>
       </div>
 
       <div className="course__body">
-        <div className="course__rating">
-          <Stars value={c.rating} size={15} />
-          <b>{c.rating.toFixed(1)}</b>
-          <span className="course__students"><Icon name="users" size={15} /> {formatNum(c.students)}</span>
-        </div>
         <h3 className="course__title">{c.title}</h3>
+        <p className="course__goal">{c.goal}</p>
         <div className="course__meta">
-          <span><Icon name="play" size={15} /> {c.lessons} dars</span>
-          <span><Icon name="clock" size={15} /> {c.hours} soat</span>
-        </div>
-        <div className="course__teacher">
-          <Avatar name={c.teacher} size={40} />
-          <span>
-            <b>{c.teacher} <Icon name="check" size={12} className="review__verified" /></b>
-            <small>Ustoz</small>
-          </span>
+          <span><Icon name="checkCircle" size={15} /> Asos talabi: {c.prereq}</span>
+          {c.volume && <span><Icon name="clock" size={15} /> {c.volume}</span>}
         </div>
         <div className="course__foot">
           <span className="course__price">
-            <small>Narxi</small>
-            <b className={free ? 'is-free' : ''}>{formatPrice(c.price)}</b>
+            <small>Narx va muddat</small>
+            <b>Tez orada e’lon qilinadi</b>
           </span>
           <a href="#royxat" className="course__btn" onClick={leadClick({ kind: 'course', course: c })}>
             Batafsil <Icon name="arrowRight" size={16} />
@@ -65,51 +46,78 @@ export function CourseCard({ c }) {
   )
 }
 
-const TABS = ['Barchasi', ...LEVELS]
+function PathNode({ id, label }) {
+  const c = byId(id)
+  return (
+    <button type="button" className="cpath__node" style={{ '--cc': c.color }} onClick={leadClick({ kind: 'course', course: c })}>
+      <small>{c.stage}</small>
+      <b>{label}</b>
+    </button>
+  )
+}
+
+function CertificationPath() {
+  return (
+    <div className="cpath">
+      <h3 className="cpath__title">Sertifikatlash yo‘li</h3>
+
+      <div className="cpath__tracks">
+        <div className="cpath__track">
+          <p className="cpath__label">Buxgalteriya-audit yo‘nalishi</p>
+          <div className="cpath__flow">
+            <PathNode id="buxgalter" label="Buxgalter" />
+            <Icon name="arrowRight" size={20} className="cpath__arrow" />
+            <div className="cpath__branch">
+              <PathNode id="auditor" label="Auditor" />
+              <PathNode id="ichki-auditor" label="Ichki auditor" />
+            </div>
+          </div>
+        </div>
+
+        <div className="cpath__track">
+          <p className="cpath__label">Bank amaliyoti yo‘nalishi</p>
+          <div className="cpath__flow">
+            <PathNode id="mutaxassis" label="Islom moliyasi va banki bo‘yicha mutaxassis" />
+          </div>
+          <p className="cpath__hint">To‘g‘ridan-to‘g‘ri, dastlabki shartsiz.</p>
+        </div>
+      </div>
+
+      <div className="cpath__notes">
+        <p>
+          <Icon name="award" size={18} />
+          <span>
+            <b>Barcha sertifikatlar uchun umumiy talab:</b> Palata tomonidan tasdiqlangan o‘quv dasturini
+            o‘zlashtirish, sertifikatlash imtihonini muvaffaqiyatli topshirish hamda AAOIFI Etika kodeksi
+            talablariga rioya etish.
+          </span>
+        </p>
+        <p>
+          <Icon name="info" size={18} />
+          <span>
+            <b>Joriy holat:</b> Nizom loyihasi tasdiqlash bosqichida. Kurslar hajmi, o‘qish muddati, imtihon
+            tartibi va to‘lov miqdori Nizom tasdiqlangandan so‘ng belgilanadi.
+          </span>
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export default function Courses() {
-  const [tab, setTab] = useState('Barchasi')
-  const [showAll, setShowAll] = useState(false)
-
-  const list = useMemo(
-    () => COURSES
-      .filter((c) => tab === 'Barchasi' || c.level === tab)
-      .sort((a, b) => b.students - a.students),
-    [tab],
-  )
-
-  const count = (t) => (t === 'Barchasi' ? COURSES.length : COURSES.filter((c) => c.level === t).length)
-
   return (
     <section className="section" id="kurslar">
       <SectionHead
         eyebrow="Kurslar"
-        title="Eng mashhur kurslarimiz"
-        action={
-          <div className="tabs" role="tablist" aria-label="Daraja bo‘yicha saralash">
-            {TABS.map((t) => (
-              <button key={t} role="tab" aria-selected={tab === t}
-                className={`tab ${tab === t ? 'tab--active' : ''}`} onClick={() => setTab(t)}>
-                {t}
-                <span className="tab__count">{count(t)}</span>
-              </button>
-            ))}
-          </div>
-        }
+        title="Kurs va malaka sertifikatlari"
+        text="Fundamental kurs hamda O‘zbekiston Respublikasi Auditorlar palatasining AAOIFI standartlariga asoslangan to‘rtta malaka sertifikati."
       />
 
       <div className="course-grid">
-        {(showAll ? list : list.slice(0, 6)).map((c) => <CourseCard key={c.id} c={c} />)}
+        {COURSES.map((c) => <CourseCard key={c.id} c={c} />)}
       </div>
 
-      {list.length > 6 && (
-        <div className="more">
-          <button type="button" className="link-arrow" onClick={() => setShowAll((v) => !v)}>
-            {showAll ? 'Kamroq ko‘rsatish' : `Barcha kurslar (${list.length})`}
-            <Icon name="chevDown" size={18} className={showAll ? 'rot180' : ''} />
-          </button>
-        </div>
-      )}
+      <CertificationPath />
     </section>
   )
 }

@@ -21,11 +21,13 @@ function GroupList() {
   const [q, setQ] = useState('')
   const [editing, setEditing] = useState(null)
   const [del, setDel] = useState(null)
-  useEffect(() => { if (hashQuery().get('new') && can('groups.manage')) setEditing({}) }, [can])
+  useEffect(() => { if (hashQuery().get('new') && can('groups.create')) setEditing({}) }, [can])
   const [view, setView] = useState(() => { try { return localStorage.getItem('ii_group_view') || 'grid' } catch { return 'grid' } })
   const changeView = (v) => { setView(v); try { localStorage.setItem('ii_group_view', v) } catch { /* xotira */ } }
   const canManage = can('groups.manage')
-  const list = scope.groups.filter((g) => (g.name + g.course).toLowerCase().includes(q.toLowerCase()))
+  const canCreate = can('groups.create')
+  const isTeacher = user.role === 'teacher'
+  const list =scope.groups.filter((g) => (g.name + g.course).toLowerCase().includes(q.toLowerCase()))
   const rows = list.map((g) => ({
     g,
     teacher: db.users.find((u) => u.id === g.teacherId),
@@ -34,7 +36,10 @@ function GroupList() {
     hw: db.homework.filter((h) => h.groupId === g.id).length,
     next: db.meetings.filter((m) => m.groupId === g.id && m.status !== 'ended').sort((a, b) => a.startsAt - b.startsAt)[0],
   }))
-  const menuFor = (g) => canManage && [{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(g) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(g) }]
+  // Ustoz ro'yxatida faqat o'z guruhlari bor: tahrirlaydi, lekin o'chirishni administrator qiladi
+  const menuFor = (g) => (canManage
+    ? [{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(g) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(g) }]
+    : isTeacher && [{ label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(g) }])
   return (
     <>
       {/* Sarlavha banneri */}
@@ -46,7 +51,7 @@ function GroupList() {
         </div>
         <blockquote className="pthero__quote">“Ilm bilan yuksalgan jamiyat barhayotdir.”</blockquote>
         <HeroArt />
-        {canManage && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Guruh yaratish</Btn>}
+        {canCreate && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Guruh yaratish</Btn>}
       </section>
 
       {/* Filtr paneli */}
@@ -62,7 +67,7 @@ function GroupList() {
         <Card>
           {q
             ? <Empty icon="search" title="Hech narsa topilmadi" text="Qidiruv so‘rovingizga mos guruh yo‘q." action={<Btn icon="refresh" onClick={() => setQ('')}>Qidiruvni tozalash</Btn>} />
-            : <Empty icon="layers" title="Guruh yo‘q" text="Guruh yarating, ustoz biriktiring va o‘quvchilarni qo‘shing." action={canManage && <Btn variant="primary" onClick={() => setEditing({})}>Guruh yaratish</Btn>} />}
+            : <Empty icon="layers" title="Guruh yo‘q" text={isTeacher ? 'Guruh yarating va o‘quvchilaringizni qo‘shing.' : 'Guruh yarating, ustoz biriktiring va o‘quvchilarni qo‘shing.'} action={canCreate && <Btn variant="primary" onClick={() => setEditing({})}>Guruh yaratish</Btn>} />}
         </Card>
       ) : (
         <div className={view === 'grid' ? 'pgroups' : 'pgroups pgroups--list'}>
@@ -199,7 +204,7 @@ function GroupDetail({ id }) {
         actions={canEdit && <>
           <Btn variant="primary" icon="video" onClick={() => setMeetOpen(true)}>Dars rejalashtirish</Btn>
           <Btn icon="fileText" onClick={() => setHwOpen(true)}>Vazifa berish</Btn>
-          {can('groups.manage') && <Btn icon="edit" onClick={() => setEditOpen(true)}>Tahrirlash</Btn>}
+          <Btn icon="edit" onClick={() => setEditOpen(true)}>Tahrirlash</Btn>
         </>} />
       <div className="pgrid pgrid--4">
         <Stat icon="users" label="O‘quvchilar" value={students.length} tone="blue" />

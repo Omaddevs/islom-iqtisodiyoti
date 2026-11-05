@@ -14,7 +14,8 @@ if (files.length) {
     SELECT data::text AS t FROM records
     UNION ALL SELECT data::text FROM organizations
     UNION ALL SELECT data::text FROM users
-    UNION ALL SELECT data::text FROM groups`)
+    UNION ALL SELECT data::text FROM groups
+    UNION ALL SELECT logo FROM partners WHERE logo IS NOT NULL`)
   const used = new Set()
   for (const { t } of rows) for (const m of t.matchAll(/img_[a-z0-9]+\.(?:jpg|png|webp)/g)) used.add(m[0])
   const dayAgo = Date.now() - 864e5

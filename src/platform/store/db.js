@@ -210,8 +210,8 @@ export function scopeFor(db, user, viewOrgId) {
 // Bu faqat interfeys uchun — haqiqiy tekshiruv serverda (backend/lib/platform.js).
 const PERMS = {
   superadmin: ['*'],
-  org_admin: ['users.create', 'users.manage', 'teachers.create', 'groups.manage', 'content.create', 'content.manage', 'org.settings', 'reports.view'],
-  teacher: ['students.create', 'groups.assign', 'content.create', 'content.own', 'homework.grade', 'meetings.host'],
+  org_admin: ['users.create', 'users.manage', 'teachers.create', 'groups.create', 'groups.manage', 'content.create', 'content.manage', 'org.settings', 'reports.view'],
+  teacher: ['students.create', 'groups.create', 'groups.assign', 'content.create', 'content.own', 'homework.grade', 'meetings.host'],
   student: ['content.view', 'homework.submit', 'tests.take'],
 }
 export const can = (user, perm) => !!user && (PERMS[user.role].includes('*') || PERMS[user.role].includes(perm))

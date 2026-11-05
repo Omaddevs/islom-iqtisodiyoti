@@ -29,6 +29,7 @@ export function navFor(user, scope, db) {
     users: { href: '#/platform/users', label: user.role === 'teacher' ? 'O‘quvchilarim' : 'Foydalanuvchilar', icon: 'users' },
     orgs: { href: '#/platform/organizations', label: 'Tashkilotlar', icon: 'building' },
     leads: { href: '#/platform/leads', label: 'Arizalar', icon: 'mail' },
+    partners: { href: '#/platform/partners', label: 'Hamkorlar', icon: 'briefcase' },
     settings: { href: '#/platform/settings', label: 'Sozlamalar', icon: 'settings' },
   }
   const materials = { title: 'Materiallar', links: [L.videos, L.vocabulary, L.library, L.articles] }
@@ -36,13 +37,13 @@ export function navFor(user, scope, db) {
   let sections
   if (user.role === 'superadmin' && !scope.orgId) {
     // Barcha tashkilotlar rejimi: platforma boshqaruvi (o'quv bo'limlari tashkilot ichida)
-    sections = [{ title: 'Platforma', links: [L.home, L.orgs, L.leads, L.users] }]
+    sections = [{ title: 'Platforma', links: [L.home, L.orgs, L.leads, L.partners, L.users] }]
   } else if (user.role === 'superadmin' || user.role === 'org_admin') {
     sections = [
       { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
       { title: 'O‘quv jarayoni', links: [L.groups, L.homework, L.tests] },
       materials,
-      { title: 'Boshqaruv', links: user.role === 'superadmin' ? [L.users, L.orgs, L.leads] : [L.users] },
+      { title: 'Boshqaruv', links: user.role === 'superadmin' ? [L.users, L.orgs, L.leads, L.partners] : [L.users] },
     ]
   } else if (user.role === 'teacher') {
     sections = [

@@ -8,7 +8,7 @@ export default function Directions() {
       <SectionHead
         eyebrow="Yo‘nalishlar"
         title="O‘zingizga mos yo‘nalishni tanlang"
-        text="Har bir yo‘nalish noldan boshlab amaliy darajagacha olib boradigan kurslar to‘plamidan iborat."
+        text="Islom iqtisodiyotining asosiy sohalari: nazariy asoslardan amaliy bilimlargacha."
       />
 
       <div className="dir-grid">
@@ -19,11 +19,6 @@ export default function Directions() {
             <h3 className="dir-card__title">{d.title}</h3>
             <p className="dir-card__desc">{d.desc}</p>
             <div className="dir-card__foot">
-              <span className="dir-card__meta">
-                <Icon name="book" size={15} /> {d.courses} ta kurs
-                <i />
-                <Icon name="clock" size={15} /> {d.duration}
-              </span>
               <span className="dir-card__arrow"><Icon name="arrowUpRight" size={18} /></span>
             </div>
           </a>

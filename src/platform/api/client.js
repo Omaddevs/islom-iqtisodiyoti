@@ -42,6 +42,13 @@ export const authApi = {
 }
 
 // Saytdagi formalar (kurs arizasi, aloqa, obuna) va ularni ko'rish (bosh admin)
+export const partnersApi = {
+  list: () => api('/api/partners'),
+  create: (partner) => api('/api/partners', { method: 'POST', body: partner }),
+  update: (id, partner) => api(`/api/partners/${id}`, { method: 'PATCH', body: partner }),
+  remove: (id) => api(`/api/partners/${id}`, { method: 'DELETE' }),
+}
+
 export const leadsApi = {
   send: (lead) => api('/api/leads', { method: 'POST', body: lead }),
   list: () => api('/api/leads'),

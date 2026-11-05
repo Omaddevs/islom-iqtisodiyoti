@@ -5,55 +5,145 @@ export const DIRECTIONS = [
     id: 'asoslar',
     title: 'Islom moliyasi asoslari',
     desc: 'Riba, g‘arar va maysir taqiqlari, shariat tamoyillari va islomiy shartnomalar nazariyasi.',
-    courses: 8, duration: '2 oy', icon: 'book', color: '#4aa3f8',
+    icon: 'book', color: '#4aa3f8',
   },
   {
     id: 'bank',
     title: 'Islom banki',
     desc: 'Murabaha, mudaraba, musharaka va ijara asosida ishlovchi bank mahsulotlari va amaliyoti.',
-    courses: 12, duration: '3 oy', icon: 'bank', color: '#6366f1',
+    icon: 'bank', color: '#6366f1',
   },
   {
     id: 'sukuk',
     title: 'Sukuk va kapital bozori',
     desc: 'Sukuk turlari, emissiya jarayoni, islomiy fondlar va shariatga mos investitsiya.',
-    courses: 7, duration: '2.5 oy', icon: 'chart', color: '#14b8a6',
+    icon: 'chart', color: '#14b8a6',
   },
   {
     id: 'takaful',
     title: 'Takaful',
     desc: 'Islomiy sug‘urta modellari: vakala, mudaraba va gibrid takaful tizimlari.',
-    courses: 5, duration: '1.5 oy', icon: 'shield', color: '#f59e0b',
+    icon: 'shield', color: '#f59e0b',
   },
   {
     id: 'biznes',
     title: 'Halol biznes va tadbirkorlik',
     desc: 'Shariatga mos biznes modeli, sheriklik shartnomalari va halol daromad strategiyalari.',
-    courses: 10, duration: '2 oy', icon: 'briefcase', color: '#10b981',
+    icon: 'briefcase', color: '#10b981',
   },
   {
     id: 'zakot',
     title: 'Zakot va vaqf',
     desc: 'Zakotni hisoblash, vaqf institutlari va ijtimoiy moliya boshqaruvi.',
-    courses: 6, duration: '1 oy', icon: 'heart', color: '#f43f5e',
+    icon: 'heart', color: '#f43f5e',
   },
 ]
 
-export const LEVELS = ['Boshlang‘ich', 'O‘rta', 'Yuqori']
-
+// «Fundamental» — platformaning kirish kursi (Auditorlar palatasi ma'lumotnomasida yo'q, matni loyiha uchun yozilgan).
+// Qolgan to'rttasi — Auditorlar palatasining malaka sertifikatlari; matn 2026-yil 5-noyabrdagi ma'lumotnomadan.
+// Narx, muddat va imtihon tartibi Nizom tasdiqlangach qo'shiladi.
 export const COURSES = [
-  { id: 1, title: 'Islom moliyasiga kirish', dir: 'asoslar', level: 'Boshlang‘ich', teacher: 'Abdulloh Karimov', lessons: 24, hours: 8, rating: 4.9, students: 12480, price: 0 },
-  { id: 2, title: 'Murabaha: nazariya va amaliyot', dir: 'bank', level: 'O‘rta', teacher: 'Dilshod Rahimov', lessons: 32, hours: 12, rating: 4.8, students: 5210, price: 349000 },
-  { id: 3, title: 'Mudaraba va musharaka shartnomalari', dir: 'bank', level: 'O‘rta', teacher: 'Muhammad Aliyev', lessons: 28, hours: 10, rating: 4.9, students: 4870, price: 349000 },
-  { id: 4, title: 'Sukuk: emissiyadan investitsiyagacha', dir: 'sukuk', level: 'Yuqori', teacher: 'Jasur Sobirov', lessons: 36, hours: 14, rating: 4.8, students: 2940, price: 499000 },
-  { id: 5, title: 'Takaful asoslari', dir: 'takaful', level: 'Boshlang‘ich', teacher: 'Nodira Qosimova', lessons: 18, hours: 6, rating: 4.7, students: 3150, price: 199000 },
-  { id: 6, title: 'Halol biznes qurish', dir: 'biznes', level: 'Boshlang‘ich', teacher: 'Sardor Yusupov', lessons: 22, hours: 9, rating: 4.9, students: 6720, price: 249000 },
-  { id: 7, title: 'Zakot hisob-kitobi amaliyoti', dir: 'zakot', level: 'Boshlang‘ich', teacher: 'Abdulloh Karimov', lessons: 12, hours: 4, rating: 4.9, students: 8300, price: 0 },
-  { id: 8, title: 'Ijara va islomiy lizing', dir: 'bank', level: 'O‘rta', teacher: 'Dilshod Rahimov', lessons: 20, hours: 7, rating: 4.7, students: 2480, price: 299000 },
-  { id: 9, title: 'Islomiy investitsiya fondlari', dir: 'sukuk', level: 'Yuqori', teacher: 'Jasur Sobirov', lessons: 26, hours: 11, rating: 4.8, students: 1960, price: 449000 },
-  { id: 10, title: 'AAOIFI shariat standartlari', dir: 'asoslar', level: 'Yuqori', teacher: 'Muhammad Aliyev', lessons: 30, hours: 13, rating: 4.9, students: 1740, price: 549000 },
-  { id: 11, title: 'Vaqf boshqaruvi', dir: 'zakot', level: 'O‘rta', teacher: 'Nodira Qosimova', lessons: 16, hours: 6, rating: 4.6, students: 1120, price: 199000 },
-  { id: 12, title: 'Salam va istisna shartnomalari', dir: 'biznes', level: 'O‘rta', teacher: 'Sardor Yusupov', lessons: 19, hours: 7, rating: 4.8, students: 2210, price: 299000 },
+  {
+    id: 'fundamental',
+    kind: 'Kurs',
+    title: 'Islom moliyasi bo‘yicha fundamental kurs',
+    stage: 'Boshlang‘ich kurs',
+    prereq: 'Talab etilmaydi',
+    field: 'Islom moliyasi asoslari',
+    dir: 'asoslar', icon: 'book', color: '#4aa3f8',
+    goal: 'Islom moliyasining asosiy tushunchalari — riba, g‘arar va maysir taqiqlari, shariat tamoyillari va islomiy shartnomalar nazariyasi bo‘yicha mustahkam poydevor yaratish.',
+    audience: [
+      'islom moliyasi bilan endi tanishayotganlar;',
+      'moliya sohasi talabalari va mutaxassislari;',
+      'sertifikat dasturini tanlashdan oldin asosiy bilimlarni mustahkamlamoqchi bo‘lganlar.',
+    ],
+    requirements: [
+      'boshlang‘ich kurs — boshqa kurs yoki sertifikat talab etilmaydi.',
+    ],
+  },
+  {
+    id: 'buxgalter',
+    kind: 'Sertifikat',
+    title: 'Islom moliyasi bo‘yicha buxgalter',
+    stage: '1-bosqich (bazaviy)',
+    prereq: 'Talab etilmaydi',
+    field: 'Islomiy moliyaviy operatsiyalar hisobi va moliyaviy hisobot',
+    icon: 'chart', color: '#14b8a6',
+    goal: 'Islomiy moliyaviy shartnomalar (murobaha, ijara, mushoraka, muzoraba, salam, istisno va boshqalar) bo‘yicha operatsiyalarni AAOIFI moliyaviy hisob standartlari asosida hisobga olish, islomiy moliya institutining moliyaviy hisobotini tuzish va oshkor qilish ko‘nikmalarini shakllantirish.',
+    audience: [
+      'islomiy banklar va an’anaviy banklarning islomiy oynalari buxgalterlari va bosh buxgalterlari;',
+      'islomiy mikromoliya, lizing, investitsiya va takaful tashkilotlarining moliya-buxgalteriya xodimlari;',
+      'moliyaviy hisobot tayyorlovchi va uni tahlil qiluvchi mutaxassislar;',
+      'tizimning keyingi bosqichi — auditor yoki ichki auditor sertifikatini olishni rejalashtirgan shaxslar.',
+    ],
+    requirements: [
+      'birinchi (bazaviy) bosqich sertifikati; boshqa sertifikat talab etilmaydi;',
+      'Palata tomonidan tasdiqlangan o‘quv dasturini o‘zlashtirish va sertifikatlash imtihonini topshirish;',
+      'ushbu sertifikat «Auditor» va «Ichki auditor» sertifikatlarini olish uchun majburiy asos hisoblanadi.',
+    ],
+  },
+  {
+    id: 'auditor',
+    kind: 'Sertifikat',
+    title: 'Islom moliyasi bo‘yicha auditor',
+    stage: '2-bosqich',
+    prereq: '«Buxgalter» sertifikati',
+    field: 'Tashqi audit va tashqi shariat auditi',
+    icon: 'shield', color: '#d97706',
+    goal: 'Islomiy moliya institutlari moliyaviy hisobotining tashqi auditini hamda shariat tamoyillari va qoidalariga muvofiqlikning mustaqil tashqi auditini (tashqi shariat auditi) AAOIFI audit va boshqaruv standartlari asosida o‘tkaza oladigan auditorlarni tayyorlash.',
+    audience: [
+      'auditorlik tashkilotlarining auditorlari va audit guruhi rahbarlari;',
+      'islomiy moliya institutlariga audit xizmati ko‘rsatishni rejalashtirgan auditorlik tashkilotlari mutaxassislari;',
+      'tashqi shariat auditi va ishonch (assurance) topshiriqlari bilan shug‘ullanuvchi ekspertlar.',
+    ],
+    requirements: [
+      'ikkinchi bosqich sertifikati;',
+      '«Islom moliyasi bo‘yicha buxgalter» sertifikatiga ega bo‘lish talab etiladi;',
+      'buxgalter bosqichi bilimlariga qo‘shimcha ravishda audit standartlari, shariat boshqaruvi va tashqi shariat auditi modullarini o‘zlashtirish hamda imtihon topshirish.',
+    ],
+  },
+  {
+    id: 'ichki-auditor',
+    kind: 'Sertifikat',
+    title: 'Islom moliyasi bo‘yicha ichki auditor',
+    stage: '2-bosqich',
+    prereq: '«Buxgalter» sertifikati',
+    field: 'Ichki audit, ichki shariat auditi va shariatga muvofiqlik nazorati',
+    icon: 'briefcase', color: '#10b981',
+    goal: 'Islomiy moliya institutida ichki audit, ichki shariat auditi va shariatga muvofiqlik funksiyasini tashkil etish, ichki nazorat tizimining samaradorligini baholash hamda shariat kengashi qarorlari ijrosini nazorat qilish ko‘nikmalarini shakllantirish.',
+    audience: [
+      'islomiy banklar va islomiy oynalarning ichki audit xizmati xodimlari;',
+      'shariatga muvofiqlik (Shariah compliance), risk-menejment va ichki nazorat bo‘linmalari xodimlari;',
+      'shariat kengashi kotibiyati va shariat nazorati bo‘limlari mutaxassislari.',
+    ],
+    requirements: [
+      'ikkinchi bosqich sertifikati;',
+      '«Islom moliyasi bo‘yicha buxgalter» sertifikatiga ega bo‘lish talab etiladi;',
+      'buxgalter bosqichi bilimlariga qo‘shimcha ravishda boshqaruv standartlari, ichki shariat auditi va ichki nazorat modullarini o‘zlashtirish hamda imtihon topshirish.',
+    ],
+  },
+  {
+    id: 'mutaxassis',
+    kind: 'Sertifikat',
+    title: 'Islom moliyasi va banki bo‘yicha mutaxassis',
+    stage: 'Mustaqil yo‘nalish',
+    prereq: 'Talab etilmaydi',
+    field: 'Islomiy bank mahsulotlari va operatsiyalari',
+    volume: '48 soat auditoriya + 48 soat mustaqil ta’lim',
+    dir: 'bank', icon: 'bank', color: '#6366f1',
+    goal: 'Islomiy bank mahsulotlari va operatsiyalarining shariat asoslari, ularni tuzish, mijozlarga taklif etish va amalga oshirish bo‘yicha amaliy bilimlarni shakllantirish; islomiy oyna faoliyatini yuritish uchun bank xodimlarini tayyorlash.',
+    audience: [
+      'islomiy banklar va islomiy oynalarning front-ofis, mahsulot ishlab chiqish, moliyalashtirish va filial xodimlari;',
+      'bank va nobank moliya tashkilotlarining islomiy mahsulotlar bilan ishlovchi mutaxassislari;',
+      'regulyator va davlat organlarining islom moliyasi masalalari bilan shug‘ullanuvchi xodimlari;',
+      'islom moliyasi sohasida faoliyat boshlamoqchi bo‘lgan mutaxassislar.',
+    ],
+    requirements: [
+      'mustaqil yo‘nalish — boshqa sertifikat talab etilmaydi;',
+      'namunaviy o‘quv dasturi hajmi: 48 soat auditoriya va 48 soat mustaqil ta’lim;',
+      'o‘quv dasturini o‘zlashtirish va sertifikatlash imtihonini topshirish.',
+    ],
+  },
 ]
 
 export const TESTIMONIALS = [
@@ -71,31 +161,6 @@ export const TESTIMONIALS = [
     text: 'Takaful modellarining farqini nihoyat tushundim. Ustoz savollarga tez va batafsil javob beradi, AI Ustoz ham juda qulay.' },
 ]
 
-// Hamkorlar — namunaviy nomlar. Haqiqiy logolar tayyor bo‘lsa, `logo: '/partners/xxx.svg'` qo‘shing.
-// mark: logo belgisi shakli (Partners.jsx dagi MARKS), color: brend rangi
-export const PARTNERS = [
-  { name: 'Amanah Bank', type: 'Islom banki', mark: 'ring', color: '#0f9d58' },
-  { name: 'Barakat Finance', type: 'Moliya kompaniyasi', mark: 'star', color: '#4aa3f8' },
-  { name: 'Sukuk Invest', type: 'Investitsiya fondi', mark: 'bars', color: '#14b8a6' },
-  { name: 'Takaful Plus', type: 'Takaful', mark: 'shield', color: '#f59e0b' },
-  { name: 'Nur Leasing', type: 'Ijara / lizing', mark: 'arc', color: '#6366f1' },
-  { name: 'Halal Trade', type: 'Savdo platformasi', mark: 'leaf', color: '#10b981' },
-  { name: 'Vaqf Fondi', type: 'Xayriya fondi', mark: 'drop', color: '#f43f5e' },
-  { name: 'Ummah Pay', type: 'Fintech', mark: 'crescent', color: '#0ea5e9' },
-  { name: 'Mudaraba Partners', type: 'Investitsiya', mark: 'hex', color: '#8b5cf6' },
-  { name: 'Sahih Audit', type: 'Shariat auditi', mark: 'check', color: '#1d4ed8' },
-  { name: 'Ilm Akademiyasi', type: 'Ta’lim', mark: 'book', color: '#ea580c' },
-  { name: 'Al-Furqon Capital', type: 'Kapital bozori', mark: 'diamond', color: '#0891b2' },
-  { name: 'Ijara Group', type: 'Ijara', mark: 'arc', color: '#e11d48' },
-  { name: 'Zakot Markazi', type: 'Zakot', mark: 'drop', color: '#16a34a' },
-  { name: 'Salam Agro', type: 'Salam moliyalash', mark: 'leaf', color: '#65a30d' },
-  { name: 'Istisna Build', type: 'Istisna', mark: 'bars', color: '#d97706' },
-  { name: 'Rahma Insurance', type: 'Takaful', mark: 'shield', color: '#7c3aed' },
-  { name: 'Tijorat Hub', type: 'Biznes inkubator', mark: 'hex', color: '#0284c7' },
-  { name: 'Iqtisod Media', type: 'Media hamkor', mark: 'ring', color: '#db2777' },
-  { name: 'Amin Fintech', type: 'Fintech', mark: 'star', color: '#059669' },
-]
-
 export const CONTACTS = {
   phone: '+998 71 200 00 00',
   email: 'info@islomiqtisod.uz',
@@ -108,8 +173,5 @@ export const CONTACTS = {
 }
 
 export const dirById = (id) => DIRECTIONS.find((d) => d.id === id)
-
-export const formatPrice = (n) =>
-  n === 0 ? 'Bepul' : `${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} so‘m`
 
 export const formatNum = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { POSTS, postBySlug } from '../data/posts.js'
-import { COURSES, formatNum, formatPrice } from '../data/content.js'
+import { COURSES, formatNum } from '../data/content.js'
 import { Avatar, Cover, Icon, SocialIcon } from '../components/ui.jsx'
 import { PostCard } from './BlogPage.jsx'
 
@@ -111,7 +111,7 @@ export default function ArticlePage({ slug }) {
   const newer = POSTS[idx - 1]
   const older = POSTS[idx + 1]
   const related = [...POSTS.filter((x) => x !== p && x.dir === p.dir), ...POSTS.filter((x) => x !== p && x.dir !== p.dir)].slice(0, 3)
-  const course = COURSES.filter((c) => c.dir === p.dir).sort((a, b) => b.students - a.students)[0]
+  const course = COURSES.find((c) => c.dir === p.dir) ?? COURSES[0] // mos yo'nalish bo'lmasa — fundamental kurs
 
   const goTo = (e, id) => {
     e.preventDefault() // hash-router'ni buzmaslik uchun
@@ -221,7 +221,7 @@ export default function ArticlePage({ slug }) {
               <a href="#kurslar" className="apromo" style={{ '--cc': p.color }}>
                 <span className="apromo__label">Mavzu bo‘yicha kurs</span>
                 <h4>{course.title}</h4>
-                <span className="apromo__meta">{course.lessons} dars · {course.hours} soat · {formatPrice(course.price)}</span>
+                <span className="apromo__meta">{course.kind} · {course.stage}</span>
                 <span className="apromo__btn">Kursni ko‘rish <Icon name="arrowRight" size={16} /></span>
               </a>
             )}
