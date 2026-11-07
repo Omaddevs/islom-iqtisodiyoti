@@ -6,8 +6,10 @@ set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 if ! command -v soffice >/dev/null || ! command -v pdftoppm >/dev/null; then
-  sudo apt-get update -q
-  sudo apt-get install -yq --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils \
+  # Boshqa apt ishi tugashini kutadi, osilib qolgan tarmoq so'rovi deploy'ni to'xtatib qo'ymaydi
+  APT_OPTS="-o DPkg::Lock::Timeout=180 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 -o Acquire::Retries=3"
+  sudo timeout 300 apt-get $APT_OPTS update -q
+  sudo apt-get $APT_OPTS install -yq --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils \
     fonts-liberation fonts-dejavu-core fonts-crosextra-carlito fonts-crosextra-caladea fonts-noto-core
 fi
 
