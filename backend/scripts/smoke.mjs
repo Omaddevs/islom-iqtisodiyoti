@@ -2,6 +2,7 @@
 // Server ishlab turgan bo'lishi kerak. Ishga tushirish: npm run test:smoke
 // Vaqtinchalik test tashkiloti yaratiladi va oxirida butunlay o'chiriladi.
 import WebSocket from 'ws'
+import sharp from 'sharp'
 
 const B = process.env.API || `http://localhost:${process.env.PORT || 4020}`
 const ORIGIN = (process.env.APP_ORIGIN || 'http://localhost:2026').split(',')[0]
@@ -117,6 +118,49 @@ const otherT = await ops(t.cookie, [{ col: 'tests', op: 'insert', item: { id: `t
 await ok(otherT.status === 200 && (await ops(s.cookie, [{ col: 'testAttempts', op: 'insert', item: { id: `tao${RUN}`, testId: `to${RUN}`, answers: { a: 0 } } }])).status === 404, 'o‘quvchi boshqa guruh testini topshira olmaydi')
 const junk = await ops(s.cookie, [{ col: 'tests', op: 'insert', item: { id: `tj${RUN}`, orgId: ORG, title: 'X' } }])
 await ok(junk.status === 403, 'o‘quvchi test yarata olmaydi')
+
+// ---- Himoyalangan materiallar (LibreOffice'siz: rasm, audio, zip) ----
+const upMaterial = (cookie, name, bytes, extra = {}) => fetch(`${B}/api/materials`, { method: 'POST', headers: { 'content-type': 'application/octet-stream', 'x-file-name': encodeURIComponent(name), cookie, ...extra }, body: bytes })
+const get = (path, cookie, headers = {}) => fetch(B + path, { headers: { ...(cookie ? { cookie } : {}), ...headers } })
+const PNG = await sharp({ create: { width: 320, height: 240, channels: 3, background: '#3b8ef0' } }).png().toBuffer()
+await ok((await upMaterial(s.cookie, 'x.png', PNG)).status === 403, 'o‘quvchi fayl yuklay olmaydi')
+await ok((await fetch(`${B}/api/materials`, { method: 'POST', headers: { 'x-file-name': 'x.png' }, body: PNG })).status === 401, 'kirmagan foydalanuvchi fayl yuklay olmaydi')
+const upImg = await upMaterial(t.cookie, '../../Sxema rasmi.png', PNG)
+const matImg = await upImg.json()
+await ok(upImg.status === 201 && matImg.name === 'Sxema rasmi.png' && matImg.kind === 'pages', 'ustoz rasm yukladi, fayl nomidagi yo‘l olib tashlandi')
+let ready = matImg
+for (let i = 0; i < 40 && ready.status === 'processing'; i++) { await new Promise((r) => setTimeout(r, 250)); ready = await (await get(`/api/materials/${matImg.id}`, t.cookie)).json() }
+await ok(ready.status === 'ready' && ready.pages === 1, 'rasm ko‘rish uchun tayyorlandi')
+const page1 = `/api/materials/${matImg.id}/pages/1`
+await ok((await get(page1)).status === 401, 'kirmagan foydalanuvchi sahifani ko‘ra olmaydi')
+await ok((await get(page1, s.cookie)).status === 403, 'kutubxonaga qo‘shilmagan faylni o‘quvchi ko‘ra olmaydi')
+await ok((await ops(t.cookie, [{ col: 'library', op: 'insert', item: { id: `lb${RUN}`, orgId: ORG, title: 'Sxema', type: 'document', groupIds: [G1], fileId: matImg.id, fileName: 'soxta.exe', fileSize: 1 } }])).status === 200, 'ustoz faylni guruhga berdi')
+const libItem = (await api('/api/data', { cookie: s.cookie })).data.library.find((x) => x.id === `lb${RUN}`)
+await ok(libItem.fileName === 'Sxema rasmi.png' && !libItem.url, 'fayl nomi serverdan olinadi, o‘quvchiga havola berilmaydi')
+const sPage = await get(page1, s.cookie)
+await ok(sPage.status === 200 && sPage.headers.get('content-type') === 'image/webp' && sPage.headers.get('cache-control').includes('no-store'), 'guruh o‘quvchisi sahifa rasmini oldi, kesh yo‘q')
+const tPage = await get(page1, t.cookie)
+await ok(Buffer.compare(Buffer.from(await sPage.arrayBuffer()), Buffer.from(await tPage.arrayBuffer())) !== 0, 'har bir ko‘ruvchiga o‘z suv belgili rasmi beriladi')
+await ok((await get(`/api/materials/${matImg.id}/source`, s.cookie)).status === 403, 'o‘quvchi asl faylni yuklab ola olmaydi')
+await ok((await get(`/api/materials/${matImg.id}/media`, s.cookie)).status === 404, 'rasm media yo‘li orqali berilmaydi')
+const srcRes = await get(`/api/materials/${matImg.id}/source`, t.cookie)
+await ok(srcRes.status === 200 && srcRes.headers.get('content-disposition').startsWith('attachment') && Buffer.compare(Buffer.from(await srcRes.arrayBuffer()), PNG) === 0, 'yuklagan ustoz asl faylni oladi')
+await ok((await get(page1.replace(matImg.id, 'mf_yoq'), s.cookie)).status === 404 && (await get(`/api/materials/${encodeURIComponent('../../.env')}`, t.cookie)).status === 404, 'noto‘g‘ri identifikator rad etiladi')
+await ok((await get(`/api/materials/${matImg.id}/pages/2`, s.cookie)).status === 404 && (await get(`/api/materials/${matImg.id}/pages/0`, s.cookie)).status === 404, 'mavjud bo‘lmagan sahifa berilmaydi')
+const s2Login = await login(P.s2, 'parol123')
+await ok((await get(page1, s2Login.cookie)).status === 403, 'boshqa guruh o‘quvchisi faylni ko‘ra olmaydi')
+await ok((await ops(t.cookie, [{ col: 'library', op: 'insert', item: { id: `lb2${RUN}`, orgId: ORG, title: 'X', fileId: 'mf_begona' } }])).status === 422, 'mavjud bo‘lmagan fayl biriktirilmaydi')
+const upAudio = await (await upMaterial(t.cookie, 'Ma’ruza.mp3', Buffer.alloc(5000, 7))).json()
+await ops(t.cookie, [{ col: 'library', op: 'insert', item: { id: `lb3${RUN}`, orgId: ORG, title: 'Ma’ruza', type: 'audio', groupIds: [], fileId: upAudio.id } }])
+for (let i = 0; i < 20 && (await (await get(`/api/materials/${upAudio.id}`, s.cookie)).json()).status !== 'ready'; i++) await new Promise((r) => setTimeout(r, 200))
+const part = await get(`/api/materials/${upAudio.id}/media`, s.cookie, { range: 'bytes=100-199' })
+await ok(part.status === 206 && part.headers.get('content-range') === 'bytes 100-199/5000' && (await part.arrayBuffer()).byteLength === 100, 'audio bo‘lib-bo‘lib uzatiladi (Range)')
+await ok((await get(`/api/materials/${upAudio.id}/media`, s.cookie, { range: 'bytes=9000-' })).status === 416, 'noto‘g‘ri diapazon rad etiladi')
+const upZip = await (await upMaterial(t.cookie, 'Arxiv.zip', Buffer.from('PK'))).json()
+await ok(upZip.kind === 'none' && upZip.status === 'ready', 'istalgan fayl turi qabul qilinadi (zip saqlanadi, ochilmaydi)')
+await ok((await api(`/api/materials/${matImg.id}/events`, { method: 'POST', cookie: s.cookie, body: { type: 'capture', detail: 'PrintScreen' } })).status === 204, 'skrinshot urinishi jurnalga yoziladi')
+await ok((await api(`/api/materials/${matImg.id}/events`, { cookie: s.cookie })).status === 403, 'o‘quvchi jurnalni ko‘ra olmaydi')
+await ok((await api(`/api/materials/${matImg.id}/events`, { cookie: t.cookie })).data.viewers.some((v) => v.id === `u_s1${RUN}` && v.captures === 1), 'ustoz jurnalda urinishni ko‘radi')
 await ok((await ops(s.cookie, [{ col: 'users', op: 'patch', id: `u_s1${RUN}`, changes: { password: 'yangi123', currentPassword: 'xato' } }])).status === 422, 'joriy parolsiz parol almashtirilmaydi')
 const s2 = await login(P.s1, 'parol123') // ikkinchi qurilma
 const goodPw = await ops(s.cookie, [{ col: 'users', op: 'patch', id: `u_s1${RUN}`, changes: { password: 'yangi123', currentPassword: 'parol123' } }])

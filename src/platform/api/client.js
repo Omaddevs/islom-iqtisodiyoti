@@ -49,6 +49,37 @@ export const partnersApi = {
   remove: (id) => api(`/api/partners/${id}`, { method: 'DELETE' }),
 }
 
+// Himoyalangan materiallar. Yuklash XHR orqali: fetch yuklash jarayonini ko'rsata olmaydi
+export const materialsApi = {
+  get: (id) => api(`/api/materials/${id}`),
+  pageUrl: (id, n) => `${BASE}/api/materials/${id}/pages/${n}`,
+  mediaUrl: (id) => `${BASE}/api/materials/${id}/media`,
+  sourceUrl: (id) => `${BASE}/api/materials/${id}/source`,
+  event: (id, type, detail) => api(`/api/materials/${id}/events`, { method: 'POST', body: { type, detail } }).catch(() => {}),
+  viewers: (id) => api(`/api/materials/${id}/events`),
+  upload(file, { orgId, onProgress } = {}) {
+    const xhr = new XMLHttpRequest()
+    const promise = new Promise((ok, no) => {
+      xhr.open('POST', `${BASE}/api/materials`)
+      xhr.withCredentials = true
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+      xhr.setRequestHeader('X-File-Name', encodeURIComponent(file.name))
+      if (orgId) xhr.setRequestHeader('X-Org-Id', orgId)
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress?.(e.loaded / e.total) }
+      xhr.onload = () => {
+        let data = null
+        try { data = JSON.parse(xhr.responseText) } catch { /* JSON emas */ }
+        if (xhr.status >= 200 && xhr.status < 300) ok(data)
+        else no(new ApiError(xhr.status, data))
+      }
+      xhr.onerror = () => no(new ApiError(0))
+      xhr.onabort = () => no(Object.assign(new Error('Bekor qilindi'), { name: 'AbortError' }))
+      xhr.send(file)
+    })
+    return { promise, abort: () => xhr.abort() }
+  },
+}
+
 export const leadsApi = {
   send: (lead) => api('/api/leads', { method: 'POST', body: lead }),
   list: () => api('/api/leads'),

@@ -334,6 +334,15 @@ const noKeys = (o, keys) => { for (const k of keys) delete o[k]; return o }
 const isMemberOf = async (c, userId, groupId) => !!(await row(c, 'SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2', [groupId, userId]))
 
 // Test bali serverda hisoblanadi — brauzer yuborgan ball inobatga olinmaydi
+// Kutubxona yozuvidagi fayl shu tashkilotga tegishli bo'lishi shart: aks holda begona faylga ruxsat olinardi.
+// Fayl nomi va hajmi brauzerdan emas, bazadan olinadi.
+async function attachFile(c, orgId, data) {
+  if (!data.fileId) return { ...data, fileId: null, fileName: null, fileExt: null, fileSize: null }
+  const f = await row(c, 'SELECT * FROM material_files WHERE id = $1 AND org_id = $2', [String(data.fileId), orgId])
+  if (!f) fail(422, 'Fayl topilmadi. Qayta yuklab ko‘ring')
+  return { ...data, fileId: f.id, fileName: f.name, fileExt: f.ext, fileSize: Number(f.size), url: '', pages: f.pages || data.pages || 0 }
+}
+
 const scoreOf = (test, answers) => (test.questions || []).reduce((s, q) => s + (answers?.[q.id] === q.correct ? 1 : 0), 0)
 
 // Savollar tuzilmasi: to'g'ri javob har doim mavjud variantni ko'rsatishi kerak (aks holda natija buziladi)
@@ -387,6 +396,7 @@ const recordOps = {
         if (item.questions === undefined) fail(422, 'Testda kamida bitta savol bo‘lishi kerak')
         item = cleanTest({ timeLimit: 10, ...item })
       }
+      if (col === 'library') item = await attachFile(c, orgId, item)
       return insertRec(c, col, id, orgId, u.id, safeLinks({ createdAt: now, ...item, orgId, authorId: u.id }))
     }
     if (col === 'testAttempts') {
@@ -463,6 +473,10 @@ const recordOps = {
           && await row(c, `SELECT 1 FROM records WHERE collection = 'testAttempts' AND data->>'testId' = $1 LIMIT 1`, [id])) {
           fail(409, 'Testni o‘quvchilar topshirgan — savollarni o‘zgartirib bo‘lmaydi')
         }
+      }
+      if (col === 'library') {
+        for (const k of ['fileName', 'fileExt', 'fileSize']) delete changes[k]
+        if ('fileId' in changes) changes = await attachFile(c, r.org_id, changes)
       }
       return updateRec(c, col, id, safeLinks({ ...d, ...noKeys({ ...changes }, ['id', 'orgId', 'authorId']) }))
     }

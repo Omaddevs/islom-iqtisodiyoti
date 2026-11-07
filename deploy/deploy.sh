@@ -15,6 +15,9 @@ if [ "${1:-}" != "--no-pull" ]; then
   exec bash "$APP/deploy/deploy.sh" --no-pull
 fi
 
+echo "• Konvertatsiya vositalari"
+bash "$APP/deploy/convert-setup.sh"
+
 echo "• Frontend"
 npm ci --no-audit --no-fund --loglevel=error
 npm run build --silent

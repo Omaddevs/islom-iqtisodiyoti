@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, ChipSelect, Empty, Icon, Confirm, Menu, useToast, cx, useFormInit } from '../ui/kit.jsx'
-import { fmtDate, fmtDuration, fmtNum } from '../ui/format.js'
+import { fmtDate, fmtDateTime, fmtDuration, fmtNum } from '../ui/format.js'
+import { SecureViewer, fmtSize } from '../ui/SecureViewer.jsx'
+import { materialsApi } from '../api/client.js'
 
 /* ---------- Ma'lumotnomalar ---------- */
 
@@ -16,10 +18,13 @@ const TYPES = {
   standard: { label: 'Standart', tab: 'Standartlar', icon: 'scale', tone: 'teal' },
   textbook: { label: 'Darslik', tab: 'Darsliklar', icon: 'book', tone: 'blue' },
   pdf: { label: 'PDF', icon: 'fileText', tone: 'violet' },
+  document: { label: 'Hujjat', icon: 'fileText', tone: 'blue' },
+  slides: { label: 'Taqdimot', icon: 'layers', tone: 'amber' },
+  sheet: { label: 'Jadval', icon: 'grid', tone: 'green' },
   link: { label: 'Havola', icon: 'globe', tone: 'teal' },
 }
 // "Boshqa" tabi — alohida tabga ega bo'lmagan turlar
-const OTHER = ['pdf', 'link']
+const OTHER = ['pdf', 'document', 'slides', 'sheet', 'link']
 const TABS = [
   { value: 'all', label: 'Barchasi', icon: 'bookOpen' },
   ...['book', 'article', 'audio', 'video', 'research', 'standard', 'textbook'].map((k) => ({ value: k, label: TYPES[k].tab, icon: TYPES[k].icon })),
@@ -32,14 +37,24 @@ const ACTION = {
   pdf: { label: 'O‘qish', icon: 'fileText' },
   link: { label: 'Ochish', icon: 'externalLink' },
 }
-const actionOf = (l) => ACTION[l.type] || { label: 'Yuklab olish', icon: 'download' }
+const actionOf = (l) => (l.fileId && !ACTION[l.type] ? { label: 'Ochish', icon: 'eye' } : l.fileId && l.type === 'link' ? { label: 'Ochish', icon: 'eye' } : ACTION[l.type] || { label: 'Yuklab olish', icon: 'download' })
+// Fayl kengaytmasidan material turi
+const typeFromExt = (ext) => {
+  if (ext === 'pdf') return 'pdf'
+  if (['doc', 'docx', 'docm', 'dot', 'dotx', 'odt', 'rtf', 'txt', 'md'].includes(ext)) return 'document'
+  if (['ppt', 'pptx', 'pptm', 'pps', 'ppsx', 'pot', 'potx', 'odp'].includes(ext)) return 'slides'
+  if (['xls', 'xlsx', 'xlsm', 'xlsb', 'xlt', 'xltx', 'ods', 'csv'].includes(ext)) return 'sheet'
+  if (['mp3', 'wav', 'ogg', 'oga', 'opus', 'm4a', 'aac', 'flac'].includes(ext)) return 'audio'
+  if (['mp4', 'm4v', 'webm', 'ogv', 'mov', 'mkv', 'avi'].includes(ext)) return 'video'
+  return 'document'
+}
 const LANGS = { uz: 'O‘zbek', ar: 'Arab', en: 'Ingliz', ru: 'Rus' }
 const FORMATS = ['PDF', 'EPUB', 'MP3', 'MP4', 'Havola']
 const SORTS = [
   { value: 'new', label: 'Yangidan eski' },
   { value: 'old', label: 'Eskidan yangi' },
   { value: 'year', label: 'Nashr yili' },
-  { value: 'popular', label: 'Ko‘p yuklangan' },
+  { value: 'popular', label: 'Eng ommabop' },
   { value: 'title', label: 'Nomi (A–Z)' },
 ]
 const sortFn = {
@@ -91,6 +106,8 @@ export default function Library() {
   const [open, setOpen] = useState(null)
   const [editing, setEditing] = useState(null)
   const [del, setDel] = useState(null)
+  const [viewing, setViewing] = useState(null)
+  const [journal, setJournal] = useState(null)
   const [saved, toggleSaved] = useSaved(user.id)
   const canEdit = user.role !== 'student' && can('content.create')
   const changeView = (v) => { setView(v); try { localStorage.setItem('ii_lib_view', v) } catch { /* xotira */ } }
@@ -120,8 +137,15 @@ export default function Library() {
   const filtered = q || tab !== 'all' || activeFilters || onlySaved
   const clear = () => { setQ(''); setTab('all'); setCat(''); setFmt(''); setLang(''); setYear(''); setOnlySaved(false) }
 
-  // Asosiy amal: fayl/havolani ochish, yuklashlar sonini oshirish
+  // Asosiy amal: yuklangan fayl platforma ichida, havola yangi oynada ochiladi
   const run = (l, e) => {
+    if (l.fileId) {
+      e?.preventDefault()
+      patch('library', l.id, { downloads: (l.downloads || 0) + 1 })
+      setOpen(null)
+      setViewing(l)
+      return
+    }
     if (!l.url) { e?.preventDefault(); toast('Bu material uchun havola hali qo‘shilmagan', 'err'); return }
     patch('library', l.id, { downloads: (l.downloads || 0) + 1 })
   }
@@ -131,7 +155,8 @@ export default function Library() {
     return [
       { label: 'Batafsil', icon: 'info', onClick: () => setOpen(l) },
       { label: saved.includes(l.id) ? 'Saqlanganlardan olish' : 'Saqlab qo‘yish', icon: 'bookmark', onClick: () => save(l) },
-      l.url && { label: 'Havolani nusxalash', icon: 'link', onClick: async () => { try { await navigator.clipboard.writeText(l.url) } catch { /* bloklangan */ } toast('Havola nusxalandi') } },
+      !l.fileId && l.url && { label: 'Havolani nusxalash', icon: 'link', onClick: async () => { try { await navigator.clipboard.writeText(l.url) } catch { /* bloklangan */ } toast('Havola nusxalandi') } },
+      ...(canEdit && mine && l.fileId ? [{ label: 'Ko‘rish jurnali', icon: 'eye', onClick: () => setJournal(l) }, { label: 'Asl faylni yuklab olish', icon: 'download', onClick: () => { window.location.href = materialsApi.sourceUrl(l.fileId) } }] : []),
       ...(canEdit && mine ? ['sep', { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(l) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(l) }] : []),
     ]
   }
@@ -167,7 +192,7 @@ export default function Library() {
         {showFilters && (
           <div className="plibbar__filters">
             <Select value={cat} onChange={setCat} placeholder="Barcha toifalar" options={categories.map((c) => ({ value: c, label: c }))} aria-label="Toifa" />
-            <Select value={fmt} onChange={setFmt} placeholder="Barcha formatlar" options={FORMATS.filter((f) => all.some((l) => l.format === f)).map((f) => ({ value: f, label: f }))} aria-label="Format" />
+            <Select value={fmt} onChange={setFmt} placeholder="Barcha formatlar" options={[...new Set(all.map((l) => l.format).filter(Boolean))].sort().map((f) => ({ value: f, label: f }))} aria-label="Format" />
             <Select value={lang} onChange={setLang} placeholder="Barcha tillar" options={langs.map((k) => ({ value: k, label: LANGS[k] }))} aria-label="Til" />
             <Select value={year} onChange={setYear} placeholder="Nashr yili" options={years.map((y) => ({ value: String(y), label: String(y) }))} aria-label="Nashr yili" />
             <span className="plibsort"><Icon name="sort" size={16} /><Select value={sort} onChange={setSort} options={SORTS} aria-label="Saralash" /></span>
@@ -223,6 +248,8 @@ export default function Library() {
       <LibDetail item={open && all.find((x) => x.id === open.id)} onClose={() => setOpen(null)} groups={db.groups} uploader={open && db.users.find((u) => u.id === open.authorId)}
         saved={open && saved.includes(open.id)} onSave={() => save(open)} onRun={run} onTag={pickTag} />
       <LibForm open={!!editing} item={editing} onClose={() => setEditing(null)} categories={categories} />
+      {viewing && <SecureViewer item={viewing} user={user} onClose={() => setViewing(null)} />}
+      <FileJournal item={journal} onClose={() => setJournal(null)} />
       <Confirm open={!!del} onClose={() => setDel(null)} danger title="Materialni o‘chirish" text={`«${del?.title}» o‘chiriladi. Bu amalni qaytarib bo‘lmaydi.`} confirmLabel="O‘chirish" onConfirm={() => { remove('library', del.id); toast('Material o‘chirildi') }} />
     </>
   )
@@ -264,12 +291,12 @@ function Cover({ l, size = 'md' }) {
       </div>
     )
   }
-  if (t === 'article' || t === 'pdf') {
+  if (t === 'article' || t === 'pdf' || t === 'document' || t === 'slides' || t === 'sheet') {
     return (
       <div className={cx('plibcov', 'plibcov--paper', `plibcov--${size}`)}>
         <span className="plibcov__ptitle">{l.title}</span>
         <span className="plibcov__lines">{Array.from({ length: 11 }, (_, i) => <i key={i} style={{ width: `${[100, 92, 96, 70, 100, 88, 94, 60, 100, 84, 76][i]}%` }} />)}</span>
-        {t === 'pdf' && <span className="plibcov__pdf">PDF</span>}
+        {(t === 'pdf' || l.fileExt) && <span className="plibcov__pdf">{(l.fileExt || 'pdf').toUpperCase()}</span>}
       </div>
     )
   }
@@ -315,6 +342,7 @@ function LibCard({ l, row, saved, onOpen, onRun, onSave, onTag, menu }) {
       <div className="plibcard__body">
         <div className="plibcard__head">
           <Badge tone={t.tone}>{t.label}</Badge>
+          {l.fileId && <span className="plibprot" title="Faqat platforma ichida ko‘riladi, yuklab olib bo‘lmaydi"><Icon name="lock" size={12} />Himoyalangan</span>}
           {row && l.category && <span className="plibcard__cat">{l.category}</span>}
         </div>
         <h4 title={l.title}>{l.title}</h4>
@@ -358,7 +386,8 @@ function LibDetail({ item: l, onClose, groups, uploader, saved, onSave, onRun, o
     ['Toifa', l.category],
     ['Til', LANGS[l.lang || 'uz']],
     ['Format', l.format],
-    ['Yuklashlar', fmtNum(l.downloads || 0)],
+    [l.fileId ? 'Ko‘rishlar' : 'Yuklashlar', fmtNum(l.downloads || 0)],
+    ['Fayl', l.fileId ? `${l.fileName} · ${fmtSize(l.fileSize || 0)}` : null],
     ['Qo‘shilgan', `${fmtDate(l.createdAt)}${uploader ? ` · ${uploader.name}` : ''}`],
   ].filter(([, v]) => v)
   return (
@@ -395,25 +424,76 @@ function LibForm({ open, item, onClose, categories }) {
   const isNew = !item?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
+  const [source, setSource] = useState('file')
+  const [up, setUp] = useState(null) // { name, progress, abort } yoki { file: meta }
+  const [drag, setDrag] = useState(false)
+  const input = useRef(null)
+  const running = useRef(null)
+  const cancelUpload = () => { running.current?.abort(); running.current = null }
+  useEffect(() => { if (!open) cancelUpload() }, [open])
   useFormInit(open, item?.id, () => {
     setErr({})
+    setDrag(false)
+    setSource(isNew || item?.fileId || !item?.url ? 'file' : 'link')
+    setUp(item?.fileId ? { file: { id: item.fileId, name: item.fileName, size: item.fileSize, ext: item.fileExt } } : null)
     setF(isNew
-      ? { title: '', author: '', type: 'book', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
+      ? { title: '', author: '', type: 'document', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
       : { ...item, minutes: item.duration ? Math.round(item.duration / 60) : '', tags: (item.tags || []).join(', ') })
   })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setType = (v) => setF((x) => ({ ...x, type: v, format: DEFAULT_FORMAT[v] || (DEFAULT_FORMAT[x.type] ? 'PDF' : x.format) }))
   const timed = f.type === 'audio' || f.type === 'video'
+  const file = up?.file
+  const autoMeta = source === 'file' && !!up // Betlar soni va format fayldan aniqlanadi
+  const uploading = !!up && !up.file
+  const fileId = file?.id, fileStatus = file?.status
+  // Fayl tayyorlanishini kuzatamiz: ustoz ochilmaydigan faylni bilmasdan o'quvchilarga bermasin
+  useEffect(() => {
+    if (!open || !fileId || (fileStatus && fileStatus !== 'processing')) return undefined
+    let alive = true
+    const t = setTimeout(() => {
+      materialsApi.get(fileId).then((m) => { if (alive) setUp((u) => (u?.file?.id === m.id ? { file: m } : u)) }).catch(() => { if (alive) setUp((u) => (u?.file?.id === fileId ? { file: { ...u.file, status: 'unknown' } } : u)) })
+    }, fileStatus ? 2000 : 0)
+    return () => { alive = false; clearTimeout(t) }
+  }, [open, file]) // eslint-disable-line react-hooks/exhaustive-deps
+  const startUpload = async (picked) => {
+    if (!picked) return
+    if (picked.size > 500 * 1024 * 1024) return setErr((x) => ({ ...x, file: 'Fayl hajmi 500 MB dan oshmasligi kerak' }))
+    if (!picked.size) return setErr((x) => ({ ...x, file: 'Fayl bo‘sh' }))
+    if (!scope.orgId) return toast(NO_ORG, 'err')
+    cancelUpload()
+    setErr((x) => ({ ...x, file: null }))
+    const job = materialsApi.upload(picked, { orgId: scope.orgId, onProgress: (p) => setUp((u) => (u && !u.file ? { ...u, progress: p } : u)) })
+    running.current = job
+    setUp({ name: picked.name, size: picked.size, progress: 0 })
+    try {
+      const meta = await job.promise
+      if (running.current !== job) return
+      running.current = null
+      setUp({ file: meta })
+      const ext = meta.ext.toUpperCase()
+      setF((x) => ({ ...x, title: x.title?.trim() ? x.title : meta.name.replace(/\.[^.]+$/, ''), type: typeFromExt(meta.ext), format: ext || x.format, url: '' }))
+    } catch (e) {
+      if (e.name === 'AbortError' || running.current !== job) return
+      running.current = null
+      setUp(null)
+      setErr((x) => ({ ...x, file: e.message }))
+    }
+  }
   const submit = () => {
     const er = {}
+    if (uploading) er.file = 'Fayl yuklanishini kuting'
     if (!f.title?.trim()) er.title = 'Nomini kiriting'
-    if (f.type === 'link' && !f.url?.trim()) er.url = 'Havolani kiriting'
-    if (f.url?.trim() && !/^https?:\/\//i.test(f.url.trim())) er.url = 'Havola http(s):// bilan boshlanishi kerak'
+    const useFile = source === 'file'
+    if (useFile && !file && !uploading) er.file = 'Fayl tanlang yoki «Havola» bo‘limidan manzil kiriting'
+    if (useFile && file?.status === 'failed') er.file = 'Bu faylni ochib bo‘lmadi. Boshqa fayl tanlang'
+    if (!useFile && !f.url?.trim()) er.url = 'Havolani kiriting'
+    if (!useFile && f.url?.trim() && !/^https?:\/\//i.test(f.url.trim())) er.url = 'Havola http(s):// bilan boshlanishi kerak'
     setErr(er); if (Object.keys(er).length) return
     const data = {
       title: f.title.trim(), author: f.author?.trim(), type: f.type, year: Number(f.year) || null,
       pages: timed ? 0 : Number(f.pages) || 0, duration: timed ? (Number(f.minutes) || 0) * 60 : 0,
-      category: f.category?.trim(), lang: f.lang, format: f.format, url: f.url?.trim(), description: f.description?.trim(),
+      category: f.category?.trim(), lang: f.lang, format: f.format, url: useFile ? '' : f.url?.trim(), fileId: useFile ? file.id : null, description: f.description?.trim(),
       tags: (f.tags || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 6), groupIds: f.groupIds || [],
     }
     if (isNew) {
@@ -426,9 +506,46 @@ function LibForm({ open, item, onClose, categories }) {
     onClose()
   }
   return (
-    <Modal open={open} onClose={onClose} title={isNew ? 'Material qo‘shish' : 'Materialni tahrirlash'} sub="Kitob, maqola, audio, video yoki boshqa manba" width={620}
-      footer={<><Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" icon={isNew ? 'plus' : 'check'} onClick={submit}>{isNew ? 'Qo‘shish' : 'Saqlash'}</Btn></>}>
+    <Modal open={open} onClose={onClose} title={isNew ? 'Material qo‘shish' : 'Materialni tahrirlash'} sub="Istalgan turdagi fayl yoki havola" width={620}
+      footer={<><Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" icon={isNew ? 'plus' : 'check'} disabled={uploading} onClick={submit}>{isNew ? 'Qo‘shish' : 'Saqlash'}</Btn></>}>
       <div className="pform">
+        <div className="pfield">
+          <div className="plibsrc" role="group" aria-label="Manba">
+            <button type="button" className={cx(source === 'file' && 'is-on')} aria-pressed={source === 'file'} onClick={() => setSource('file')}><Icon name="upload" size={15} />Fayl yuklash</button>
+            <button type="button" className={cx(source === 'link' && 'is-on')} aria-pressed={source === 'link'} onClick={() => setSource('link')}><Icon name="link" size={15} />Havola</button>
+          </div>
+        </div>
+        {source === 'file' && (
+          <div className="pfield">
+            <input ref={input} type="file" hidden aria-label="Fayl tanlash" onChange={(e) => { startUpload(e.target.files?.[0]); e.target.value = '' }} />
+            {file ? (
+              <div className="plibfile">
+                <span className="plibfile__ext">{(file.ext || '?').slice(0, 5).toUpperCase()}</span>
+                <div className="plibfile__info"><b title={file.name}>{file.name}</b><span className={cx(file.status === 'failed' && 'is-bad', file.kind === 'none' && 'is-warn')}>{fmtSize(file.size || 0)} · {file.status === 'failed' ? (file.error || 'Faylni ochib bo‘lmadi') : file.kind === 'none' ? 'Bu tur brauzerda ochilmaydi: o‘quvchilar faqat nomini ko‘radi' : file.status === 'ready' ? `Tayyor${file.pages ? `: ${file.pages} bet` : ''}` : 'Ko‘rish uchun tayyorlanmoqda…'}</span></div>
+                <button type="button" className="plibicon" onClick={() => { setUp(null); input.current?.click() }} aria-label="Boshqa fayl tanlash" title="Boshqa fayl"><Icon name="refresh" size={16} /></button>
+              </div>
+            ) : uploading ? (
+              <div className="plibfile">
+                <span className="plibfile__ext"><Icon name="upload" size={18} /></span>
+                <div className="plibfile__info"><b title={up.name}>{up.name}</b>
+                  <span>{up.progress >= 1 ? 'Saqlanmoqda…' : `Yuklanmoqda: ${Math.round(up.progress * 100)}% · ${fmtSize(up.size)}`}</span>
+                  <span className="pprog pprog--sm"><span className="pprog__bar" style={{ width: `${Math.round(up.progress * 100)}%` }} /></span>
+                </div>
+                <button type="button" className="plibicon" onClick={() => { cancelUpload(); setUp(null) }} aria-label="Yuklashni bekor qilish" title="Bekor qilish"><Icon name="x" size={16} /></button>
+              </div>
+            ) : (
+              <button type="button" className={cx('plibdrop', drag && 'is-over', err.file && 'is-err')} onClick={() => input.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); setDrag(true) }} onDragLeave={() => setDrag(false)}
+                onDrop={(e) => { e.preventDefault(); setDrag(false); startUpload(e.dataTransfer.files?.[0]) }}>
+                <Icon name="upload" size={26} />
+                <b>Faylni shu yerga tashlang yoki tanlang</b>
+                <span>PDF, Word, Excel, PowerPoint, rasm, audio, video va boshqa turlar · 500 MB gacha</span>
+              </button>
+            )}
+            {err.file && <span className="pfield__error">{err.file}</span>}
+            <p className="plibnote"><Icon name="lock" size={14} />O‘quvchilar faylni faqat platforma ichida ko‘radi: yuklab olish yopiq, har bir sahifada ismi va telefoni yoziladi.</p>
+          </div>
+        )}
         <FField label="Turi">
           <div className="plibtypes">
             {Object.entries(TYPES).map(([k, t]) => (
@@ -444,18 +561,55 @@ function LibForm({ open, item, onClose, categories }) {
         <div className="pform__row">
           {timed
             ? <FField label="Davomiylik (daqiqa)"><Input type="number" min="1" value={f.minutes || ''} onChange={(e) => set('minutes', e.target.value)} /></FField>
-            : <FField label="Betlar soni"><Input type="number" min="1" value={f.pages || ''} onChange={(e) => set('pages', e.target.value)} /></FField>}
+            : !autoMeta && <FField label="Betlar soni"><Input type="number" min="1" value={f.pages || ''} onChange={(e) => set('pages', e.target.value)} /></FField>}
           <FField label="Nashr yili"><Input type="number" value={f.year || ''} onChange={(e) => set('year', e.target.value)} /></FField>
         </div>
         <div className="pform__row">
           <FField label="Til"><Select value={f.lang} onChange={(v) => set('lang', v)} options={Object.entries(LANGS).map(([k, v]) => ({ value: k, label: v }))} /></FField>
-          <FField label="Format"><Select value={f.format} onChange={(v) => set('format', v)} options={FORMATS.map((x) => ({ value: x, label: x }))} /></FField>
+          {!autoMeta && <FField label="Format"><Select value={f.format} onChange={(v) => set('format', v)} options={[...new Set([...FORMATS, f.format].filter(Boolean))].map((x) => ({ value: x, label: x }))} /></FField>}
         </div>
-        <FField label={f.type === 'link' ? 'Havola' : 'Fayl havolasi'} error={err.url} hint="Google Drive, Telegram yoki boshqa ochiq havola"><Input value={f.url || ''} onChange={(e) => set('url', e.target.value)} placeholder="https://…" /></FField>
+        {source === 'link' && <FField label="Havola" error={err.url} hint="Havola orqali ochilgan material himoyalanmaydi: u tashqi saytda ochiladi"><Input value={f.url || ''} onChange={(e) => set('url', e.target.value)} placeholder="https://…" /></FField>}
         <FField label="Teglar" hint="Vergul bilan ajrating, masalan: Murobaha, Amaliy"><Input value={f.tags || ''} onChange={(e) => set('tags', e.target.value)} /></FField>
         <FField label="Kimlar ko‘radi"><ChipSelect allLabel="Barcha guruhlar" value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>
         <FField label="Tavsif"><Textarea value={f.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Qisqacha mazmuni…" /></FField>
       </div>
+    </Modal>
+  )
+}
+
+/* ---------- Ko'rish jurnali ---------- */
+
+function FileJournal({ item, onClose }) {
+  const [rows, setRows] = useState(null)
+  const [error, setError] = useState(null)
+  const id = item?.fileId
+  useEffect(() => {
+    if (!id) return undefined
+    let alive = true
+    setRows(null); setError(null)
+    materialsApi.viewers(id).then((d) => { if (alive) setRows(d.viewers) }).catch((e) => { if (alive) setError(e.message) })
+    return () => { alive = false }
+  }, [id])
+  return (
+    <Modal open={!!item} onClose={onClose} title="Ko‘rish jurnali" sub={item?.title} width={620}>
+      {error ? <Empty icon="alertCircle" title="Jurnalni yuklab bo‘lmadi" text={error} />
+        : !rows ? <p className="pmuted">Yuklanmoqda…</p>
+          : rows.length === 0 ? <Empty icon="eye" title="Hali hech kim ochmagan" />
+            : (
+              <div className="ptable-wrap">
+                <table className="ptable">
+                  <thead><tr><th>Foydalanuvchi</th><th>Ochgan</th><th>Skrinshot urinishi</th><th>So‘nggi marta</th></tr></thead>
+                  <tbody>{rows.map((r) => (
+                    <tr key={r.id}>
+                      <td><b>{r.name}</b></td>
+                      <td>{r.opens} marta</td>
+                      <td>{r.captures ? <Badge tone="red">{r.captures} ta</Badge> : <span className="pmuted">Yo‘q</span>}</td>
+                      <td>{fmtDateTime(r.lastAt)}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            )}
     </Modal>
   )
 }

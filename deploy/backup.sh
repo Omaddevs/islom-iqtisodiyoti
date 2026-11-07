@@ -21,6 +21,7 @@ mv "$DIR/db/db-$STAMP.dump.tmp" "$DIR/db/db-$STAMP.dump"
 find "$DIR/db" -name 'db-*.dump' -mtime +"$KEEP_DAYS" -delete
 
 # 3) Fayllar: o'sib boruvchi nusxa (faqat yangi/o'zgargan fayllar ko'chiriladi, o'chirilganlari zaxirada qoladi)
-rsync -a "$STORAGE/" "$DIR/files/"
+# Sahifa rasmlari asl fayldan qayta hosil bo'ladi, zaxiraga kerak emas
+rsync -a --exclude 'materials/*/p-*.jpg' "$STORAGE/" "$DIR/files/"
 
 echo "✓ $(date '+%F %T') zaxira: $(du -sh "$DIR/db/db-$STAMP.dump" | cut -f1) baza, $(du -sh "$DIR/files" | cut -f1) fayllar, bo'sh joy: $(df -h / | awk 'NR==2{print $4}')"

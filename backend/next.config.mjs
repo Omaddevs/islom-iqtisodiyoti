@@ -1,6 +1,6 @@
 /** Faqat API: sahifalar frontend (Vite) tomonida. */
 const nextConfig = {
-  serverExternalPackages: ['pg', 'bcryptjs', 'ws'],
+  serverExternalPackages: ['pg', 'bcryptjs', 'ws', 'sharp'],
   poweredByHeader: false,
   // Bir vaqtda ikkinchi nusxa (masalan, tekshiruv uchun) alohida papkada build qilinadi
   distDir: process.env.NEXT_DIST_DIR || '.next',
