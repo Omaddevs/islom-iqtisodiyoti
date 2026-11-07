@@ -24,18 +24,22 @@ sudo visudo -cf /etc/sudoers.d/islom-convert >/dev/null
 sudo tee /etc/systemd/system/islom-convert-net.service >/dev/null <<'UNIT'
 [Unit]
 Description=ii-convert foydalanuvchisi uchun tarmoq taqiqi
-After=network-pre.target
+After=network-pre.target ufw.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c 'iptables -C OUTPUT -m owner --uid-owner ii-convert -j REJECT 2>/dev/null || iptables -A OUTPUT -m owner --uid-owner ii-convert -j REJECT'
-ExecStart=/bin/sh -c 'ip6tables -C OUTPUT -m owner --uid-owner ii-convert -j REJECT 2>/dev/null || ip6tables -A OUTPUT -m owner --uid-owner ii-convert -j REJECT'
+# Birinchi o'ringa: ufw zanjirlaridagi ACCEPT qoidalaridan oldin ishlashi shart
+ExecStart=/bin/sh -c 'iptables -D OUTPUT -m owner --uid-owner ii-convert -j REJECT 2>/dev/null; iptables -I OUTPUT 1 -m owner --uid-owner ii-convert -j REJECT'
+ExecStart=/bin/sh -c 'ip6tables -D OUTPUT -m owner --uid-owner ii-convert -j REJECT 2>/dev/null; ip6tables -I OUTPUT 1 -m owner --uid-owner ii-convert -j REJECT'
 [Install]
 WantedBy=multi-user.target
 UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable --now islom-convert-net >/dev/null 2>&1
 sudo systemctl restart islom-convert-net
+
+# Yuklangan fayllar (materiallar, rasmlar, dars yozuvlari) ii-convert uchun yopiq: fayllarni faqat backend beradi
+sudo chmod 750 /var/www/islom-iqtisodiyoti-storage
 
 # Backend shu sozlamalar bo'yicha ii-convert ostida ishga tushiradi
 ENV=/var/www/islom-iqtisodiyoti/backend/.env
