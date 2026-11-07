@@ -43,13 +43,13 @@ const pagePath = (id, n) => join(fileDir(id), `p-${n}.jpg`)
 // ---- Tashqi dasturlar ----
 // Muhit o'zgaruvchilari (baza paroli, JWT) dasturlarga uzatilmaydi
 const cleanEnv = () => ({ PATH: process.env.PATH, HOME: process.env.CONVERT_HOME || tmpdir(), LANG: 'C.UTF-8', SystemRoot: process.env.SystemRoot, TEMP: process.env.TEMP, TMP: process.env.TMP })
-function run(cmd, args, { timeoutS = 120, sandbox = false } = {}) {
+function run(cmd, args, { timeoutS = 120, sandbox = false, cwd } = {}) {
   return new Promise((ok, no) => {
     // Hujjatni ochuvchi dastur alohida, huquqsiz foydalanuvchi ostida ishlaydi (deploy/convert-setup.sh):
     // zararli hujjat .env yoki boshqa materiallarni o'qiy olmaydi va tarmoqqa chiqa olmaydi
     const user = sandbox && process.env.CONVERT_USER
     const [bin, argv] = user ? ['sudo', ['-n', '-u', user, 'timeout', '-k', '10', String(timeoutS), cmd, ...args]] : [cmd, args]
-    const p = spawn(bin, argv, { env: cleanEnv(), stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
+    const p = spawn(bin, argv, { cwd, env: cleanEnv(), stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
     let out = '', err = ''
     p.stdout.on('data', (d) => { if (out.length < 65536) out += d })
     p.stderr.on('data', (d) => { if (err.length < 8192) err += d })
@@ -72,7 +72,7 @@ async function officeToPdf(id, ext) {
     await copyFile(sourcePath(id), input)
     await chmod(input, 0o644)
     const profile = process.env.CONVERT_PROFILE || join(tmpdir(), 'ii-lo-profile')
-    await run(SOFFICE(), [`-env:UserInstallation=${fileUrl(profile)}`, '--headless', '--norestore', '--nolockcheck', '--convert-to', 'pdf', '--outdir', work, input], { timeoutS: CONVERT_TIMEOUT_S, sandbox: true })
+    await run(SOFFICE(), [`-env:UserInstallation=${fileUrl(profile)}`, '--headless', '--norestore', '--nolockcheck', '--convert-to', 'pdf', '--outdir', work, input], { timeoutS: CONVERT_TIMEOUT_S, sandbox: true, cwd: work }) // soffice joriy papkaga kira olishi shart
     const out = join(work, 'input.pdf')
     await stat(out).catch(() => { throw new Error('PDF hosil bo‘lmadi') })
     await copyFile(out, pdfPath(id))
