@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
-import { fmtDate, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
+import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
-import { StatSpark, Donut, series, endOfDay } from '../ui/charts.jsx'
+import { StatSpark, series, endOfDay } from '../ui/charts.jsx'
+import { ChartPanel } from '../ui/chartpanel.jsx'
 
 export default function Tests({ param }) {
   const { user } = useAuth()
@@ -25,6 +26,50 @@ const GRADES = [
 const gradeOf = (p) => GRADES.find((g) => p >= g.min)
 const PERIODS = [{ value: '7', label: 'So‘nggi 7 kun' }, { value: '30', label: 'So‘nggi 30 kun' }, { value: 'all', label: 'Butun davr' }]
 const avgOf = (list) => (list.length ? Math.round(list.reduce((s, a) => s + pct(a.score, a.total), 0) / list.length) : 0)
+const LETTER = (i) => String.fromCharCode(65 + i)
+const STATUS = {
+  right: { label: 'To‘g‘ri', color: '#10b981', icon: 'checkCircle', tone: 'green' },
+  wrong: { label: 'Xato', color: '#ef4444', icon: 'alertCircle', tone: 'red' },
+  skip: { label: 'Javob berilmagan', color: '#aab4c2', icon: 'minus', tone: 'gray' },
+}
+// Har bir savol bo'yicha o'quvchi javobining holati
+const reviewOf = (t, a) => t.questions.map((q, i) => {
+  const my = a.answers?.[q.id]
+  return { q, i, my, status: my === undefined || my === null ? 'skip' : my === q.correct ? 'right' : 'wrong' }
+})
+
+/* ---------- Grafik ma'lumotlari ---------- */
+
+function gradesDataset(list) {
+  return {
+    key: 'grades', label: 'Baholar', sub: 'Har bir bahoga nechta topshiruv to‘g‘ri kelgani', defaultType: 'donut', head: ['Baho', 'Topshiruvlar'],
+    parts: { label: 'Topshiruvlarning baholar bo‘yicha ulushi', value: (r) => r.value }, center: { value: `${avgOf(list)}%`, label: 'O‘rtacha' },
+    rows: list.length ? GRADES.map((g) => {
+      const n = list.filter((a) => gradeOf(pct(a.score, a.total)).key === g.key).length
+      return { key: g.key, label: `${g.label} (${g.range})`, short: g.label, value: n, shown: `${n} ta`, color: g.color }
+    }) : [],
+  }
+}
+function testsDataset(list, tests, label = 'Testlar', sub = 'Har bir test bo‘yicha o‘rtacha natija, vaqt tartibida') {
+  const rows = tests.map((t) => ({ t, ta: list.filter((a) => a.testId === t.id) })).filter((x) => x.ta.length)
+    .map((x) => ({ ...x, at: Math.max(...x.ta.map((a) => a.finishedAt)) })).sort((a, b) => a.at - b.at).slice(-24)
+  return {
+    key: 'tests', label, sub, max: 100, unit: '%', defaultType: 'line', head: ['Test', 'Natija'], parts: null,
+    rows: rows.map((x) => ({ key: x.t.id, label: x.t.title, value: avgOf(x.ta), shown: x.ta.length > 1 ? `${avgOf(x.ta)}% · ${x.ta.length} ta topshiruv` : `${avgOf(x.ta)}% · ${fmtDate(x.at)}` })),
+  }
+}
+function daysDataset(list) {
+  const days = new Map()
+  for (const a of [...list].sort((x, y) => x.finishedAt - y.finishedAt)) {
+    const k = new Date(a.finishedAt).toDateString()
+    if (!days.has(k)) days.set(k, [])
+    days.get(k).push(a)
+  }
+  return {
+    key: 'days', label: 'Kunlar', sub: 'Har kuni nechta test topshirilgani', head: ['Sana', 'Topshiruvlar'], parts: { label: 'Topshiruvlarning kunlar bo‘yicha ulushi', value: (r) => r.value },
+    rows: [...days.values()].map((ta) => ({ key: String(ta[0].finishedAt), label: fmtDate(ta[0].finishedAt), short: fmtDateShort(ta[0].finishedAt), value: ta.length, shown: `${ta.length} ta · o‘rtacha ${avgOf(ta)}%` })),
+  }
+}
 
 /* ---------- Ro'yxat sahifasi ---------- */
 
@@ -48,7 +93,8 @@ function TestList() {
     const ta = attempts.filter((a) => a.testId === t.id)
     const my = ta.find((a) => a.studentId === user.id)
     const groups = db.groups.filter((g) => t.groupIds.includes(g.id))
-    const total = new Set(groups.flatMap((g) => g.studentIds)).size
+    // Guruhdan chiqqan bo'lsa ham topshirgan o'quvchi hisobda qoladi
+    const total = new Set([...groups.flatMap((g) => g.studentIds), ...ta.map((a) => a.studentId)]).size
     const author = db.users.find((u) => u.id === t.authorId)
     return { t, my, groups, total, author, done: ta.length, avg: ta.length ? `${avgOf(ta)}%` : '—', expired: t.dueAt < now }
   }).sort((a, b) => (a.expired - b.expired) || (a.expired ? b.t.dueAt - a.t.dueAt : a.t.dueAt - b.t.dueAt)), [scope.tests, attempts, db.groups, db.users, user.id, now])
@@ -85,7 +131,7 @@ function TestList() {
 
   const recent = useMemo(() => [...attempts].sort((a, b) => b.finishedAt - a.finishedAt), [attempts])
   const inPeriod = useMemo(() => (period === 'all' ? attempts : attempts.filter((a) => a.finishedAt >= now - Number(period) * D)), [attempts, period, now])
-  const parts = GRADES.map((g) => ({ ...g, value: inPeriod.filter((a) => gradeOf(pct(a.score, a.total)).key === g.key).length }))
+  const datasets = useMemo(() => [gradesDataset(inPeriod), testsDataset(inPeriod, scope.tests), daysDataset(inPeriod)], [inPeriod, scope.tests])
 
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const canCreate = isStaff && can('content.create')
@@ -160,21 +206,10 @@ function TestList() {
             )}
         </Card>
 
-        <Card id="pt-analytics" className="ptanalytics">
-          <header className="ptcard-h ptcard-h--in">
-            <h3 className="pdt"><span className="pdt__ico"><Icon name="chart" size={18} /></span>Natijalar tahlili</h3>
-            <label className="pdsel"><span>{PERIODS.find((p) => p.value === period).label}</span><Icon name="chevDown" size={16} />
-              <select value={period} onChange={(e) => setPeriod(e.target.value)} aria-label="Davr">{PERIODS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</select>
-            </label>
-          </header>
-          <div className="ptan">
-            <Donut parts={parts} center={inPeriod.length ? `${avgOf(inPeriod)}%` : '—'} sub="O‘rtacha natija" />
-            <ul className="ptlegend">
-              {parts.map((g) => <li key={g.key}><i style={{ background: g.color }} /><span>{g.label} <small>({g.range})</small></span><b>{g.value}</b></li>)}
-            </ul>
-          </div>
-          {inPeriod.length === 0 && <p className="pmuted ptan__empty">Tanlangan davrda topshiruv yo‘q.</p>}
-        </Card>
+        <ChartPanel id="pt-analytics" title="Natijalar tahlili" storeKey="tests_overview" defaultType="donut" datasets={datasets} emptyText="Tanlangan davrda topshiruv yo‘q."
+          actions={<label className="pdsel"><span>{PERIODS.find((p) => p.value === period).label}</span><Icon name="chevDown" size={16} />
+            <select value={period} onChange={(e) => setPeriod(e.target.value)} aria-label="Davr">{PERIODS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}</select>
+          </label>} />
       </div>
 
       <TestForm open={!!editing} test={editing} onClose={() => setEditing(null)} />
@@ -229,26 +264,53 @@ function TestCard({ r, isStaff, menu }) {
 }
 
 // ---- Test konstruktori ----
+const MAX_OPTS = 8
 const emptyQ = () => ({ id: uid('q'), text: '', options: ['', '', '', ''], correct: 0 })
 function TestForm({ open, test, onClose }) {
-  const { user, scope } = useAuth()
+  const { user, db, scope } = useAuth()
   const toast = useToast()
   const isNew = !test?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState('')
+  useEffect(() => { setErr('') }, [f]) // forma tuzatilganda eski xato ko'rinib turmasin
+  // Topshirilgan testning savollari qulflanadi: aks holda eski natijalar buziladi
+  const locked = !isNew && db.testAttempts.some((a) => a.testId === test.id)
   useFormInit(open, test?.id, () => { setErr(''); setF(isNew ? { title: '', description: '', groupIds: scope.groups[0] ? [scope.groups[0].id] : [], timeLimit: 15, dueAt: toLocalInput(Date.now() + 7 * 864e5), questions: [emptyQ(), emptyQ()] } : { ...test, dueAt: toLocalInput(test.dueAt), questions: test.questions.map((q) => ({ ...q, options: [...q.options] })) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setQ = (i, k, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, [k]: v } : q)) }))
   const setOpt = (i, oi, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, options: q.options.map((o, k) => (k === oi ? v : o)) } : q)) }))
+  const addOpt = (i) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, options: [...q.options, ''] } : q)) }))
+  const delOpt = (i, oi) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => {
+    if (j !== i) return q
+    const correct = oi === q.correct ? 0 : oi < q.correct ? q.correct - 1 : q.correct
+    return { ...q, options: q.options.filter((_, k) => k !== oi), correct }
+  }) }))
 
   const submit = () => {
     if (!f.title?.trim()) return setErr('Test nomini kiriting')
     if (!f.groupIds?.length) return setErr('Kamida bitta guruh tanlang')
-    if (!fromLocalInput(f.dueAt)) return setErr('Muddatni kiriting')
-    const qs = f.questions.filter((q) => q.text.trim())
-    if (!qs.length) return setErr('Kamida bitta savol kiriting')
-    for (const q of qs) if (q.options.filter((o) => o.trim()).length < 2 || !q.options[q.correct]?.trim()) return setErr('Har bir savolda kamida 2 ta variant va to‘g‘ri javob bo‘lishi kerak')
-    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: Number(f.timeLimit) || 10, dueAt: fromLocalInput(f.dueAt), questions: qs.map((q) => ({ ...q, options: q.options.filter((o) => o.trim()) })) }
+    const limit = Number(f.timeLimit)
+    if (!Number.isFinite(limit) || limit < 1 || limit > 600) return setErr('Vaqt chegarasi 1 daqiqadan 600 daqiqagacha bo‘lishi kerak')
+    const dueAt = fromLocalInput(f.dueAt)
+    if (!dueAt) return setErr('Muddatni kiriting')
+    if (isNew && dueAt <= Date.now()) return setErr('Muddat kelajakdagi vaqt bo‘lishi kerak')
+    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: limit, dueAt }
+    if (!locked) {
+      const qs = []
+      for (let n = 0; n < f.questions.length; n++) {
+        const q = f.questions[n], label = `${n + 1}-savol`
+        // Bo'sh variantlar olib tashlanganda to'g'ri javob ko'rsatkichi ham surilishi kerak
+        const kept = q.options.map((o, i) => ({ o: o.trim(), i })).filter((x) => x.o)
+        if (!q.text.trim()) { if (kept.length) return setErr(`${label}: savol matnini kiriting`); continue }
+        if (kept.length < 2) return setErr(`${label}: kamida 2 ta variant kiriting`)
+        if (new Set(kept.map((x) => x.o.toLowerCase())).size !== kept.length) return setErr(`${label}: variantlar takrorlanmasin`)
+        const correct = kept.findIndex((x) => x.i === q.correct)
+        if (correct < 0) return setErr(`${label}: to‘g‘ri javob to‘ldirilgan variantlardan biri bo‘lishi kerak`)
+        qs.push({ id: q.id, text: q.text.trim(), options: kept.map((x) => x.o), correct })
+      }
+      if (!qs.length) return setErr('Kamida bitta savol kiriting')
+      data.questions = qs
+    }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       const t = add('tests', { ...data, orgId: scope.orgId, authorId: user.id })
@@ -260,162 +322,340 @@ function TestForm({ open, test, onClose }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} width={760} title={isNew ? 'Test yaratish' : 'Testni tahrirlash'} sub="Savollar, variantlar va to‘g‘ri javobni belgilang"
-      footer={<>{err && <span style={{ color: 'var(--pf-red)', fontSize: 13, marginRight: 'auto', alignSelf: 'center' }}>{err}</span>}<Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" onClick={submit}>{isNew ? 'Yaratish' : 'Saqlash'}</Btn></>}>
+    <Modal open={open} onClose={onClose} width={760} title={isNew ? 'Test yaratish' : 'Testni tahrirlash'} sub={locked ? 'Nomi, guruhlari va muddatini o‘zgartirish mumkin' : 'Savollar, variantlar va to‘g‘ri javobni belgilang'}
+      footer={<>{err && <span className="ptform__err" role="alert">{err}</span>}<Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" onClick={submit}>{isNew ? 'Yaratish' : 'Saqlash'}</Btn></>}>
       <div className="pform">
         <FField label="Test nomi"><Input value={f.title || ''} onChange={(e) => set('title', e.target.value)} autoFocus /></FField>
         <FField label="Tavsif"><Input value={f.description || ''} onChange={(e) => set('description', e.target.value)} /></FField>
         <div className="pform__row">
-          <FField label="Vaqt chegarasi (daqiqa)"><Input type="number" min="1" value={f.timeLimit || ''} onChange={(e) => set('timeLimit', e.target.value)} /></FField>
+          <FField label="Vaqt chegarasi (daqiqa)"><Input type="number" min="1" max="600" value={f.timeLimit || ''} onChange={(e) => set('timeLimit', e.target.value)} /></FField>
           <FField label="Topshirish muddati"><Input type="datetime-local" value={f.dueAt || ''} onChange={(e) => set('dueAt', e.target.value)} /></FField>
         </div>
-        <FField label="Guruhlar"><ChipSelect value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>
+        <div className="pfield">
+          <span className="pfield__label">Guruhlar</span>
+          {scope.groups.length
+            ? <ChipSelect value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} />
+            : <span className="pfield__hint">Avval guruh yarating: test guruh o‘quvchilariga beriladi.</span>}
+        </div>
         <div className="pfield__label">Savollar ({f.questions?.length || 0})</div>
-        {(f.questions || []).map((q, i) => (
+        {locked && <p className="ptform__lock"><Icon name="lock" size={16} />O‘quvchilar bu testni topshirgan, shuning uchun savollar qulflangan: o‘zgarish eski natijalarni buzadi.</p>}
+        {(f.questions || []).map((q, i) => (locked ? (
+          <div key={q.id} className="pqb pqb--ro">
+            <b>{i + 1}. {q.text}</b>
+            <ul>{q.options.map((o, oi) => <li key={oi} className={cx(oi === q.correct && 'is-right')}><i>{LETTER(oi)}</i>{o}{oi === q.correct && <Icon name="check" size={15} />}</li>)}</ul>
+          </div>
+        ) : (
           <div key={q.id} className="pqb">
             <div className="prow" style={{ flexWrap: 'nowrap' }}>
               <Badge tone="violet">{i + 1}</Badge>
-              <Input value={q.text} onChange={(e) => setQ(i, 'text', e.target.value)} placeholder="Savol matni" />
+              <Input value={q.text} onChange={(e) => setQ(i, 'text', e.target.value)} placeholder="Savol matni" aria-label={`${i + 1}-savol matni`} />
               <Btn size="sm" variant="ghost" icon="trash" onClick={() => set('questions', f.questions.filter((_, j) => j !== i))} aria-label="Savolni o‘chirish" />
             </div>
             <div className="pqb__opts">
               {q.options.map((o, oi) => (
-                <label key={oi} className="pqb__opt">
-                  <input type="radio" name={`c-${q.id}`} checked={q.correct === oi} onChange={() => setQ(i, 'correct', oi)} title="To‘g‘ri javob" />
-                  <Input value={o} onChange={(e) => setOpt(i, oi, e.target.value)} placeholder={`${String.fromCharCode(65 + oi)} varianti`} style={{ height: 40 }} />
-                </label>
+                <div key={oi} className={cx('pqb__opt', q.correct === oi && 'is-right')}>
+                  <input type="radio" name={`c-${q.id}`} checked={q.correct === oi} onChange={() => setQ(i, 'correct', oi)} title="To‘g‘ri javob" aria-label={`${LETTER(oi)} — to‘g‘ri javob`} />
+                  <Input value={o} onChange={(e) => setOpt(i, oi, e.target.value)} placeholder={`${LETTER(oi)} varianti`} style={{ height: 40 }} />
+                  {q.options.length > 2 && <button type="button" className="pqb__del" onClick={() => delOpt(i, oi)} aria-label={`${LETTER(oi)} variantini o‘chirish`}><Icon name="x" size={14} /></button>}
+                </div>
               ))}
             </div>
-            <span className="pfield__hint" style={{ display: 'block', marginTop: 6 }}>Radio tugma bilan to‘g‘ri javobni belgilang</span>
+            <div className="pqb__foot">
+              <span className="pfield__hint">Doira bilan to‘g‘ri javobni belgilang</span>
+              {q.options.length < MAX_OPTS && <button type="button" className="ptlink" onClick={() => addOpt(i)}><Icon name="plus" size={15} />Variant qo‘shish</button>}
+            </div>
           </div>
-        ))}
-        <Btn icon="plus" onClick={() => set('questions', [...f.questions, emptyQ()])}>Savol qo‘shish</Btn>
+        )))}
+        {!locked && <Btn icon="plus" onClick={() => set('questions', [...f.questions, emptyQ()])}>Savol qo‘shish</Btn>}
       </div>
     </Modal>
   )
 }
 
+// ---- Savollar bo'yicha javoblarni ko'rish (o'quvchi va ustoz uchun) ----
+function QuestionReview({ test, attempt, who = 'Sizning javobingiz' }) {
+  const items = useMemo(() => reviewOf(test, attempt), [test, attempt])
+  const [filter, setFilter] = useState('all')
+  const n = (s) => items.filter((x) => x.status === s).length
+  const tabs = [
+    { value: 'all', label: 'Barchasi', count: items.length },
+    { value: 'wrong', label: 'Xatolar', icon: 'alertCircle', count: n('wrong') },
+    { value: 'right', label: 'To‘g‘ri', icon: 'checkCircle', count: n('right') },
+    ...(n('skip') ? [{ value: 'skip', label: 'Javobsiz', icon: 'minus', count: n('skip') }] : []),
+  ]
+  const shown = filter === 'all' ? items : items.filter((x) => x.status === filter)
+  const idOf = (x) => `ptrv-${attempt.id}-${x.q.id}`
+  const jump = (x) => {
+    setFilter('all')
+    setTimeout(() => document.getElementById(idOf(x))?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 30)
+  }
+  return (
+    <div className="ptrv">
+      <div className="ptrv__map" role="group" aria-label="Savollar xaritasi">
+        {items.map((x) => (
+          <button key={x.q.id} type="button" className={`is-${x.status}`} onClick={() => jump(x)} title={`${x.i + 1}-savol: ${STATUS[x.status].label}`} aria-label={`${x.i + 1}-savol: ${STATUS[x.status].label}`}>
+            {x.i + 1}<Icon name={x.status === 'right' ? 'check' : x.status === 'wrong' ? 'x' : 'minus'} size={11} stroke={3} />
+          </button>
+        ))}
+      </div>
+      <Tabs value={filter} onChange={setFilter} items={tabs} className="ptrv__tabs" />
+      {shown.length === 0 && <Empty icon={filter === 'wrong' ? 'award' : 'clipboard'} title={filter === 'wrong' ? 'Xato javob yo‘q' : 'Bu bo‘limda savol yo‘q'} text={filter === 'wrong' ? 'Barcha javoblar to‘g‘ri yoki javobsiz qoldirilgan.' : undefined} />}
+      <ol className="ptrv__list">
+        {shown.map((x) => (
+          <li key={x.q.id} id={idOf(x)} className={cx('ptrv__q', `is-${x.status}`)}>
+            <header>
+              <span className="ptrv__num">{x.i + 1}</span>
+              <h4>{x.q.text}</h4>
+              <Badge tone={STATUS[x.status].tone}>{STATUS[x.status].label}</Badge>
+            </header>
+            <div className="ptrv__opts">
+              {x.q.options.map((o, oi) => {
+                const right = oi === x.q.correct, mine = oi === x.my
+                return (
+                  <div key={oi} className={cx('ptrv__opt', right && 'is-right', mine && !right && 'is-wrong')}>
+                    <i>{right ? <Icon name="check" size={14} stroke={3} /> : mine ? <Icon name="x" size={14} stroke={3} /> : LETTER(oi)}</i>
+                    <span>{o}</span>
+                    {(right || mine) && (
+                      <em>
+                        {mine && <small className={right ? 'is-ok' : 'is-bad'}>{who}</small>}
+                        {right && <small className="is-ok">To‘g‘ri javob</small>}
+                      </em>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+// O'quvchi javoblaridan bir qator statistikasi
+function ScoreHero({ test, attempt, staff }) {
+  const items = reviewOf(test, attempt)
+  const p = pct(attempt.score, attempt.total)
+  const g = gradeOf(p)
+  const count = (s) => items.filter((x) => x.status === s).length
+  const spent = attempt.finishedAt && attempt.startedAt ? Math.max(0, Math.round((attempt.finishedAt - attempt.startedAt) / 1000)) : null
+  return (
+    <section className="ptrh">
+      <div className="ptrh__ring" style={{ '--v': p, '--c': g.color }} role="img" aria-label={`Natija ${p}%`}><span><b>{p}%</b><small>{attempt.score}/{attempt.total}</small></span></div>
+      <div className="ptrh__main">
+        <span className={cx('ptpill', `ptpill--${g.tone}`)}>{g.label}</span>
+        <h2>{staff ? `${attempt.score} ta to‘g‘ri javob, jami ${attempt.total} ta savol` : p >= 90 ? 'Ajoyib natija!' : p >= 70 ? 'Yaxshi natija!' : p >= 50 ? 'Yomon emas, yanada yaxshilash mumkin' : 'Mavzuni qayta takrorlang'}</h2>
+        <p>{fmtDateTime(attempt.finishedAt)}</p>
+      </div>
+      <dl className="ptrh__tiles">
+        <div className="is-right"><dt><Icon name="checkCircle" size={16} />To‘g‘ri</dt><dd>{count('right')}</dd></div>
+        <div className="is-wrong"><dt><Icon name="alertCircle" size={16} />Xato</dt><dd>{count('wrong')}</dd></div>
+        <div><dt><Icon name="minus" size={16} />Javobsiz</dt><dd>{count('skip')}</dd></div>
+        <div><dt><Icon name="timer" size={16} />Vaqt</dt><dd>{spent === null ? '—' : fmtDuration(spent)}</dd></div>
+      </dl>
+    </section>
+  )
+}
+
 // ---- Talaba: testni topshirish ----
+const readRun = (k) => {
+  try {
+    const r = JSON.parse(localStorage.getItem(k))
+    return r && Number.isFinite(r.startedAt) && r.answers && typeof r.answers === 'object' ? r : null
+  } catch { return null }
+}
+const writeRun = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k) } catch { /* xotira */ } }
+
 function TakeTest({ id }) {
   const { user, db } = useAuth()
   const toast = useToast()
   const t = db.tests.find((x) => x.id === id)
   const existing = db.testAttempts.find((a) => a.testId === id && a.studentId === user.id)
-  const [started, setStarted] = useState(false)
-  const [cur, setCur] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [left, setLeft] = useState(0)
-  const [result, setResult] = useState(existing || null)
+  const storeKey = `ii_test_run_${user.id}_${id}`
+  // Javoblar va boshlangan vaqt saqlanadi: sahifa yangilansa ham test davom etadi, taymer qaytadan boshlanmaydi
+  const [run, setRun] = useState(() => (existing ? null : readRun(storeKey)))
+  const [fresh, setFresh] = useState(null)
+  const [now, setNow] = useState(Date.now())
+  const [busy, setBusy] = useState(false)
+  const [ask, setAsk] = useState(false)
   const sending = useRef(false)
+  const result = existing || fresh
+  const active = !!run && !result && !!t
+  const left = active ? Math.max(0, Math.ceil((run.startedAt + t.timeLimit * 60e3 - now) / 1000)) : 0
 
+  useEffect(() => { writeRun(storeKey, result ? null : run) }, [storeKey, run, result])
   useEffect(() => {
-    if (!started || result) return
-    setLeft(t.timeLimit * 60)
-    const iv = setInterval(() => setLeft((l) => { if (l <= 1) { clearInterval(iv); return 0 } return l - 1 }), 1000)
+    if (!active) return undefined
+    setNow(Date.now())
+    const iv = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(iv)
-  }, [started, result, t?.timeLimit])
-  useEffect(() => { if (started && !result && left === 0 && t) finish(true) }, [left]) // eslint-disable-line
-
-  if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
+  }, [active])
 
   // Ball serverda hisoblanadi; to'g'ri javoblar topshirilgandan keyingina yuklanadi
   const finish = async (auto = false) => {
-    if (sending.current) return
+    if (sending.current || !run) return
     sending.current = true
+    setBusy(true)
     try {
-      const [r] = await commit([{ col: 'testAttempts', op: 'insert', item: { id: uid('ta'), testId: t.id, studentId: user.id, answers, startedAt: Date.now() - (t.timeLimit * 60 - left) * 1000 } }])
+      const [r] = await commit([{ col: 'testAttempts', op: 'insert', item: { id: uid('ta'), testId: t.id, studentId: user.id, answers: run.answers, startedAt: run.startedAt } }])
       await loadDB().catch(() => {})
       notify([t.authorId], `${user.name} «${t.title}» testini topshirdi: ${r.item.score}/${r.item.total}`, `#/platform/tests/${t.id}`)
-      setResult(r.item)
+      setFresh(r.item)
+      setRun(null)
       toast(auto ? 'Vaqt tugadi, test avtomatik topshirildi' : 'Test topshirildi')
     } catch (e) {
       sending.current = false
-      toast(e.message, 'err')
-    }
+      if (e.status === 409) { await loadDB().catch(() => {}); setRun(null) } // boshqa oynada allaqachon topshirilgan
+      else if (e.status === 422 || e.status === 404) { setRun(null); toast(e.message, 'err') }
+      else toast(`${e.message}. Javoblaringiz saqlangan — qayta urinib ko‘ring.`, 'err')
+    } finally { setBusy(false) }
   }
+  useEffect(() => { if (active && left === 0) finish(true) }, [active, left]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Klaviatura: 1-9 — variant, ← → — savollar orasida
+  const total = t?.questions.length || 0
+  const cur = active ? Math.min(run.cur || 0, total - 1) : 0
+  useEffect(() => {
+    if (!active) return undefined
+    const onKey = (e) => {
+      if (ask || e.ctrlKey || e.metaKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return
+      if (e.key === 'ArrowLeft') setRun((r) => ({ ...r, cur: Math.max(0, (r.cur || 0) - 1) }))
+      else if (e.key === 'ArrowRight') setRun((r) => ({ ...r, cur: Math.min(total - 1, (r.cur || 0) + 1) }))
+      else if (/^[1-9]$/.test(e.key)) {
+        const q = t.questions[cur], oi = Number(e.key) - 1
+        if (q && oi < q.options.length) setRun((r) => ({ ...r, answers: { ...r.answers, [q.id]: oi } }))
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [active, ask, total, cur, t])
+
+  // To'g'ri javoblar hali yuklanmagan bo'lsa (tarmoq uzilishi) — qayta so'raladi
+  const reviewReady = !!t && t.questions.every((q) => q.correct !== undefined)
+  useEffect(() => { if (result && t && !reviewReady) loadDB().catch(() => {}) }, [result?.id, reviewReady]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const myAttempts = useMemo(() => db.testAttempts.filter((a) => a.studentId === user.id), [db.testAttempts, user.id])
+  const datasets = useMemo(() => {
+    if (!result || !t || !reviewReady) return []
+    const items = reviewOf(t, result)
+    const row = (s) => { const v = items.filter((x) => x.status === s).length; return { key: s, label: STATUS[s].label, short: s === 'skip' ? 'Javobsiz' : STATUS[s].label, value: v, shown: `${v} ta savol`, color: STATUS[s].color } }
+    return [
+      { key: 'answers', label: 'Javoblar', sub: 'To‘g‘ri, xato va javobsiz qolgan savollar soni', defaultType: 'donut', head: ['Javob', 'Savollar'], rows: ['right', 'wrong', 'skip'].map(row),
+        parts: { label: 'Savollarning javob holati bo‘yicha ulushi', value: (r) => r.value }, center: { value: `${pct(result.score, result.total)}%`, label: 'Natija' } },
+      { key: 'questions', label: 'Savollar', sub: 'Har bir savol: to‘g‘ri javob — 100%, xato yoki javobsiz — 0%', max: 100, unit: '%', head: ['Savol', 'Holat'], parts: null,
+        rows: items.map((x) => ({ key: x.q.id, label: `${x.i + 1}. ${x.q.text}`, short: String(x.i + 1), value: x.status === 'right' ? 100 : 0, shown: STATUS[x.status].label, color: STATUS[x.status].color })) },
+      testsDataset(myAttempts, db.tests, 'Mening dinamikam', 'Topshirgan testlaringiz bo‘yicha natija, vaqt tartibida'),
+    ]
+  }, [result, t, reviewReady, myAttempts, db.tests])
+
+  if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" text="Test o‘chirilgan yoki sizga berilmagan bo‘lishi mumkin." action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
+  const crumbs = [{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]
 
   if (result) {
-    const p = pct(result.score, result.total)
     return (
       <>
-        <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title="Natija" />
-        <div className="pgrid pgrid--main">
-          <Card>
-            {t.questions.map((q, i) => {
-              const my = result.answers?.[q.id]
-              return (
-                <div key={q.id} style={{ padding: '14px 0', borderBottom: '1px solid var(--pf-line)' }}>
-                  <b style={{ display: 'block', marginBottom: 8 }}>{i + 1}. {q.text}</b>
-                  {q.options.map((o, oi) => (
-                    <div key={oi} className={cx('pquiz__opt', oi === q.correct && 'is-right', my === oi && my !== q.correct && 'is-wrong')} style={{ cursor: 'default', padding: '9px 12px', fontSize: 14 }}>
-                      <i>{String.fromCharCode(65 + oi)}</i>{o}{oi === q.correct && <Icon name="check" size={16} />}
-                    </div>
-                  ))}
-                  {my === undefined && <span className="pmuted" style={{ fontSize: 12.5 }}>Javob berilmagan</span>}
-                </div>
-              )
-            })}
-          </Card>
-          <div className="pstack-v" style={{ gap: 20 }}>
-            <Card>
-              <div className="pscore" style={{ '--v': p }}><span>{p}%</span></div>
-              <h3 style={{ textAlign: 'center', marginTop: 16, fontFamily: 'var(--f-head)', fontSize: 20 }}>{p >= 80 ? 'A’lo natija!' : p >= 60 ? 'Yaxshi!' : 'Yana mashq qiling'}</h3>
-              <p className="pmuted" style={{ textAlign: 'center', marginTop: 6 }}>{result.score} / {result.total} to‘g‘ri javob · {fmtDuration(Math.round((result.finishedAt - result.startedAt) / 1000))}</p>
-              <div style={{ textAlign: 'center', marginTop: 18 }}><Btn as="a" href="#/platform/tests" variant="primary">Testlarga qaytish</Btn></div>
-            </Card>
-          </div>
-        </div>
+        <PageHead crumbs={crumbs} title="Test natijasi" sub={t.title} actions={<Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
+        {!reviewReady ? (
+          <Card><Empty icon="refresh" title="Javoblar yuklanmoqda" text={`Natijangiz saqlandi: ${result.score}/${result.total}. To‘g‘ri javoblarni ko‘rish uchun yangilang.`} action={<Btn variant="primary" icon="refresh" onClick={() => loadDB().catch((e) => toast(e.message, 'err'))}>Yangilash</Btn>} /></Card>
+        ) : (
+          <>
+            <ScoreHero test={t} attempt={result} />
+            <ChartPanel title="Natija grafigi" storeKey="test_result" datasets={datasets} defaultType="donut" />
+            <section className="pcard">
+              <h3 className="pdt ptrv__ttl"><span className="pdt__ico"><Icon name="clipboard" size={18} /></span>Savollar va to‘g‘ri javoblar</h3>
+              <QuestionReview test={t} attempt={result} />
+            </section>
+          </>
+        )}
       </>
     )
   }
 
-  if (!started) {
+  if (!run) {
+    const closed = t.dueAt < Date.now()
     return (
       <>
-        <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={t.description} />
-        <Card style={{ maxWidth: 640 }}>
-          <div className="pgrid pgrid--3" style={{ gap: 12 }}>
-            {[['Savollar', t.questions.length, 'clipboard'], ['Vaqt', `${t.timeLimit} daq`, 'timer'], ['Muddat', fmtDate(t.dueAt), 'calendar']].map(([l, v, ic]) => (
-              <div key={l} style={{ padding: 14, borderRadius: 14, background: 'var(--c-surface)', display: 'flex', gap: 10, alignItems: 'center' }}><Icon name={ic} size={20} /><div><b style={{ display: 'block' }}>{v}</b><span className="pmuted" style={{ fontSize: 12.5 }}>{l}</span></div></div>
-            ))}
+        <PageHead crumbs={crumbs} title={t.title} sub={t.description} />
+        <section className="pcard ptintro">
+          <span className="ptintro__icon"><Icon name={closed ? 'lock' : 'clipboard'} size={30} /></span>
+          <h2>{closed ? 'Test muddati tugagan' : 'Testni boshlashga tayyormisiz?'}</h2>
+          <dl className="ptintro__facts">
+            <div><dt><Icon name="clipboard" size={17} />Savollar</dt><dd>{t.questions.length} ta</dd></div>
+            <div><dt><Icon name="timer" size={17} />Vaqt</dt><dd>{t.timeLimit} daqiqa</dd></div>
+            <div><dt><Icon name="calendar" size={17} />Muddat</dt><dd>{fmtDateTime(t.dueAt)}</dd></div>
+          </dl>
+          {closed ? <p className="pmuted">Bu testni endi topshirib bo‘lmaydi. Savollaringiz bo‘lsa, ustozingizga murojaat qiling.</p> : (
+            <ul className="ptintro__rules">
+              <li><Icon name="check" size={16} />Testni faqat bir marta topshirish mumkin.</li>
+              <li><Icon name="check" size={16} />Boshlaganingizdan so‘ng vaqt to‘xtamaydi, vaqt tugasa test avtomatik topshiriladi.</li>
+              <li><Icon name="check" size={16} />Sahifa yangilansa, javoblaringiz saqlanib qoladi.</li>
+              <li><Icon name="check" size={16} />Topshirgach, xatolaringiz va to‘g‘ri javoblarni ko‘rasiz.</li>
+            </ul>
+          )}
+          <div className="prow ptintro__cta">
+            {!closed && <Btn variant="primary" size="lg" icon="play" onClick={() => setRun({ startedAt: Date.now(), answers: {}, cur: 0, flags: [] })}>Testni boshlash</Btn>}
+            <Btn as="a" href="#/platform/tests" size="lg">Orqaga</Btn>
           </div>
-          <p className="pmuted" style={{ marginTop: 18 }}>Testni faqat bir marta topshirish mumkin. Boshlaganingizdan so‘ng vaqt hisoblanadi; vaqt tugasa test avtomatik topshiriladi.</p>
-          <div className="prow" style={{ marginTop: 18 }}><Btn variant="primary" size="lg" icon="play" onClick={() => setStarted(true)}>Boshlash</Btn><Btn as="a" href="#/platform/tests" size="lg">Orqaga</Btn></div>
-        </Card>
+        </section>
       </>
     )
   }
 
   const q = t.questions[cur]
-  const answered = Object.keys(answers).length
+  const answers = run.answers
+  const flags = run.flags || []
+  const answered = t.questions.filter((x) => answers[x.id] !== undefined).length
+  const missing = total - answered
+  const go = (i) => setRun((r) => ({ ...r, cur: i }))
+  const pick = (oi) => setRun((r) => ({ ...r, answers: { ...r.answers, [q.id]: oi } }))
+  const toggleFlag = () => setRun((r) => ({ ...r, flags: flags.includes(q.id) ? flags.filter((x) => x !== q.id) : [...flags, q.id] }))
   return (
     <>
-      <div className="prow prow--between">
-        <div><h1 style={{ fontFamily: 'var(--f-head)', fontSize: 22 }}>{t.title}</h1><span className="pmuted" style={{ fontSize: 13.5 }}>{cur + 1} / {t.questions.length} savol · {answered} ta javob berildi</span></div>
-        <span className={cx('ptimer', left < 60 && 'is-low')}><Icon name="timer" size={18} /> {fmtDuration(left)}</span>
+      <div className="ptq__bar">
+        <div className="ptq__ttl"><h1>{t.title}</h1><span>{answered} / {total} ta savolga javob berildi</span></div>
+        <span className={cx('ptimer', left < 60 && 'is-low')} role="timer" aria-label="Qolgan vaqt"><Icon name="timer" size={18} /> {fmtDuration(left)}</span>
+        <Progress value={pct(answered, total)} size="sm" />
       </div>
-      <Progress value={pct(answered, t.questions.length)} />
-      <div className="pgrid pgrid--main">
-        <div className="pquiz__q">
-          <h3>{cur + 1}. {q.text}</h3>
-          {q.options.map((o, oi) => (
-            <div key={oi} className={cx('pquiz__opt', answers[q.id] === oi && 'is-on')} onClick={() => setAnswers((a) => ({ ...a, [q.id]: oi }))}>
-              <i>{String.fromCharCode(65 + oi)}</i>{o}
-            </div>
-          ))}
-          <div className="prow prow--between" style={{ marginTop: 18 }}>
-            <Btn icon="chevLeft" disabled={cur === 0} onClick={() => setCur((c) => c - 1)}>Oldingi</Btn>
-            {cur < t.questions.length - 1 ? <Btn variant="primary" onClick={() => setCur((c) => c + 1)}>Keyingi <Icon name="chevRight" size={16} /></Btn> : <Btn variant="success" icon="check" onClick={() => finish(false)}>Testni topshirish</Btn>}
+      <div className="pgrid pgrid--main ptq">
+        <section className="pquiz__q">
+          <div className="ptq__head">
+            <span className="ptq__count">{cur + 1}-savol, jami {total} ta</span>
+            <button type="button" className={cx('ptq__flag', flags.includes(q.id) && 'is-on')} aria-pressed={flags.includes(q.id)} onClick={toggleFlag}><Icon name="bookmark" size={16} />Keyinroq qaytish</button>
           </div>
-        </div>
-        <Card title="Savollar">
+          <h3>{q.text}</h3>
+          <div role="radiogroup" aria-label="Javob variantlari">
+            {q.options.map((o, oi) => (
+              <button key={oi} type="button" role="radio" aria-checked={answers[q.id] === oi} className={cx('pquiz__opt', answers[q.id] === oi && 'is-on')} onClick={() => pick(oi)}>
+                <i>{LETTER(oi)}</i><span>{o}</span>
+              </button>
+            ))}
+          </div>
+          <div className="ptq__nav">
+            <Btn icon="chevLeft" disabled={cur === 0} onClick={() => go(cur - 1)}>Oldingi</Btn>
+            {cur < total - 1
+              ? <Btn variant="primary" onClick={() => go(cur + 1)}>Keyingi <Icon name="chevRight" size={16} /></Btn>
+              : <Btn variant="success" icon="check" disabled={busy} onClick={() => setAsk(true)}>Testni topshirish</Btn>}
+          </div>
+        </section>
+        <Card title="Savollar" className="ptq__side">
           <div className="pquiz__dots">
-            {t.questions.map((qq, i) => <button key={qq.id} className={cx(answers[qq.id] !== undefined && 'is-done', i === cur && 'is-cur')} onClick={() => setCur(i)}>{i + 1}</button>)}
+            {t.questions.map((qq, i) => (
+              <button key={qq.id} type="button" className={cx(answers[qq.id] !== undefined && 'is-done', i === cur && 'is-cur', flags.includes(qq.id) && 'is-flag')} onClick={() => go(i)}
+                aria-label={`${i + 1}-savol${answers[qq.id] !== undefined ? ', javob berilgan' : ''}${flags.includes(qq.id) ? ', belgilangan' : ''}`} aria-current={i === cur ? 'true' : undefined}>{i + 1}</button>
+            ))}
           </div>
-          <p className="pmuted" style={{ marginTop: 14, fontSize: 13 }}>Barcha savollarga javob bergach «Testni topshirish» tugmasini bosing.</p>
-          <Btn variant="primary" style={{ marginTop: 12, width: '100%' }} onClick={() => finish(false)} disabled={answered === 0}>Topshirish ({answered}/{t.questions.length})</Btn>
+          <ul className="ptq__keys">
+            <li><i className="is-done" />Javob berilgan</li>
+            <li><i />Javob berilmagan</li>
+            <li><i className="is-flag" />Belgilangan</li>
+          </ul>
+          <Btn variant="primary" className="ptq__submit" disabled={busy} onClick={() => setAsk(true)}>{busy ? 'Yuborilmoqda…' : `Topshirish (${answered}/${total})`}</Btn>
+          <p className="pmuted ptq__hint">Klaviatura: 1–{Math.min(q.options.length, 9)} — variant, ← → — savollar.</p>
         </Card>
       </div>
+      <Confirm open={ask} onClose={() => setAsk(false)} title="Testni topshirasizmi?" confirmLabel="Topshirish"
+        text={missing ? `${missing} ta savolga javob berilmagan. Topshirgach, javoblarni o‘zgartirib bo‘lmaydi.` : 'Barcha savollarga javob berdingiz. Topshirgach, javoblarni o‘zgartirib bo‘lmaydi.'}
+        onConfirm={() => finish(false)} />
     </>
   )
 }
@@ -424,41 +664,105 @@ function TakeTest({ id }) {
 function TestResults({ id }) {
   const { db } = useAuth()
   const t = db.tests.find((x) => x.id === id)
+  const [groupId, setGroupId] = useState('all')
+  const [sort, setSort] = useState('order')
+  const [open, setOpen] = useState(null)
+  const data = useMemo(() => {
+    if (!t) return null
+    const groups = db.groups.filter((g) => t.groupIds.includes(g.id))
+    const inScope = groupId === 'all' ? groups : groups.filter((g) => g.id === groupId)
+    const attempts = db.testAttempts.filter((a) => a.testId === id)
+    // Guruhdan chiqqan o'quvchining natijasi ham «Barcha guruhlar» ko'rinishida qoladi
+    const ids = new Set([...inScope.flatMap((g) => g.studentIds), ...(groupId === 'all' ? attempts.map((a) => a.studentId) : [])])
+    const rows = [...ids].map((sid) => ({ id: sid, s: db.users.find((u) => u.id === sid), a: attempts.find((x) => x.studentId === sid) })).filter((r) => r.s)
+      .sort((x, y) => (y.a ? pct(y.a.score, y.a.total) : -1) - (x.a ? pct(x.a.score, x.a.total) : -1) || x.s.name.localeCompare(y.s.name))
+    const done = rows.filter((r) => r.a)
+    const list = done.map((r) => r.a)
+    const qStats = t.questions.map((q, i) => {
+      const counts = q.options.map((_, oi) => list.filter((a) => a.answers?.[q.id] === oi).length)
+      const ok = counts[q.correct] || 0
+      const skip = list.length - counts.reduce((s, n) => s + n, 0)
+      return { q, i, counts, ok, skip, wrong: list.length - ok - skip, rate: pct(ok, list.length) }
+    })
+    return { groups, rows, done, list, qStats }
+  }, [t, db.groups, db.users, db.testAttempts, id, groupId])
+  const datasets = useMemo(() => (!data ? [] : [
+    gradesDataset(data.list),
+    { key: 'questions', label: 'Savollar', sub: 'Har bir savolga to‘g‘ri javob berganlar ulushi', max: 100, unit: '%', head: ['Savol', 'To‘g‘ri javoblar'],
+      parts: { label: 'Xato javoblarning savollar bo‘yicha ulushi', value: (r) => r.wrong, unit: ' ta', empty: 'Xato javoblar yo‘q — hamma savollarga to‘g‘ri javob berilgan.' },
+      rows: data.list.length ? data.qStats.map((x) => ({ key: x.q.id, label: `${x.i + 1}. ${x.q.text}`, short: String(x.i + 1), value: x.rate, wrong: x.wrong + x.skip, shown: `${x.rate}% · ${x.ok}/${data.list.length} to‘g‘ri` })) : [] },
+    { key: 'students', label: 'O‘quvchilar', sub: 'Har bir o‘quvchining natijasi', max: 100, unit: '%', head: ['O‘quvchi', 'Natija'], defaultType: 'bar',
+      parts: { label: 'To‘g‘ri javoblarning o‘quvchilar bo‘yicha ulushi', value: (r) => r.score, unit: ' ta' },
+      rows: data.done.map((r) => ({ key: r.id, label: r.s.name, short: r.s.name.split(' ')[0], value: pct(r.a.score, r.a.total), score: r.a.score, shown: `${pct(r.a.score, r.a.total)}% · ${r.a.score}/${r.a.total}` })) },
+  ]), [data])
+
   if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
-  const groups = db.groups.filter((g) => t.groupIds.includes(g.id))
-  const students = [...new Set(groups.flatMap((g) => g.studentIds))].map((sid) => db.users.find((u) => u.id === sid)).filter(Boolean)
-  const rows = students.map((s) => ({ id: s.id, s, a: db.testAttempts.find((x) => x.testId === id && x.studentId === s.id) })).sort((x, y) => (y.a ? pct(y.a.score, y.a.total) : -1) - (x.a ? pct(x.a.score, x.a.total) : -1))
-  const done = rows.filter((r) => r.a)
-  const avg = done.length ? `${Math.round(done.reduce((s, r) => s + pct(r.a.score, r.a.total), 0) / done.length)}%` : '—'
-  // Savollar bo'yicha qiyinlik
-  const qStats = t.questions.map((q) => ({ q, ok: done.filter((r) => r.a.answers?.[q.id] === q.correct).length }))
+  const { groups, rows, done, list, qStats } = data
+  const scores = list.map((a) => pct(a.score, a.total))
+  const avg = list.length ? `${avgOf(list)}%` : '—'
+  const sorted = sort === 'hard' ? [...qStats].sort((a, b) => a.rate - b.rate) : qStats
+  const groupName = (sid) => groups.filter((g) => g.studentIds.includes(sid)).map((g) => g.name).join(', ')
   return (
     <>
-      <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddat ${fmtDateTime(t.dueAt)}`} />
+      <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddat ${fmtDateTime(t.dueAt)}`}
+        actions={groups.length > 1 && (
+          <label className="pdsel"><span>{groupId === 'all' ? 'Barcha guruhlar' : groups.find((g) => g.id === groupId)?.name}</span><Icon name="chevDown" size={16} />
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} aria-label="Guruh"><option value="all">Barcha guruhlar</option>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select>
+          </label>
+        )} />
       <div className="pgrid pgrid--4">
-        <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="users" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.length}/{students.length}</span><span className="pstat__label">Topshirdi</span></span></div>
-        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="award" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg}</span><span className="pstat__label">O‘rtacha ball</span></span></div>
-        <div className="pstat pstat--violet"><span className="pstat__icon"><Icon name="star" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.filter((r) => pct(r.a.score, r.a.total) >= 80).length}</span><span className="pstat__label">A’lo (80%+)</span></span></div>
-        <div className="pstat pstat--red"><span className="pstat__icon"><Icon name="alertCircle" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.filter((r) => pct(r.a.score, r.a.total) < 60).length}</span><span className="pstat__label">Qoniqarsiz</span></span></div>
+        <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="users" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.length}/{rows.length}</span><span className="pstat__label">Topshirdi</span></span></div>
+        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="chart" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg}</span><span className="pstat__label">O‘rtacha natija</span></span></div>
+        <div className="pstat pstat--violet"><span className="pstat__icon"><Icon name="trophy" size={22} /></span><span className="pstat__body"><span className="pstat__value">{scores.length ? `${Math.max(...scores)}%` : '—'}</span><span className="pstat__label">Eng yuqori natija</span></span></div>
+        <div className="pstat pstat--red"><span className="pstat__icon"><Icon name="alertCircle" size={22} /></span><span className="pstat__body"><span className="pstat__value">{scores.filter((p) => p < 50).length}</span><span className="pstat__label">Qoniqarsiz (50% dan past)</span></span></div>
       </div>
-      <div className="pgrid pgrid--main">
-        <Card title="O‘quvchilar natijalari" pad={false}>
-          <Table rows={rows} cols={[
-            { key: 's', label: 'O‘quvchi', render: (r) => <div className="pcell-user"><UAvatar user={r.s} size={34} /><div><b>{r.s.name}</b><span>{r.s.phone}</span></div></div> },
-            { key: 'g', label: 'Guruh', render: (r) => groups.filter((g) => g.studentIds.includes(r.s.id)).map((g) => g.name).join(', ') },
-            { key: 'res', label: 'Natija', render: (r) => r.a ? <div style={{ minWidth: 140 }}><div className="prow prow--between" style={{ fontSize: 13, marginBottom: 4 }}><b>{r.a.score}/{r.a.total}</b><span>{pct(r.a.score, r.a.total)}%</span></div><Progress size="sm" value={pct(r.a.score, r.a.total)} tone={pct(r.a.score, r.a.total) >= 60 ? 'green' : 'red'} /></div> : <Badge tone="gray">Topshirmagan</Badge> },
-            { key: 'time', label: 'Vaqt', render: (r) => r.a ? fmtDateTime(r.a.finishedAt) : '—' },
-          ]} />
-        </Card>
-        <Card title="Savollar tahlili" sub="Necha o‘quvchi to‘g‘ri javob berdi">
-          {qStats.map(({ q, ok }, i) => (
-            <div key={q.id} style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 13.5, marginBottom: 6 }}><b>{i + 1}.</b> {q.text}</div>
-              <div className="prow" style={{ flexWrap: 'nowrap' }}><Progress size="sm" value={pct(ok, done.length)} tone={pct(ok, done.length) < 50 ? 'red' : 'green'} /><span className="pmuted" style={{ fontSize: 12.5, whiteSpace: 'nowrap' }}>{ok}/{done.length}</span></div>
-            </div>
+
+      <ChartPanel title="Natijalar grafigi" storeKey="test_results" datasets={datasets} defaultType="column" emptyText="Hali hech kim topshirmagan. Natijalar shu yerda paydo bo‘ladi." />
+
+      <Card title="O‘quvchilar natijalari" sub={done.length ? 'Javoblarini ko‘rish uchun o‘quvchini tanlang' : undefined} pad={false}>
+        <Table rows={rows} onRow={(r) => r.a && setOpen(r)} empty={<Empty icon="users" title="Bu guruhda o‘quvchi yo‘q" />} cols={[
+          { key: 's', label: 'O‘quvchi', render: (r) => <div className="pcell-user"><UAvatar user={r.s} size={34} /><div><b>{r.s.name}</b><span>{r.s.phone}</span></div></div> },
+          { key: 'g', label: 'Guruh', render: (r) => groupName(r.id) || <span className="pmuted">Guruhda emas</span> },
+          { key: 'res', label: 'Natija', render: (r) => r.a ? <div className="ptres__cell"><div><b>{r.a.score}/{r.a.total}</b><span className={cx('ptpill', `ptpill--${gradeOf(pct(r.a.score, r.a.total)).tone}`)}>{pct(r.a.score, r.a.total)}%</span></div><Progress size="sm" value={pct(r.a.score, r.a.total)} tone={pct(r.a.score, r.a.total) >= 50 ? 'green' : 'red'} /></div> : <Badge tone="gray">Topshirmagan</Badge> },
+          { key: 'time', label: 'Topshirilgan vaqt', render: (r) => r.a ? <span className="ptdate">{fmtDateTime(r.a.finishedAt)}</span> : '—' },
+          { key: 'go', label: '', align: 'right', render: (r) => r.a && <Icon name="chevRight" size={18} /> },
+        ]} />
+      </Card>
+
+      <Card title="Savollar tahlili" sub={list.length ? 'Har bir variantni nechta o‘quvchi tanlagani' : 'Test topshirilgach, ko‘p xato qilingan savollar shu yerda ko‘rinadi'}
+        action={list.length > 0 && (
+          <label className="pdsel"><span>{sort === 'hard' ? 'Eng qiyinlari avval' : 'Test tartibida'}</span><Icon name="chevDown" size={16} />
+            <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Saralash"><option value="order">Test tartibida</option><option value="hard">Eng qiyinlari avval</option></select>
+          </label>
+        )}>
+        <div className="ptqa">
+          {sorted.map((x) => (
+            <details key={x.q.id} className="ptqa__item" open={t.questions.length <= 6}>
+              <summary>
+                <span className="ptrv__num">{x.i + 1}</span>
+                <span className="ptqa__text">{x.q.text}</span>
+                {list.length > 0 && <span className={cx('ptpill', `ptpill--${gradeOf(x.rate).tone}`)}>{x.rate}%</span>}
+                <Icon name="chevDown" size={16} />
+              </summary>
+              <div className="ptqa__opts">
+                {x.q.options.map((o, oi) => (
+                  <div key={oi} className={cx('ptqa__opt', oi === x.q.correct && 'is-right')}>
+                    <i>{oi === x.q.correct ? <Icon name="check" size={13} stroke={3} /> : LETTER(oi)}</i>
+                    <span className="ptqa__olabel">{o}{oi === x.q.correct && <small>To‘g‘ri javob</small>}</span>
+                    <span className="ptqa__track"><b style={{ width: `${pct(x.counts[oi], list.length)}%` }} /></span>
+                    <span className="ptqa__n">{x.counts[oi]} ta · {pct(x.counts[oi], list.length)}%</span>
+                  </div>
+                ))}
+                {x.skip > 0 && <p className="pmuted ptqa__skip">{x.skip} ta o‘quvchi javob bermagan</p>}
+              </div>
+            </details>
           ))}
-        </Card>
-      </div>
+        </div>
+      </Card>
+
+      <Modal open={!!open} onClose={() => setOpen(null)} width={860} title={open?.s.name} sub={t.title}>
+        {open && <><ScoreHero test={t} attempt={open.a} staff /><QuestionReview test={t} attempt={open.a} who="O‘quvchi javobi" /></>}
+      </Modal>
     </>
   )
 }

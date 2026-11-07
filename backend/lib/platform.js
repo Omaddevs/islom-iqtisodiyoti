@@ -336,6 +336,44 @@ const isMemberOf = async (c, userId, groupId) => !!(await row(c, 'SELECT 1 FROM 
 // Test bali serverda hisoblanadi — brauzer yuborgan ball inobatga olinmaydi
 const scoreOf = (test, answers) => (test.questions || []).reduce((s, q) => s + (answers?.[q.id] === q.correct ? 1 : 0), 0)
 
+// Savollar tuzilmasi: to'g'ri javob har doim mavjud variantni ko'rsatishi kerak (aks holda natija buziladi)
+function cleanQuestions(list) {
+  if (!Array.isArray(list) || !list.length || list.length > 200) fail(422, 'Testda 1 tadan 200 tagacha savol bo‘lishi kerak')
+  const seen = new Set()
+  return list.map((q, i) => {
+    const label = `${i + 1}-savol`
+    const id = String(q?.id || '').slice(0, 60)
+    if (!id || seen.has(id)) fail(422, `${label}: identifikator noto‘g‘ri`)
+    seen.add(id)
+    if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 8) fail(422, `${label}: 2 tadan 8 tagacha variant bo‘lishi kerak`)
+    const options = q.options.map((o) => text(o, { min: 1, max: 1000, label: `${label} varianti` }))
+    if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct >= options.length) fail(422, `${label}: to‘g‘ri javobni belgilang`)
+    return { id, text: text(q.text, { min: 1, max: 2000, label }), options, correct: q.correct }
+  })
+}
+const sameQuestions = (a, b) => JSON.stringify(cleanStored(a)) === JSON.stringify(cleanStored(b))
+const cleanStored = (list) => (list || []).map((q) => [q.id, q.text, q.options, q.correct])
+function cleanTest(d) {
+  const out = { ...d }
+  if (d.questions !== undefined) out.questions = cleanQuestions(d.questions)
+  if (d.timeLimit !== undefined) {
+    out.timeLimit = Number(d.timeLimit)
+    if (!Number.isFinite(out.timeLimit) || out.timeLimit < 1 || out.timeLimit > 600) fail(422, 'Vaqt chegarasi 1 daqiqadan 600 daqiqagacha bo‘lishi kerak')
+  }
+  if (d.dueAt !== undefined && !Number.isFinite(Number(d.dueAt))) fail(422, 'Muddat noto‘g‘ri')
+  return out
+}
+// Faqat mavjud savol va variantlarga berilgan javoblar saqlanadi
+function cleanAnswers(test, answers) {
+  const out = {}
+  if (!answers || typeof answers !== 'object') return out
+  for (const q of test.questions || []) {
+    const v = answers[q.id]
+    if (Number.isInteger(v) && v >= 0 && v < (q.options || []).length) out[q.id] = v
+  }
+  return out
+}
+
 const recordOps = {
   async insert(c, u, { col, item }, id) {
     const now = Date.now()
@@ -345,6 +383,10 @@ const recordOps = {
       if (!orgId || !inOrg(u, orgId) || !(await row(c, 'SELECT 1 FROM organizations WHERE id = $1', [orgId]))) fail(422, 'Avval tashkilotni tanlang')
       if (col === 'homework' && !(await row(c, 'SELECT 1 FROM groups WHERE id = $1 AND org_id = $2', [item.groupId, orgId]))) fail(422, 'Guruhni tanlang')
       noInlineImages(item)
+      if (col === 'tests') {
+        if (item.questions === undefined) fail(422, 'Testda kamida bitta savol bo‘lishi kerak')
+        item = cleanTest({ timeLimit: 10, ...item })
+      }
       return insertRec(c, col, id, orgId, u.id, safeLinks({ createdAt: now, ...item, orgId, authorId: u.id }))
     }
     if (col === 'testAttempts') {
@@ -353,10 +395,14 @@ const recordOps = {
       if (!t || t.org_id !== u.org_id) fail(404, 'Test topilmadi')
       const dup = await row(c, `SELECT 1 FROM records WHERE collection = 'testAttempts' AND owner_id = $1 AND data->>'testId' = $2`, [u.id, t.id])
       if (dup) fail(409, 'Bu test allaqachon topshirilgan')
-      const answers = item.answers && typeof item.answers === 'object' ? item.answers : {}
+      const groupIds = t.data.groupIds || []
+      if (groupIds.length && !(await row(c, 'SELECT 1 FROM group_members WHERE user_id = $1 AND group_id = ANY($2)', [u.id, groupIds]))) fail(404, 'Test topilmadi')
+      // Muddat oxirida boshlangan test vaqti tugaguncha topshirila oladi (+1 daqiqa tarmoq uchun)
+      if (t.data.dueAt && now > Number(t.data.dueAt) + ((Number(t.data.timeLimit) || 0) + 1) * 60e3) fail(422, 'Testni topshirish muddati tugagan')
+      const answers = cleanAnswers(t.data, item.answers)
       return insertRec(c, col, id, t.org_id, u.id, {
         testId: t.id, studentId: u.id, answers, score: scoreOf(t.data, answers), total: (t.data.questions || []).length,
-        startedAt: Number(item.startedAt) || now, finishedAt: now,
+        startedAt: Math.min(Number(item.startedAt) || now, now), finishedAt: now,
       })
     }
     if (col === 'submissions') {
@@ -410,6 +456,14 @@ const recordOps = {
         return updateRec(c, col, id, next)
       }
       noInlineImages(changes)
+      if (col === 'tests') {
+        changes = cleanTest(changes)
+        // Topshirilgan testning savollari o'zgarsa, eski natijalar va tahlil buziladi
+        if (changes.questions && !sameQuestions(changes.questions, d.questions)
+          && await row(c, `SELECT 1 FROM records WHERE collection = 'testAttempts' AND data->>'testId' = $1 LIMIT 1`, [id])) {
+          fail(409, 'Testni o‘quvchilar topshirgan — savollarni o‘zgartirib bo‘lmaydi')
+        }
+      }
       return updateRec(c, col, id, safeLinks({ ...d, ...noKeys({ ...changes }, ['id', 'orgId', 'authorId']) }))
     }
     if (col === 'submissions') {
