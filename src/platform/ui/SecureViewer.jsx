@@ -1,7 +1,7 @@
-// Himoyalangan material ko'ruvchisi. Asl fayl brauzerga kelmaydi: hujjat sahifalari server yozgan suv belgili
-// rasm sifatida canvas'ga chiziladi. Yuklab olish, nusxalash va chop etish yopiladi; oyna fokusni yo'qotganda yoki
+// Himoyalangan material ko'ruvchisi. Asl fayl brauzerga kelmaydi: hujjat sahifalari rasm sifatida canvas'ga
+// chiziladi. Yuklab olish, nusxalash va chop etish yopiladi; oyna fokusni yo'qotganda yoki
 // skrinshot tugmalari bosilganda kontent yashiriladi va urinish jurnalga yoziladi.
-// Eslatma: brauzer skrinshotni butunlay taqiqlay olmaydi — asosiy himoya kontent ustidagi ko'ruvchi ismi.
+// Eslatma: brauzer skrinshotni butunlay taqiqlay olmaydi.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Btn, Icon, cx } from './kit.jsx'
@@ -272,7 +272,7 @@ export function SecureViewer({ item, user, onClose }) {
         <button type="button" className="psv__shield" onClick={() => { setUnfocused(false); setCapture(null) }}>
           <Icon name="lock" size={34} />
           <b>{capture === 'flag' ? 'Ekran tasvirini olish taqiqlangan' : 'Material himoyalangan'}</b>
-          <span>{capture === 'flag' ? 'Bu urinish ustozingiz jurnaliga yozildi. Har bir sahifada ismingiz va telefoningiz bor.' : 'Davom etish uchun shu yerni bosing'}</span>
+          <span>{capture === 'flag' ? 'Bu urinish ustozingiz jurnaliga yozildi.' : 'Davom etish uchun shu yerni bosing'}</span>
         </button>
       )}
     </div>,

@@ -138,7 +138,7 @@ await ok((await ops(t.cookie, [{ col: 'library', op: 'insert', item: { id: `lb${
 const libItem = (await api('/api/data', { cookie: s.cookie })).data.library.find((x) => x.id === `lb${RUN}`)
 await ok(libItem.fileName === 'Sxema rasmi.png' && !libItem.url, 'fayl nomi serverdan olinadi, o‘quvchiga havola berilmaydi')
 const sPage = await get(page1, s.cookie)
-await ok(sPage.status === 200 && sPage.headers.get('content-type') === 'image/webp' && sPage.headers.get('cache-control').includes('no-store'), 'guruh o‘quvchisi sahifa rasmini oldi, kesh yo‘q')
+await ok(sPage.status === 200 && sPage.headers.get('content-type') === 'image/jpeg' && sPage.headers.get('cache-control').includes('no-store'), 'guruh o‘quvchisi sahifa rasmini oldi, kesh yo‘q')
 const tPage = await get(page1, t.cookie)
 await ok(Buffer.compare(Buffer.from(await sPage.arrayBuffer()), Buffer.from(await tPage.arrayBuffer())) !== 0, 'har bir ko‘ruvchiga o‘z suv belgili rasmi beriladi')
 await ok((await get(`/api/materials/${matImg.id}/source`, s.cookie)).status === 403, 'o‘quvchi asl faylni yuklab ola olmaydi')

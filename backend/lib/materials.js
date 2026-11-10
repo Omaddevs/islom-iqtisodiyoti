@@ -2,7 +2,7 @@
 // ruxsatni tekshirish va har bir sahifaga ko'ruvchining ismini yozish.
 // Asl fayl o'quvchiga hech qachon berilmaydi — unga faqat ustida ismi yozilgan rasm yetib boradi.
 import { spawn } from 'node:child_process'
-import { copyFile, chmod, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
+import { copyFile, chmod, mkdtemp, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import sharp from 'sharp'
@@ -178,24 +178,3 @@ export const fileOut = (f, u) => ({
   id: f.id, name: f.name, ext: f.ext, size: Number(f.size), kind: f.kind, status: f.status, pages: f.pages, ratio: f.ratio, error: f.error,
   canManage: canManageFile(u, f),
 })
-
-// ---- Suv belgisi ----
-const esc = (s) => String(s).replace(/[<>&"']/g, (c) => `&#${c.charCodeAt(0)};`)
-const stamp = () => new Intl.DateTimeFormat('uz-UZ', { timeZone: 'Asia/Tashkent', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()).replace(',', '')
-export const watermarkText = (u) => `${u.name} · +${u.phone || ''} · ${stamp()}`
-
-// Rasmning o'zigaga yoziladi: brauzer vositalari bilan olib tashlab bo'lmaydi, skrinshotda ham qoladi.
-// Qora va oq nusxasi birga: yorug' sahifada ham, qorong'i slaydda ham ko'rinadi.
-export async function watermarkedPage(path, text) {
-  const img = sharp(await readFile(path))
-  const { width, height } = await img.metadata()
-  const fs = Math.max(14, Math.round(Math.min(width, 1600) * 0.019))
-  const tw = Math.round(text.length * fs * 0.56 + fs * 6), th = fs * 11
-  const label = (x, y) => `<text x="${x}" y="${y}" font-family="DejaVu Sans, Liberation Sans, Arial, sans-serif" font-size="${fs}" font-weight="600">${esc(text)}</text>`
-  const row = label(0, fs * 2.5) + label(-tw / 2, fs * 8) + label(tw / 2, fs * 8)
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><defs>
-    <pattern id="w" width="${tw}" height="${th}" patternUnits="userSpaceOnUse" patternTransform="rotate(-27)">
-      <g fill="#ffffff" fill-opacity=".13" transform="translate(1.2 1.2)">${row}</g><g fill="#16233b" fill-opacity=".13">${row}</g>
-    </pattern></defs><rect width="100%" height="100%" fill="url(#w)"/></svg>`
-  return img.composite([{ input: Buffer.from(svg) }]).webp({ quality: 82 }).toBuffer()
-}
