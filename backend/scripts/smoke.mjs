@@ -119,6 +119,42 @@ await ok(otherT.status === 200 && (await ops(s.cookie, [{ col: 'testAttempts', o
 const junk = await ops(s.cookie, [{ col: 'tests', op: 'insert', item: { id: `tj${RUN}`, orgId: ORG, title: 'X' } }])
 await ok(junk.status === 403, 'o‘quvchi test yarata olmaydi')
 
+// ---- Dars jadvali va bildirishnomalar ----
+const tk = (ms) => new Date(ms + 5 * 3600e3).toISOString() // Toshkent devor soati
+const tomorrow = tk(Date.now() + 864e5).slice(0, 10)
+const tmrDow = new Date(`${tomorrow}T00:00:00Z`).getUTCDay()
+const L1 = `ls1${RUN}`
+const lesson = (id, groupId, extra = {}) => ({ col: 'lessons', op: 'insert', item: { id, groupId, title: 'Smoke darsi', repeat: 'weekly', date: tomorrow, days: [tmrDow], time: '18:00', durationMin: 90, online: false, room: '204', ...extra } })
+const notesOf = async (cookie) => (await api('/api/data', { cookie })).data.notifications
+await ok((await ops(s.cookie, [lesson(`lsx${RUN}`, G1)])).status === 403, 'o‘quvchi dars qo‘sha olmaydi')
+await ok((await ops(t.cookie, [lesson(`lsy${RUN}`, G2)])).status === 403, 'ustoz boshqa ustoz guruhiga dars qo‘sha olmaydi')
+await ok((await ops(t.cookie, [lesson(`lsz${RUN}`, G1, { days: [] })])).status === 422, 'hafta kuni tanlanmagan dars rad etildi')
+await ok((await ops(t.cookie, [lesson(`lsz${RUN}`, G1, { time: '25:00' })])).status === 422, 'noto‘g‘ri vaqt rad etildi')
+await ok((await ops(t.cookie, [lesson(`lsz${RUN}`, G1, { online: true, url: 'javascript:alert(1)' })])).status === 422, 'xavfli havola rad etildi')
+const mkL = await ops(t.cookie, [lesson(L1, G1)])
+await ok(mkL.status === 200 && mkL.data.results[0].item.authorId === `u_t1${RUN}` && mkL.data.results[0].item.orgId === ORG, 'ustoz o‘z guruhiga haftalik dars qo‘shdi')
+const sData = await api('/api/data', { cookie: s.cookie })
+await ok(sData.data.lessons.some((l) => l.id === L1) && sData.data.notifications.some((n) => n.text.includes('Jadvalga yangi dars') && n.href === `#/platform/schedule/${L1}.${tomorrow}`), 'guruh o‘quvchisi darsni ko‘rdi va bildirishnoma oldi')
+const sOther = await login(P.s2, 'parol123')
+await ok(!(await api('/api/data', { cookie: sOther.cookie })).data.lessons.some((l) => l.id === L1), 'boshqa guruh o‘quvchisi bu darsni ko‘rmaydi')
+await ok(!(await notesOf(t.cookie)).some((n) => n.text.includes('Smoke darsi')), 'dars qo‘shgan ustozning o‘ziga xabar bormaydi')
+await ok((await ops(t.cookie, [{ col: 'lessons', op: 'patch', id: L1, changes: { skips: [tomorrow] } }])).status === 200 && (await notesOf(s.cookie)).some((n) => n.text.includes('kuni bo‘lmaydi')), 'bir kun bekor qilindi — o‘quvchiga xabar bordi')
+await ok((await ops(OA.cookie, [{ col: 'lessons', op: 'patch', id: L1, changes: { time: '19:30', skips: [] } }])).status === 200, 'admin ustoz darsining vaqtini o‘zgartirdi')
+await ok((await notesOf(s.cookie)).some((n) => n.text.includes('o‘zgartirildi') && n.text.includes('19:30')) && (await notesOf(t.cookie)).some((n) => n.text.includes('o‘zgartirildi')), 'vaqt o‘zgargani o‘quvchiga ham, ustozga ham yetdi')
+await ok((await ops(t.cookie, [{ col: 'lessons', op: 'patch', id: L1, changes: { groupId: G2 } }])).status === 422, 'darsni boshqa guruhga ko‘chirib bo‘lmaydi')
+await ok((await ops(s.cookie, [{ col: 'lessons', op: 'patch', id: L1, changes: { title: 'X' } }])).status === 403, 'o‘quvchi darsni o‘zgartira olmaydi')
+if (!process.env.API) {
+  // Eslatma: 30 daqiqadan keyin boshlanadigan dars (faqat lokal bazada — funksiya bazaga to'g'ridan-to'g'ri ulanadi)
+  const { remindLessons } = await import('../lib/lessons.js')
+  const soon = tk(Date.now() + 30 * 60e3)
+  await ok((await ops(t.cookie, [lesson(`lsr${RUN}`, G1, { title: 'Yaqin dars', repeat: 'once', date: soon.slice(0, 10), days: [], time: soon.slice(11, 16) })])).status === 200, 'yaqin orada boshlanadigan bir martalik dars qo‘shildi')
+  const n1 = await remindLessons(), n2 = await remindLessons()
+  await ok(n1 >= 2 && n2 === 0 && (await notesOf(s.cookie)).some((n) => n.text.startsWith('Eslatma: «Yaqin dars»')), `dars oldidan eslatma o‘quvchi va ustozga bordi, takrorlanmadi (${n1}/${n2})`)
+  const { pool } = await import('../lib/db.js')
+  await pool.end()
+}
+await ok((await ops(t.cookie, [{ col: 'lessons', op: 'delete', id: L1 }])).status === 200 && (await notesOf(s.cookie)).some((n) => n.text.includes('jadvaldan olib tashlandi')), 'dars o‘chirildi — o‘quvchiga xabar bordi')
+
 // ---- Himoyalangan materiallar (LibreOffice'siz: rasm, audio, zip) ----
 const upMaterial = (cookie, name, bytes, extra = {}) => fetch(`${B}/api/materials`, { method: 'POST', headers: { 'content-type': 'application/octet-stream', 'x-file-name': encodeURIComponent(name), cookie, ...extra }, body: bytes })
 const get = (path, cookie, headers = {}) => fetch(B + path, { headers: { ...(cookie ? { cookie } : {}), ...headers } })
@@ -140,7 +176,7 @@ await ok(libItem.fileName === 'Sxema rasmi.png' && !libItem.url, 'fayl nomi serv
 const sPage = await get(page1, s.cookie)
 await ok(sPage.status === 200 && sPage.headers.get('content-type') === 'image/jpeg' && sPage.headers.get('cache-control').includes('no-store'), 'guruh o‘quvchisi sahifa rasmini oldi, kesh yo‘q')
 const tPage = await get(page1, t.cookie)
-await ok(Buffer.compare(Buffer.from(await sPage.arrayBuffer()), Buffer.from(await tPage.arrayBuffer())) !== 0, 'har bir ko‘ruvchiga o‘z suv belgili rasmi beriladi')
+await ok(tPage.status === 200 && Buffer.compare(Buffer.from(await sPage.arrayBuffer()), Buffer.from(await tPage.arrayBuffer())) === 0, 'sahifa rasmi fon yozuvisiz, hamma ko‘ruvchiga bir xil')
 await ok((await get(`/api/materials/${matImg.id}/source`, s.cookie)).status === 403, 'o‘quvchi asl faylni yuklab ola olmaydi')
 await ok((await get(`/api/materials/${matImg.id}/media`, s.cookie)).status === 404, 'rasm media yo‘li orqali berilmaydi')
 const srcRes = await get(`/api/materials/${matImg.id}/source`, t.cookie)

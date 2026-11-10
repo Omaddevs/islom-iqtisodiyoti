@@ -5,9 +5,12 @@ import bcrypt from 'bcryptjs'
 import { many } from './db.js'
 import { fail } from './http.js'
 import { digits } from './ids.js'
+import { cleanLesson, lessonMessages, lessonHref, writeNotes, wallDate } from './lessons.js'
 
 export const CONTENT = ['videos', 'tests', 'vocabSets', 'library', 'articles', 'homework']
-export const RECORD_COLS = [...CONTENT, 'testAttempts', 'submissions', 'vocabProgress', 'notifications', 'activity']
+// Guruhga bog'langan yozuvlar: o'quvchi faqat o'z guruhinikini oladi
+const GROUPED = [...CONTENT, 'lessons']
+export const RECORD_COLS = [...CONTENT, 'lessons', 'testAttempts', 'submissions', 'vocabProgress', 'notifications', 'activity']
 export const COLLECTIONS = ['organizations', 'users', 'groups', ...RECORD_COLS]
 
 // Talaba (va boshqa ko'ruvchilar) faqat hisoblagichlarni o'zgartira oladi — server o'zi +1 qiladi
@@ -108,7 +111,7 @@ export async function loadState(u) {
     if (!state[r.collection]) continue
     let item = recOut(r)
     if (student) {
-      if (CONTENT.includes(r.collection)) {
+      if (GROUPED.includes(r.collection)) {
         const ids = item.groupIds ?? (item.groupId ? [item.groupId] : [])
         if (ids.length && !ids.some((id) => myGroups.has(id))) continue
         if (r.collection === 'articles' && !item.published) continue
@@ -136,7 +139,7 @@ export async function applyOps(c, u, ops) {
     if (op.op === 'insert') { if (!op.item || typeof op.item !== 'object') fail(422, 'Ma’lumot yo‘q'); sizeOk(op.item) }
     if (op.op === 'patch') { if (!op.changes || typeof op.changes !== 'object') fail(422, 'Ma’lumot yo‘q'); sizeOk(op.changes) }
     const id = checkId(op.op === 'insert' ? op.item.id : op.id)
-    const h = op.col === 'organizations' ? orgOps : op.col === 'users' ? userOps : op.col === 'groups' ? groupOps : recordOps
+    const h = op.col === 'organizations' ? orgOps : op.col === 'users' ? userOps : op.col === 'groups' ? groupOps : op.col === 'lessons' ? lessonOps : recordOps
     out.push({ col: op.col, id, item: (await h[op.op](c, u, op, id)) ?? null, deleted: op.op === 'delete' })
   }
   return out
@@ -317,6 +320,54 @@ const groupOps = {
     if (!g) return
     if (!adminOf(u, g.org_id)) deny()
     await c.query('DELETE FROM groups WHERE id = $1', [id])
+    await c.query(`DELETE FROM records WHERE collection = 'lessons' AND data->>'groupId' = $1`, [id])
+  },
+}
+
+// ---- Dars jadvali ----
+// Darsni guruh ustozi yoki tashkilot administratori boshqaradi. Xabar guruh o'quvchilariga va
+// (amalni boshqa odam bajargan bo'lsa) ustozga yuboriladi.
+async function lessonGroup(c, u, groupId) {
+  const g = await row(c, 'SELECT id, org_id, teacher_id FROM groups WHERE id = $1', [String(groupId || '')])
+  if (!g) fail(422, 'Guruhni tanlang')
+  if (!adminOf(u, g.org_id) && !(u.role === 'teacher' && g.teacher_id === u.id)) deny('Faqat o‘zingiz dars beradigan guruh jadvalini o‘zgartira olasiz')
+  return g
+}
+const lessonOrFail = (src) => { const l = cleanLesson(src); if (typeof l === 'string') fail(422, l); return l }
+async function sendLessonNotes(c, u, g, id, kind, prev, next) {
+  const members = (await c.query('SELECT user_id FROM group_members WHERE group_id = $1', [g.id])).rows.map((r) => r.user_id)
+  const to = [...members, g.teacher_id].filter((x) => x && x !== u.id)
+  for (const m of lessonMessages(kind, prev, next, wallDate(Date.now()))) {
+    await writeNotes(c, to, m.text, kind === 'deleted' ? '#/platform/schedule' : lessonHref(id, m.date))
+  }
+}
+
+const lessonOps = {
+  async insert(c, u, { item }, id) {
+    const g = await lessonGroup(c, u, item.groupId)
+    const l = lessonOrFail({ ...item, skips: [] })
+    const rec = await insertRec(c, 'lessons', id, g.org_id, u.id, { ...l, groupId: g.id, orgId: g.org_id, authorId: u.id, createdAt: Date.now() })
+    await sendLessonNotes(c, u, g, id, 'created', null, rec)
+    return rec
+  },
+  async patch(c, u, { changes }, id) {
+    const r = await getRec(c, 'lessons', id)
+    if (!r) fail(404, 'Dars topilmadi (ehtimol o‘chirilgan)')
+    if (changes.groupId !== undefined && changes.groupId !== r.data.groupId) fail(422, 'Darsning guruhini o‘zgartirib bo‘lmaydi — yangi dars qo‘shing')
+    const g = await lessonGroup(c, u, r.data.groupId)
+    const l = lessonOrFail({ ...r.data, ...changes })
+    const next = await updateRec(c, 'lessons', id, { ...r.data, ...l, groupId: r.data.groupId, updatedAt: Date.now() })
+    await sendLessonNotes(c, u, g, id, 'updated', r.data, next)
+    return next
+  },
+  async delete(c, u, op, id) {
+    const r = await getRec(c, 'lessons', id)
+    if (!r) return
+    const g = await row(c, 'SELECT id, org_id, teacher_id FROM groups WHERE id = $1', [r.data.groupId])
+    if (g) await lessonGroup(c, u, g.id)
+    else if (!adminOf(u, r.org_id)) deny()
+    await c.query(`DELETE FROM records WHERE collection = 'lessons' AND id = $1`, [id])
+    if (g) await sendLessonNotes(c, u, g, id, 'deleted', r.data, null)
   },
 }
 

@@ -87,7 +87,7 @@ function Layout({ stats, left, right, side, notice }) {
 }
 
 const useDay = () => useState(() => startOfDay(Date.now()))
-const todayCount = (scope, db) => eventsForDay(scope, db, startOfDay(Date.now())).length
+const todayCount = (scope, db) => eventsForDay(scope, db, startOfDay(Date.now())).filter((e) => e.status !== 'cancelled').length
 const plusWeek = (list, since) => { const n = list.filter((x) => x.createdAt > since).length; return n ? `+${n} bu hafta` : undefined }
 
 /* ================= Bosh administrator (barcha tashkilotlar) ================= */
@@ -454,28 +454,29 @@ function TodayLessons({ day, setDay }) {
 function LessonRow({ e }) {
   const { db } = useAuth()
   const teacher = db.users.find((u) => u.id === e.hostId)
-  const online = /onlayn|online/i.test(e.group?.room || '')
+  const online = e.online
+  const cancelled = e.status === 'cancelled'
   const now = Date.now()
-  const upcoming = e.status !== 'ended' && e.status !== 'live' && e.startsAt > now
-  const past = e.status === 'ended' || (e.status === 'regular' && e.startsAt + e.durationMin * 60e3 < now)
+  const upcoming = !cancelled && e.status !== 'ended' && e.status !== 'live' && e.startsAt > now
+  const past = !cancelled && (e.status === 'ended' || (e.status === 'lesson' && e.startsAt + e.durationMin * 60e3 < now))
   const soon = upcoming && e.startsAt - now < 3 * 3600e3
   const menu = [
     e.status === 'live' ? { label: 'Darsga qo‘shilish', icon: 'video', onClick: () => (window.location.hash = e.href) }
       : e.status === 'ended' ? { label: e.href.includes('/videos/') ? 'Yozuvni ko‘rish' : 'Darsni ochish', icon: 'play', onClick: () => (window.location.hash = e.href) }
-        : e.status === 'regular' ? { label: 'Guruhni ochish', icon: 'layers', onClick: () => (window.location.hash = e.href) }
+        : e.kind === 'lesson' ? { label: 'Dars tafsilotlari', icon: 'calendar', onClick: () => (window.location.hash = e.href) }
           : { label: 'Xonaga kirish', icon: 'logIn', onClick: () => (window.location.hash = e.href) },
     { label: 'Dars jadvali', icon: 'calendar', onClick: () => (window.location.hash = '#/platform/schedule') },
   ]
   return (
-    <div className={cx('pdl', past && 'is-past')} style={{ '--lc': e.group?.color || '#4aa3f8' }}>
+    <div className={cx('pdl', (past || cancelled) && 'is-past', cancelled && 'is-cancelled')} style={{ '--lc': e.group?.color || '#4aa3f8' }}>
       <span className="pdl__dot" />
       <div className="pdl__time">{e.time} – {e.end}</div>
       <div className="pdl__body">
         <b>{e.title}</b>
-        <span>{e.group?.name} · {teacher?.name || 'Ustoz biriktirilmagan'} · {online ? 'Onlayn' : e.group?.room || 'Xona ko‘rsatilmagan'}</span>
+        <span>{e.group?.name} · {teacher?.name || 'Ustoz biriktirilmagan'} · {online ? 'Onlayn' : e.place || 'Xona ko‘rsatilmagan'}</span>
       </div>
       <div className="pdl__side">
-        {e.status === 'live' ? <Badge tone="live" dot>Jonli</Badge> : online ? <Badge tone="green">Onlayn</Badge> : <Badge tone="blue">Xonada</Badge>}
+        {cancelled ? <Badge tone="red">Bekor qilindi</Badge> : e.status === 'live' ? <Badge tone="live" dot>Jonli</Badge> : online ? <Badge tone="green">Onlayn</Badge> : <Badge tone="blue">Xonada</Badge>}
         {soon && <small className="is-soon"><Icon name="clock" size={13} /> {fmtLeft(e.startsAt)}</small>}
         {e.status === 'live' && <small>hozir davom etmoqda</small>}
         {past && <small>o‘tildi</small>}

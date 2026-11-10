@@ -7,7 +7,7 @@ import { api } from '../api/client.js'
 import { uid } from './ids.js'
 
 // Tartib muhim: avval tashkilot, keyin foydalanuvchi, keyin guruh, keyin kontent
-export const COLLECTIONS = ['organizations', 'users', 'groups', 'videos', 'tests', 'testAttempts', 'vocabSets', 'vocabProgress', 'library', 'articles', 'homework', 'submissions', 'notifications', 'activity']
+export const COLLECTIONS = ['organizations', 'users', 'groups', 'lessons', 'videos', 'tests', 'testAttempts', 'vocabSets', 'vocabProgress', 'library', 'articles', 'homework', 'submissions', 'notifications', 'activity']
 // Darslar o'z API'si orqali sinxronlanadi (api/meetings.js) — bu yerdan serverga yuborilmaydi
 const LOCAL = ['meetings', 'messages']
 // Faqat qo'shiladigan jurnallar: ro'yxatni qisqartirish (slice) serverdan o'chirish degani emas
@@ -196,6 +196,8 @@ export function scopeFor(db, user, viewOrgId) {
     teachers,
     myStudents,
     meetings: db.meetings.filter(byGroups),
+    // Dars jadvali: faqat ko'rinadigan guruhlarniki (o'chirilgan guruh darsi ko'rsatilmaydi)
+    lessons: db.lessons.filter((l) => gids.has(l.groupId)),
     videos: db.videos.filter(byGroups),
     tests: db.tests.filter(byGroups),
     vocabSets: db.vocabSets.filter(byGroups),
@@ -210,8 +212,8 @@ export function scopeFor(db, user, viewOrgId) {
 // Bu faqat interfeys uchun — haqiqiy tekshiruv serverda (backend/lib/platform.js).
 const PERMS = {
   superadmin: ['*'],
-  org_admin: ['users.create', 'users.manage', 'teachers.create', 'groups.create', 'groups.manage', 'content.create', 'content.manage', 'org.settings', 'reports.view'],
-  teacher: ['students.create', 'groups.create', 'groups.assign', 'content.create', 'content.own', 'homework.grade', 'meetings.host'],
+  org_admin: ['users.create', 'users.manage', 'teachers.create', 'groups.create', 'groups.manage', 'content.create', 'content.manage', 'org.settings', 'reports.view', 'lessons.manage'],
+  teacher: ['students.create', 'groups.create', 'groups.assign', 'lessons.manage', 'content.create', 'content.own', 'homework.grade', 'meetings.host'],
   student: ['content.view', 'homework.submit', 'tests.take'],
 }
 export const can = (user, perm) => !!user && (PERMS[user.role].includes('*') || PERMS[user.role].includes(perm))

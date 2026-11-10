@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx, useFormInit } from '../ui/kit.jsx'
-import { DAYS, DAYS_FULL, fmtWhen, fmtDate, pct } from '../ui/format.js'
+import { fmtWhen, fmtDate, pct } from '../ui/format.js'
+import { groupLessonsText, nextLessonTs, hasFuture, lessonWhen, lessonTime, lessonPlace } from '../ui/agenda.js'
+import { LessonForm } from './Schedule.jsx'
 import { UserForm } from './Users.jsx'
 import { MeetingForm, hashQuery } from './Meetings.jsx'
 import { HomeworkForm } from './Homework.jsx'
@@ -34,7 +36,8 @@ function GroupList() {
     students: g.studentIds.map((id) => db.users.find((u) => u.id === id)).filter(Boolean),
     held: db.meetings.filter((m) => m.groupId === g.id && m.status === 'ended').length,
     hw: db.homework.filter((h) => h.groupId === g.id).length,
-    next: db.meetings.filter((m) => m.groupId === g.id && m.status !== 'ended').sort((a, b) => a.startsAt - b.startsAt)[0],
+    next: nextOf(db, g.id),
+    sched: groupLessonsText(db.lessons, g.id),
   }))
   // Ustoz ro'yxatida faqat o'z guruhlari bor: tahrirlaydi, lekin o'chirishni administrator qiladi
   const menuFor = (g) => (canManage
@@ -80,9 +83,16 @@ function GroupList() {
   )
 }
 
-const scheduleText = (g) => g.schedule.map((s) => `${DAYS[s.day]} ${s.time}`).join(' · ')
+// Eng yaqin dars: jonli/rejalashtirilgan onlayn dars yoki Dars jadvalidagi dars
+function nextOf(db, groupId) {
+  const m = db.meetings.filter((x) => x.groupId === groupId && x.status !== 'ended').sort((a, b) => a.startsAt - b.startsAt)[0]
+  if (m?.status === 'live') return m
+  const ts = nextLessonTs(db.lessons, groupId)
+  if (ts != null && (!m || ts < m.startsAt)) return { startsAt: ts, status: 'scheduled' }
+  return m
+}
 
-function GroupCard({ g, teacher, students, held, hw, next, menu }) {
+function GroupCard({ g, teacher, students, held, hw, next, sched, menu }) {
   const open = () => { window.location.hash = `#/platform/groups/${g.id}` }
   const live = next?.status === 'live'
   return (
@@ -96,7 +106,7 @@ function GroupCard({ g, teacher, students, held, hw, next, menu }) {
         <div><Icon name="bookOpen" size={20} /><b>{held}</b><span>dars o‘tildi</span></div>
         <div><Icon name="fileText" size={20} /><b>{hw}</b><span>vazifa</span></div>
       </div>
-      <div className="pgroup__sched"><Icon name="calendar" size={16} />{scheduleText(g) || 'Jadval belgilanmagan'}</div>
+      <div className="pgroup__sched"><Icon name="calendar" size={16} />{sched || 'Jadval belgilanmagan'}</div>
       <div className={cx('pgroup__next', live && 'is-live', !next && 'is-none')}>
         <Icon name={live ? 'radio' : next ? 'video' : 'calendar'} size={16} />
         {live ? 'Hozir jonli' : next ? fmtWhen(next.startsAt) : 'Dars rejalashtirilmagan'}
@@ -117,16 +127,15 @@ export function GroupForm({ open, group, onClose }) {
   const isNew = !group?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useFormInit(open, group?.id, () => { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherId: user.role === 'teacher' ? user.id : '', room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length], schedule: [{ day: 1, time: '19:00' }, { day: 3, time: '19:00' }] } : { ...group, schedule: group.schedule.map((s) => ({ ...s })) }) })
+  useFormInit(open, group?.id, () => { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherId: user.role === 'teacher' ? user.id : '', room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length] } : { ...group }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
-  const setS = (i, k, v) => setF((x) => ({ ...x, schedule: x.schedule.map((s, j) => (j === i ? { ...s, [k]: v } : s)) }))
   const teachers = db.users.filter((u) => u.role === 'teacher' && u.orgId === (scope.orgId || user.orgId))
   const submit = () => {
     const er = {}
     if (!f.name?.trim()) er.name = 'Guruh nomini kiriting'
     if (!f.course?.trim()) er.course = 'Kurs nomini kiriting'
     setErr(er); if (Object.keys(er).length) return
-    const data = { name: f.name.trim(), course: f.course.trim(), level: f.level, teacherId: f.teacherId || null, room: f.room?.trim(), color: f.color, schedule: f.schedule.filter((s) => s.time) }
+    const data = { name: f.name.trim(), course: f.course.trim(), level: f.level, teacherId: f.teacherId || null, room: f.room?.trim(), color: f.color }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       const orgId = scope.orgId
@@ -149,16 +158,7 @@ export function GroupForm({ open, group, onClose }) {
           <FField label="Xona / format"><Input value={f.room || ''} onChange={(e) => set('room', e.target.value)} placeholder="Onlayn" /></FField>
         </div>
         <FField label="Rang"><div className="pswatches">{COLORS.map((c) => <button key={c} type="button" className={cx(f.color === c && 'is-on')} style={{ background: c }} onClick={() => set('color', c)} aria-label={c} />)}</div></FField>
-        <FField label="Dars jadvali">
-          {(f.schedule || []).map((s, i) => (
-            <div key={i} className="prow" style={{ flexWrap: 'nowrap', marginBottom: 8 }}>
-              <Select value={String(s.day)} onChange={(v) => setS(i, 'day', Number(v))} options={DAYS_FULL.map((d, di) => ({ value: String(di), label: d }))} />
-              <Input type="time" value={s.time} onChange={(e) => setS(i, 'time', e.target.value)} style={{ width: 130 }} />
-              <Btn icon="trash" variant="ghost" onClick={() => set('schedule', f.schedule.filter((_, j) => j !== i))} aria-label="O‘chirish" />
-            </div>
-          ))}
-          <Btn size="sm" icon="plus" onClick={() => set('schedule', [...(f.schedule || []), { day: 1, time: '18:00' }])}>Kun qo‘shish</Btn>
-        </FField>
+        <p className="pform__note"><Icon name="calendar" size={15} /> Dars kunlari va vaqtlari «Dars jadvali» bo‘limida qo‘shiladi — o‘quvchilarga bildirishnoma boradi.</p>
       </div>
     </Modal>
   )
@@ -174,6 +174,7 @@ function GroupDetail({ id }) {
   const [editOpen, setEditOpen] = useState(false)
   const [meetOpen, setMeetOpen] = useState(false)
   const [hwOpen, setHwOpen] = useState(false)
+  const [lessonOpen, setLessonOpen] = useState(false)
   const [creds, setCreds] = useState(null)
   const [rm, setRm] = useState(null)
   const [pick, setPick] = useState([])
@@ -183,6 +184,7 @@ function GroupDetail({ id }) {
   const canEdit = can('groups.manage') || (user.role === 'teacher' && g.teacherId === user.id)
   const meetings = db.meetings.filter((m) => m.groupId === g.id).sort((a, b) => b.startsAt - a.startsAt)
   const homework = db.homework.filter((h) => h.groupId === g.id)
+  const lessons = db.lessons.filter((l) => l.groupId === g.id && hasFuture(l)).sort((a, b) => (a.repeat === b.repeat ? (a.date + a.time).localeCompare(b.date + b.time) : a.repeat === 'weekly' ? -1 : 1))
   const tests = db.tests.filter((x) => x.groupIds.includes(g.id))
   const videos = db.videos.filter((v) => v.groupIds.includes(g.id))
   const available = db.users.filter((u) => u.role === 'student' && u.orgId === g.orgId && !g.studentIds.includes(u.id))
@@ -200,7 +202,7 @@ function GroupDetail({ id }) {
 
   return (
     <>
-      <PageHead crumbs={[{ label: 'Guruhlar', href: '#/platform/groups' }, { label: g.name }]} title={`${g.name} — ${g.course}`} sub={`${g.level} · ${g.room} · ${g.schedule.map((s) => `${DAYS_FULL[s.day].slice(0, 3)} ${s.time}`).join(', ')}`}
+      <PageHead crumbs={[{ label: 'Guruhlar', href: '#/platform/groups' }, { label: g.name }]} title={`${g.name} — ${g.course}`} sub={[g.level, g.room, groupLessonsText(db.lessons, g.id)].filter(Boolean).join(' · ')}
         actions={canEdit && <>
           <Btn variant="primary" icon="video" onClick={() => setMeetOpen(true)}>Dars rejalashtirish</Btn>
           <Btn icon="fileText" onClick={() => setHwOpen(true)}>Vazifa berish</Btn>
@@ -266,9 +268,14 @@ function GroupDetail({ id }) {
           <Card title="Ustoz">
             {t ? <div className="pcell-user"><UAvatar user={t} size={48} /><div><b style={{ fontSize: 15 }}>{t.name}</b><span>{t.title}</span><span className="mono">{t.phone}</span></div></div> : <Empty icon="user" title="Ustoz biriktirilmagan" action={can('groups.manage') && <Btn size="sm" onClick={() => setEditOpen(true)}>Biriktirish</Btn>} />}
           </Card>
-          <Card title="Dars jadvali">
-            {g.schedule.length === 0 && <p className="pmuted">Belgilanmagan</p>}
-            {g.schedule.map((s, i) => <div key={i} className="pitem" style={{ padding: '10px 0' }}><div className="pitem__icon" style={{ width: 38, height: 38, borderRadius: 11 }}><Icon name="calendar" size={17} /></div><div className="pitem__body"><b style={{ fontSize: 14 }}>{DAYS_FULL[s.day]}</b><span>{s.time} · {g.room}</span></div></div>)}
+          <Card title="Dars jadvali" action={canEdit && <Btn size="sm" icon="plus" onClick={() => setLessonOpen(true)}>Qo‘shish</Btn>}>
+            {lessons.length === 0 && <Empty icon="calendar" title="Jadval belgilanmagan" text={canEdit ? 'Dars qo‘shing — o‘quvchilarga bildirishnoma boradi.' : undefined} />}
+            {lessons.map((l) => (
+              <a key={l.id} href={`#/platform/schedule/${l.id}`} className="pitem" style={{ padding: '10px 0' }}>
+                <div className="pitem__icon" style={{ width: 38, height: 38, borderRadius: 11 }}><Icon name={l.online ? 'video' : 'calendar'} size={17} /></div>
+                <div className="pitem__body"><b style={{ fontSize: 14 }}>{lessonWhen(l)} · {lessonTime(l)}</b><span>{[l.title, lessonPlace(l, g)].filter(Boolean).join(' · ')}</span></div>
+              </a>
+            ))}
           </Card>
         </div>
       </div>
@@ -286,6 +293,7 @@ function GroupDetail({ id }) {
       <GroupForm open={editOpen} group={g} onClose={() => setEditOpen(false)} />
       <MeetingForm open={meetOpen} meeting={{}} defaultGroupId={g.id} onClose={() => setMeetOpen(false)} />
       <HomeworkForm open={hwOpen} hw={{}} defaultGroupId={g.id} onClose={() => setHwOpen(false)} />
+      <LessonForm open={lessonOpen} lesson={null} defaultGroupId={g.id} onClose={() => setLessonOpen(false)} />
       <Confirm open={!!rm} onClose={() => setRm(null)} danger title="Guruhdan chiqarish" text={`${rm?.name} guruhdan chiqariladi. Hisobi saqlanib qoladi.`} confirmLabel="Chiqarish" onConfirm={() => removeStudent(rm)} />
     </>
   )
