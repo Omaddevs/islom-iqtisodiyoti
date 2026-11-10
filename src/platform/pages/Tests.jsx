@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
 import { StatSpark, series, endOfDay } from '../ui/charts.jsx'
@@ -9,6 +9,9 @@ import { ChartPanel } from '../ui/chartpanel.jsx'
 
 export default function Tests({ param }) {
   const { user } = useAuth()
+  // #/platform/tests/group.<guruhId> — guruh statistikasi, #/platform/tests/student.<o'quvchiId> — o'quvchi statistikasi
+  if (param?.startsWith('group.')) return user.role === 'student' ? <StudentTestStats sid={user.id} /> : <GroupTestStats gid={param.slice(6)} />
+  if (param?.startsWith('student.')) return <StudentTestStats sid={user.role === 'student' ? user.id : param.slice(8)} />
   if (param) return user.role === 'student' ? <TakeTest id={param} /> : <TestResults id={param} />
   return <TestList />
 }
@@ -147,6 +150,7 @@ function TestList() {
         </div>
         <blockquote className="pthero__quote">“Bilim — hayotga nur, jamiyatga farovonlikdir.”</blockquote>
         {canCreate && <Btn variant="primary" size="lg" icon="plus" className="pthero__btn" onClick={() => setEditing({})}>Test yaratish</Btn>}
+        {!isStaff && <Btn variant="primary" size="lg" icon="chart" className="pthero__btn" as="a" href={`#/platform/tests/student.${user.id}`}>Mening statistikam</Btn>}
       </section>
 
       {/* Statistika */}
@@ -158,7 +162,7 @@ function TestList() {
         </> : <>
           <StatSpark icon="clipboard" tone="blue" color="#3b8ef0" value={count('active')} label="Topshirish kerak" data={stats.sActive} onClick={() => setTab('active')} />
           <StatSpark icon="checkCircle" tone="teal" color="#14b8a6" value={count('done')} label="Topshirilgan testlar" data={series(14, (ts) => attempts.filter((a) => a.finishedAt <= endOfDay(ts)).length)} onClick={() => setTab('done')} />
-          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={stats.avg} label="O‘rtacha natijam" data={stats.sAvg} onClick={() => scrollTo('pt-analytics')} />
+          <StatSpark icon="chart" tone="violet" color="#8b5cf6" value={stats.avg} label="O‘rtacha natijam" data={stats.sAvg} onClick={() => { window.location.hash = `#/platform/tests/student.${user.id}` }} />
         </>}
       </div>
 
@@ -185,6 +189,8 @@ function TestList() {
             ] : null} />)}
         </div>
       )}
+
+      {isStaff && <GroupsOverview tests={scope.tests} attempts={attempts} />}
 
       {/* Pastki qism: so'nggi topshiruvlar + tahlil */}
       <div className="ptbottom">
@@ -265,7 +271,18 @@ function TestCard({ r, isStaff, menu }) {
 
 // ---- Test konstruktori ----
 const MAX_OPTS = 8
-const emptyQ = () => ({ id: uid('q'), text: '', options: ['', '', '', ''], correct: 0 })
+const emptyQ = () => ({ id: uid('q'), text: '', options: ['', '', '', ''], correct: 0, explain: '' })
+// Savol izohi maydoni: o'quvchi testni topshirgach ko'radi (ayniqsa xato qilganda)
+function ExplainField({ value, onChange, n }) {
+  const [open, setOpen] = useState(!!value)
+  if (!open) return <button type="button" className="ptlink pqb__explain-add" onClick={() => setOpen(true)}><Icon name="message" size={15} />Izoh qo‘shish</button>
+  return (
+    <label className="pqb__explain">
+      <span><Icon name="message" size={14} />Izoh — o‘quvchi topshirgach ko‘radi</span>
+      <Textarea rows={2} maxLength={3000} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="Nega aynan shu javob to‘g‘ri? Qoidani yoki manbani yozing…" aria-label={`${n}-savol izohi`} />
+    </label>
+  )
+}
 function TestForm({ open, test, onClose }) {
   const { user, db, scope } = useAuth()
   const toast = useToast()
@@ -306,10 +323,19 @@ function TestForm({ open, test, onClose }) {
         if (new Set(kept.map((x) => x.o.toLowerCase())).size !== kept.length) return setErr(`${label}: variantlar takrorlanmasin`)
         const correct = kept.findIndex((x) => x.i === q.correct)
         if (correct < 0) return setErr(`${label}: to‘g‘ri javob to‘ldirilgan variantlardan biri bo‘lishi kerak`)
-        qs.push({ id: q.id, text: q.text.trim(), options: kept.map((x) => x.o), correct })
+        qs.push({ id: q.id, text: q.text.trim(), options: kept.map((x) => x.o), correct, ...(q.explain?.trim() ? { explain: q.explain.trim() } : {}) })
       }
       if (!qs.length) return setErr('Kamida bitta savol kiriting')
       data.questions = qs
+    } else {
+      // Qulflangan testda faqat izohlar o'zgaradi — savol, variant va to'g'ri javob o'sha-o'sha
+      const old = test.questions
+      const qs = old.map((q) => {
+        const e = (f.questions.find((x) => x.id === q.id)?.explain || '').trim()
+        const { explain, ...rest } = q // eslint-disable-line no-unused-vars
+        return e ? { ...rest, explain: e } : rest
+      })
+      if (qs.some((q, i) => (q.explain || '') !== (old[i].explain || ''))) data.questions = qs
     }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
@@ -338,11 +364,12 @@ function TestForm({ open, test, onClose }) {
             : <span className="pfield__hint">Avval guruh yarating: test guruh o‘quvchilariga beriladi.</span>}
         </div>
         <div className="pfield__label">Savollar ({f.questions?.length || 0})</div>
-        {locked && <p className="ptform__lock"><Icon name="lock" size={16} />O‘quvchilar bu testni topshirgan, shuning uchun savollar qulflangan: o‘zgarish eski natijalarni buzadi.</p>}
+        {locked && <p className="ptform__lock"><Icon name="lock" size={16} />O‘quvchilar bu testni topshirgan, shuning uchun savollar qulflangan: o‘zgarish eski natijalarni buzadi. Izohlarni esa qo‘shish va tahrirlash mumkin — o‘quvchilar darhol ko‘radi.</p>}
         {(f.questions || []).map((q, i) => (locked ? (
           <div key={q.id} className="pqb pqb--ro">
             <b>{i + 1}. {q.text}</b>
             <ul>{q.options.map((o, oi) => <li key={oi} className={cx(oi === q.correct && 'is-right')}><i>{LETTER(oi)}</i>{o}{oi === q.correct && <Icon name="check" size={15} />}</li>)}</ul>
+            <ExplainField value={q.explain} onChange={(v) => setQ(i, 'explain', v)} n={i + 1} />
           </div>
         ) : (
           <div key={q.id} className="pqb">
@@ -364,6 +391,7 @@ function TestForm({ open, test, onClose }) {
               <span className="pfield__hint">Doira bilan to‘g‘ri javobni belgilang</span>
               {q.options.length < MAX_OPTS && <button type="button" className="ptlink" onClick={() => addOpt(i)}><Icon name="plus" size={15} />Variant qo‘shish</button>}
             </div>
+            <ExplainField value={q.explain} onChange={(v) => setQ(i, 'explain', v)} n={i + 1} />
           </div>
         )))}
         {!locked && <Btn icon="plus" onClick={() => set('questions', [...f.questions, emptyQ()])}>Savol qo‘shish</Btn>}
@@ -425,6 +453,12 @@ function QuestionReview({ test, attempt, who = 'Sizning javobingiz' }) {
                 )
               })}
             </div>
+            {x.q.explain && (
+              <div className={cx('ptrv__exp', x.status !== 'right' && 'is-hot')}>
+                <span><Icon name="message" size={15} />{x.status === 'right' ? 'Izoh' : 'Izoh: nega bu javob to‘g‘ri'}</span>
+                <p>{x.q.explain}</p>
+              </div>
+            )}
           </li>
         ))}
       </ol>
@@ -560,6 +594,7 @@ function TakeTest({ id }) {
         ) : (
           <>
             <ScoreHero test={t} attempt={result} />
+            <FeedbackBox test={t} attempt={result} />
             <ChartPanel title="Natija grafigi" storeKey="test_result" datasets={datasets} defaultType="donut" />
             <section className="pcard">
               <h3 className="pdt ptrv__ttl"><span className="pdt__ico"><Icon name="clipboard" size={18} /></span>Savollar va to‘g‘ri javoblar</h3>
@@ -725,7 +760,11 @@ function TestResults({ id }) {
           { key: 'g', label: 'Guruh', render: (r) => groupName(r.id) || <span className="pmuted">Guruhda emas</span> },
           { key: 'res', label: 'Natija', render: (r) => r.a ? <div className="ptres__cell"><div><b>{r.a.score}/{r.a.total}</b><span className={cx('ptpill', `ptpill--${gradeOf(pct(r.a.score, r.a.total)).tone}`)}>{pct(r.a.score, r.a.total)}%</span></div><Progress size="sm" value={pct(r.a.score, r.a.total)} tone={pct(r.a.score, r.a.total) >= 50 ? 'green' : 'red'} /></div> : <Badge tone="gray">Topshirmagan</Badge> },
           { key: 'time', label: 'Topshirilgan vaqt', render: (r) => r.a ? <span className="ptdate">{fmtDateTime(r.a.finishedAt)}</span> : '—' },
-          { key: 'go', label: '', align: 'right', render: (r) => r.a && <Icon name="chevRight" size={18} /> },
+          { key: 'fb', label: 'Izoh', render: (r) => r.a?.feedback ? <Badge tone="blue"><Icon name="message" size={13} /> Yozilgan</Badge> : <span className="pmuted">—</span> },
+          { key: 'go', label: '', align: 'right', render: (r) => <span onClick={(e) => e.stopPropagation()}><Menu items={[
+            r.a && { label: 'Javoblar va izoh', icon: 'eye', onClick: () => setOpen(r) },
+            { label: 'O‘quvchi statistikasi', icon: 'chart', onClick: () => { window.location.hash = `#/platform/tests/student.${r.id}` } },
+          ].filter(Boolean)} /></span> },
         ]} />
       </Card>
 
@@ -760,9 +799,356 @@ function TestResults({ id }) {
         </div>
       </Card>
 
-      <Modal open={!!open} onClose={() => setOpen(null)} width={860} title={open?.s.name} sub={t.title}>
-        {open && <><ScoreHero test={t} attempt={open.a} staff /><QuestionReview test={t} attempt={open.a} who="O‘quvchi javobi" /></>}
-      </Modal>
+      <AttemptModal test={t} attempt={open && db.testAttempts.find((a) => a.id === open.a.id)} student={open?.s} onClose={() => setOpen(null)} />
     </>
+  )
+}
+
+/* ================= Statistika: guruh va o'quvchi kesimida ================= */
+
+const pctOf = (a) => pct(a.score, a.total)
+const pill = (p, extra) => <span className={cx('ptpill', `ptpill--${gradeOf(p).tone}`, extra)}>{p}%</span>
+
+// Guruh bo'yicha: qaysi testlar berilgan, kim qaysi testni qanday topshirgan
+function groupStats(g, tests, attempts, users) {
+  const gt = tests.filter((t) => t.groupIds.includes(g.id)).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+  const tIds = new Set(gt.map((t) => t.id))
+  const students = g.studentIds.map((id) => users.find((u) => u.id === id)).filter(Boolean)
+  const sIds = new Set(students.map((s) => s.id))
+  const list = attempts.filter((a) => tIds.has(a.testId) && sIds.has(a.studentId))
+  const now = Date.now()
+  const rows = students.map((s) => {
+    const mine = list.filter((a) => a.studentId === s.id)
+    const cells = new Map(mine.map((a) => [a.testId, a]))
+    const missed = gt.filter((t) => t.dueAt < now && !cells.has(t.id)).length
+    return { s, cells, done: mine.length, avg: mine.length ? avgOf(mine) : null, missed }
+  })
+  // Muddati o'tgan yoki topshirilgan testlar — o'quvchidan kutilgan ishlar
+  const due = gt.reduce((n, t) => n + students.filter((s) => t.dueAt < now || list.some((a) => a.testId === t.id && a.studentId === s.id)).length, 0)
+  return {
+    g, tests: gt, students, rows, list,
+    avg: list.length ? avgOf(list) : null,
+    rate: pct(list.length, due),
+    weak: rows.filter((r) => r.avg !== null && r.avg < 50).length,
+  }
+}
+
+function GroupsOverview({ tests, attempts }) {
+  const { db, scope } = useAuth()
+  const rows = useMemo(() => scope.groups.map((g) => groupStats(g, tests, attempts, db.users)), [scope.groups, tests, attempts, db.users])
+  if (!rows.length) return null
+  return (
+    <section className="pcard ptgo">
+      <header className="ptcard-h">
+        <h3 className="pdt"><span className="pdt__ico"><Icon name="layers" size={18} /></span>Guruhlar kesimida</h3>
+        <span className="ptgo__hint">Guruhni tanlang — har bir o‘quvchining barcha testlar bo‘yicha natijasi</span>
+      </header>
+      <div className="ptgo__grid">
+        {rows.map((r) => (
+          <a key={r.g.id} href={`#/platform/tests/group.${r.g.id}`} className="ptgo__card" style={{ '--gc': r.g.color || '#4aa3f8' }}>
+            <div className="ptgo__top">
+              <div><b>{r.g.name}</b><span>{r.g.course}</span></div>
+              {r.avg === null ? <span className="ptpill ptpill--gray">—</span> : pill(r.avg, 'ptpill--lg')}
+            </div>
+            <div className="ptgo__nums">
+              <div><b>{r.students.length}</b><span>o‘quvchi</span></div>
+              <div><b>{r.tests.length}</b><span>test</span></div>
+              <div><b>{r.list.length}</b><span>topshiruv</span></div>
+            </div>
+            <div className="ptgo__bar">
+              <span>Topshirish ko‘rsatkichi <b>{r.rate}%</b></span>
+              <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${r.rate}%` }} /></span>
+            </div>
+            <div className="ptgo__foot">
+              {r.weak > 0 ? <small className="is-warn"><Icon name="alertCircle" size={14} />{r.weak} o‘quvchi 50% dan past</small>
+                : r.tests.length ? <small><Icon name="checkCircle" size={14} />Qoniqarsiz o‘quvchi yo‘q</small> : <small>Hali test berilmagan</small>}
+              <span className="ptgo__go">Batafsil <Icon name="arrowRight" size={15} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// CSV (Excel ochadi): o'quvchi × test jadvali
+function downloadCsv(name, head, rows) {
+  const esc = (v) => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s }
+  const csv = '﻿' + [head, ...rows].map((r) => r.map(esc).join(';')).join('\r\n')
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+  a.download = name.replace(/[\\/:*?"<>|]+/g, '_') + '.csv'
+  document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
+function GroupTestStats({ gid }) {
+  const { db, scope } = useAuth()
+  const [sort, setSort] = useState('avg')
+  const [open, setOpen] = useState(null) // { t, aId, s }
+  const g = scope.groups.find((x) => x.id === gid)
+  const st = useMemo(() => g && groupStats(g, scope.tests, db.testAttempts, db.users), [g, scope.tests, db.testAttempts, db.users])
+  const datasets = useMemo(() => (!st ? [] : [
+    { key: 'students', label: 'O‘quvchilar', sub: 'Har bir o‘quvchining barcha testlar bo‘yicha o‘rtacha natijasi', max: 100, unit: '%', head: ['O‘quvchi', 'O‘rtacha'], defaultType: 'bar',
+      parts: { label: 'Topshiruvlarning o‘quvchilar bo‘yicha ulushi', value: (r) => r.done, unit: ' ta' },
+      rows: st.rows.filter((r) => r.avg !== null).map((r) => ({ key: r.s.id, label: r.s.name, short: r.s.name.split(' ')[0], value: r.avg, done: r.done, shown: `${r.avg}% · ${r.done} ta test` })) },
+    testsDataset(st.list, st.tests, 'Testlar', 'Har bir test bo‘yicha guruh o‘rtachasi, vaqt tartibida'),
+    { key: 'completion', label: 'Topshirish', sub: 'Har bir testni guruhning necha foizi topshirgani', max: 100, unit: '%', head: ['Test', 'Topshirganlar'], parts: null,
+      rows: st.students.length ? st.tests.map((t) => { const n = st.list.filter((a) => a.testId === t.id).length; return { key: t.id, label: t.title, value: pct(n, st.students.length), shown: `${n}/${st.students.length} · ${pct(n, st.students.length)}%` } }) : [] },
+    gradesDataset(st.list),
+  ]), [st])
+
+  if (!g) return <Card><Empty icon="layers" title="Guruh topilmadi" text="Guruh o‘chirilgan yoki sizga biriktirilmagan." action={<Btn as="a" href="#/platform/tests">Testlarga qaytish</Btn>} /></Card>
+  const rows = [...st.rows].sort((a, b) => (sort === 'name' ? a.s.name.localeCompare(b.s.name) : (b.avg ?? -1) - (a.avg ?? -1) || a.s.name.localeCompare(b.s.name)))
+  const teacher = db.users.find((u) => u.id === g.teacherId)
+  const now = Date.now()
+  const exportCsv = () => downloadCsv(`${g.name} — test natijalari`,
+    ['O‘quvchi', ...st.tests.map((t) => t.title), 'O‘rtacha, %', 'Topshirgan', 'Qoldirgan'],
+    rows.map((r) => [r.s.name, ...st.tests.map((t) => { const a = r.cells.get(t.id); return a ? `${pctOf(a)}% (${a.score}/${a.total})` : t.dueAt < now ? 'topshirmagan' : 'kutilmoqda' }), r.avg ?? '', r.done, r.missed]))
+  const openCell = (t, a, s) => setOpen({ t, aId: a.id, s })
+  const cur = open && db.testAttempts.find((a) => a.id === open.aId)
+
+  return (
+    <>
+      <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: `${g.name} statistikasi` }]} title={`${g.name} — testlar statistikasi`}
+        sub={`${g.course}${teacher ? ` · ${teacher.name}` : ''}`}
+        actions={<>
+          <Btn icon="layers" as="a" href={`#/platform/groups/${g.id}`}>Guruh sahifasi</Btn>
+          {st.tests.length > 0 && st.students.length > 0 && <Btn variant="primary" icon="download" onClick={exportCsv}>Excel’ga yuklash</Btn>}
+        </>} />
+      <div className="pgrid pgrid--4">
+        <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="users" size={22} /></span><span className="pstat__body"><span className="pstat__value">{st.students.length}</span><span className="pstat__label">O‘quvchilar</span></span></div>
+        <div className="pstat pstat--violet"><span className="pstat__icon"><Icon name="clipboard" size={22} /></span><span className="pstat__body"><span className="pstat__value">{st.tests.length}</span><span className="pstat__label">Berilgan testlar</span></span></div>
+        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="chart" size={22} /></span><span className="pstat__body"><span className="pstat__value">{st.avg === null ? '—' : `${st.avg}%`}</span><span className="pstat__label">Guruh o‘rtachasi</span></span></div>
+        <div className="pstat pstat--red"><span className="pstat__icon"><Icon name="alertCircle" size={22} /></span><span className="pstat__body"><span className="pstat__value">{st.weak}</span><span className="pstat__label">50% dan past o‘quvchilar</span></span></div>
+      </div>
+
+      <ChartPanel title="Guruh natijalari" storeKey="group_tests" datasets={datasets} defaultType="bar" emptyText="Guruhda hali test topshirilmagan." />
+
+      <Card pad={false} className="ptmx-card">
+        <header className="ptcard-h">
+          <h3 className="pdt"><span className="pdt__ico"><Icon name="grid" size={18} /></span>O‘quvchilar va testlar</h3>
+          <label className="pdsel"><span>{sort === 'name' ? 'Ism bo‘yicha' : 'Natija bo‘yicha'}</span><Icon name="chevDown" size={16} />
+            <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Saralash"><option value="avg">Natija bo‘yicha</option><option value="name">Ism bo‘yicha</option></select>
+          </label>
+        </header>
+        {!st.students.length ? <Empty icon="users" title="Guruhda o‘quvchi yo‘q" />
+          : !st.tests.length ? <Empty icon="clipboard" title="Guruhga hali test berilmagan" action={<Btn variant="primary" as="a" href="#/platform/tests">Test yaratish</Btn>} />
+            : (
+              <div className="ptmx">
+                <table>
+                  <thead>
+                    <tr>
+                      <th className="ptmx__name">O‘quvchi</th>
+                      {st.tests.map((t) => <th key={t.id} title={t.title}><a href={`#/platform/tests/${t.id}`}>{t.title}</a><small>{fmtDateShort(t.dueAt)}</small></th>)}
+                      <th className="ptmx__avg">O‘rtacha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.s.id}>
+                        <th className="ptmx__name"><a href={`#/platform/tests/student.${r.s.id}`} className="pcell-user ptuser"><UAvatar user={r.s} size={30} /><span><b>{r.s.name}</b><small>{r.done}/{st.tests.length} test{r.missed ? ` · ${r.missed} qoldirgan` : ''}</small></span></a></th>
+                        {st.tests.map((t) => {
+                          const a = r.cells.get(t.id)
+                          if (a) return <td key={t.id}><button type="button" className={cx('ptmx__cell', `is-${gradeOf(pctOf(a)).tone}`)} onClick={() => openCell(t, a, r.s)} title={`${t.title}: ${a.score}/${a.total}${a.feedback ? ' · izoh yozilgan' : ''}`}>{pctOf(a)}%{a.feedback && <Icon name="message" size={11} />}</button></td>
+                          return <td key={t.id}><span className={cx('ptmx__cell', t.dueAt < now ? 'is-miss' : 'is-wait')} title={t.dueAt < now ? 'Topshirmagan, muddat tugagan' : 'Hali topshirmagan'}>{t.dueAt < now ? '✕' : '…'}</span></td>
+                        })}
+                        <td className="ptmx__avg">{r.avg === null ? <span className="pmuted">—</span> : pill(r.avg)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th className="ptmx__name">Test o‘rtachasi</th>
+                      {st.tests.map((t) => { const ta = st.list.filter((a) => a.testId === t.id); return <td key={t.id}>{ta.length ? pill(avgOf(ta)) : <span className="pmuted">—</span>}</td> })}
+                      <td className="ptmx__avg">{st.avg === null ? '—' : pill(st.avg)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+        <p className="ptmx__legend"><span><i className="is-green" />90%+ a’lo</span><span><i className="is-blue" />70–89%</span><span><i className="is-amber" />50–69%</span><span><i className="is-red" />50% dan past</span><span>✕ topshirmagan</span><span>… kutilmoqda</span><span><Icon name="message" size={12} /> izoh yozilgan</span></p>
+      </Card>
+
+      <AttemptModal test={open?.t} attempt={cur} student={open?.s} onClose={() => setOpen(null)} />
+    </>
+  )
+}
+
+function StudentTestStats({ sid }) {
+  const { user, db, scope } = useAuth()
+  const staff = user.role !== 'student'
+  const [open, setOpen] = useState(null) // attempt id
+  const [onlyTest, setOnlyTest] = useState('all')
+  const s = db.users.find((u) => u.id === sid)
+  const allowed = !!s && (!staff ? sid === user.id : (user.role === 'teacher' ? scope.myStudents : scope.students).some((x) => x.id === sid))
+  const data = useMemo(() => {
+    if (!allowed) return null
+    const groups = db.groups.filter((g) => g.studentIds.includes(sid) && (!staff || scope.groupIds.has(g.id)))
+    const mine = db.testAttempts.filter((a) => a.studentId === sid)
+    const tests = scope.tests.filter((t) => t.groupIds.some((id) => groups.some((g) => g.id === id)) || mine.some((a) => a.testId === t.id))
+    const tIds = new Set(tests.map((t) => t.id))
+    const done = mine.filter((a) => tIds.has(a.testId))
+    const now = Date.now()
+    const rows = tests.map((t) => ({ id: t.id, t, a: done.find((a) => a.testId === t.id), expired: t.dueAt < now, groups: groups.filter((g) => t.groupIds.includes(g.id)) }))
+      .sort((x, y) => (y.a?.finishedAt || y.t.dueAt) - (x.a?.finishedAt || x.t.dueAt))
+    // Xatolar: topshirilgan testlardagi noto'g'ri va javobsiz savollar (to'g'ri javob ma'lum bo'lsa)
+    const mistakes = rows.filter((r) => r.a && r.t.questions.every((q) => q.correct !== undefined))
+      .flatMap((r) => reviewOf(r.t, r.a).filter((x) => x.status !== 'right').map((x) => ({ ...x, t: r.t, a: r.a })))
+    const totals = { right: 0, wrong: 0, skip: 0 }
+    for (const r of rows) if (r.a && r.t.questions.every((q) => q.correct !== undefined)) for (const x of reviewOf(r.t, r.a)) totals[x.status]++
+    return { groups, tests, rows, done, mistakes, totals }
+  }, [allowed, db.groups, db.testAttempts, scope.tests, scope.groupIds, sid, staff])
+  const datasets = useMemo(() => (!data ? [] : [
+    testsDataset(data.done, data.tests, 'Dinamika', 'Har bir test natijasi, vaqt tartibida'),
+    gradesDataset(data.done),
+    { key: 'answers', label: 'Javoblar', sub: 'Barcha topshirilgan testlardagi savollar', defaultType: 'donut', head: ['Javob', 'Savollar'],
+      parts: { label: 'Savollarning javob holati bo‘yicha ulushi', value: (r) => r.value },
+      center: { value: String(data.totals.right + data.totals.wrong + data.totals.skip), label: 'Savol' },
+      rows: data.done.length ? ['right', 'wrong', 'skip'].map((k) => ({ key: k, label: STATUS[k].label, short: k === 'skip' ? 'Javobsiz' : STATUS[k].label, value: data.totals[k], shown: `${data.totals[k]} ta`, color: STATUS[k].color })) : [] },
+  ]), [data])
+
+  if (!allowed) return <Card><Empty icon="user" title="O‘quvchi topilmadi" text="O‘quvchi o‘chirilgan yoki sizning guruhingizda emas." action={<Btn as="a" href="#/platform/tests">Testlarga qaytish</Btn>} /></Card>
+  const { rows, done, mistakes } = data
+  const scores = done.map(pctOf)
+  const avg = done.length ? avgOf(done) : null
+  const shownMistakes = onlyTest === 'all' ? mistakes : mistakes.filter((m) => m.t.id === onlyTest)
+  const mistakeTests = [...new Map(mistakes.map((m) => [m.t.id, m.t])).values()]
+  const cur = open && db.testAttempts.find((a) => a.id === open)
+  const curTest = cur && db.tests.find((t) => t.id === cur.testId)
+  const crumbs = staff
+    ? [{ label: 'Testlar', href: '#/platform/tests' }, ...(data.groups[0] ? [{ label: `${data.groups[0].name} statistikasi`, href: `#/platform/tests/group.${data.groups[0].id}` }] : []), { label: s.name }]
+    : [{ label: 'Testlar', href: '#/platform/tests' }, { label: 'Mening statistikam' }]
+
+  return (
+    <>
+      <PageHead crumbs={crumbs} title={staff ? s.name : 'Mening statistikam'} sub={data.groups.map((g) => `${g.name} · ${g.course}`).join(', ') || 'Guruhga biriktirilmagan'}
+        actions={!staff && <Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
+      <div className="pgrid pgrid--4">
+        <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="clipboard" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.length}/{rows.length}</span><span className="pstat__label">Topshirilgan testlar</span></span></div>
+        <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="chart" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg === null ? '—' : `${avg}%`}</span><span className="pstat__label">O‘rtacha natija</span></span></div>
+        <div className="pstat pstat--violet"><span className="pstat__icon"><Icon name="trophy" size={22} /></span><span className="pstat__body"><span className="pstat__value">{scores.length ? `${Math.max(...scores)}%` : '—'}</span><span className="pstat__label">Eng yuqori natija</span></span></div>
+        <div className="pstat pstat--red"><span className="pstat__icon"><Icon name="alertCircle" size={22} /></span><span className="pstat__body"><span className="pstat__value">{data.totals.wrong + data.totals.skip}</span><span className="pstat__label">Xato va javobsiz savollar</span></span></div>
+      </div>
+
+      <ChartPanel title={staff ? 'O‘quvchi natijalari' : 'Natijalarim'} storeKey="student_tests" datasets={datasets} defaultType="line" emptyText="Hali test topshirilmagan." />
+
+      <Card title="Testlar" sub={done.length ? 'Javoblar, izohlar va to‘g‘ri javoblarni ko‘rish uchun testni tanlang' : undefined} pad={false}>
+        <Table rows={rows} onRow={(r) => (r.a ? setOpen(r.a.id) : !staff && !r.expired && (window.location.hash = `#/platform/tests/${r.t.id}`))}
+          empty={<Empty icon="clipboard" title="Hali test berilmagan" />} cols={[
+            { key: 't', label: 'Test', render: (r) => <div className="ptname-cell"><b>{r.t.title}</b><span>{r.t.questions.length} savol · {r.groups.map((g) => g.name).join(', ')}</span></div> },
+            { key: 'res', label: 'Natija', render: (r) => (r.a ? <div className="ptres__cell"><div><b>{r.a.score}/{r.a.total}</b>{pill(pctOf(r.a))}</div><Progress size="sm" value={pctOf(r.a)} tone={pctOf(r.a) >= 50 ? 'green' : 'red'} /></div>
+              : r.expired ? <Badge tone="red">Topshirilmagan</Badge> : <Badge tone="amber">Kutilmoqda · {fmtLeft(r.t.dueAt)}</Badge>) },
+            { key: 'd', label: 'Sana', render: (r) => <span className="ptdate">{r.a ? fmtDateTime(r.a.finishedAt) : `Muddat: ${fmtDateTime(r.t.dueAt)}`}</span> },
+            { key: 'fb', label: 'Ustoz izohi', render: (r) => (r.a?.feedback ? <Badge tone="blue"><Icon name="message" size={13} /> Bor</Badge> : <span className="pmuted">—</span>) },
+            { key: 'go', label: '', align: 'right', render: (r) => (r.a || (!staff && !r.expired)) && <Icon name="chevRight" size={18} /> },
+          ]} />
+      </Card>
+
+      <Card title="Xatolar ustida ishlash" sub={mistakes.length ? `${mistakes.length} ta savolda xato yoki javobsiz — to‘g‘ri javob va ustoz izohi bilan` : undefined}
+        action={mistakeTests.length > 1 && (
+          <label className="pdsel"><span>{onlyTest === 'all' ? 'Barcha testlar' : mistakeTests.find((t) => t.id === onlyTest)?.title}</span><Icon name="chevDown" size={16} />
+            <select value={onlyTest} onChange={(e) => setOnlyTest(e.target.value)} aria-label="Test"><option value="all">Barcha testlar</option>{mistakeTests.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}</select>
+          </label>
+        )}>
+        {shownMistakes.length === 0
+          ? <Empty icon="award" title={done.length ? 'Xato yo‘q' : 'Hali test topshirilmagan'} text={done.length ? 'Barcha savollarga to‘g‘ri javob berilgan. Ofarin!' : undefined} />
+          : (
+            <ol className="ptmk">
+              {shownMistakes.map((m) => (
+                <li key={`${m.a.id}-${m.q.id}`} className={cx('ptmk__item', `is-${m.status}`)}>
+                  <header><span className="ptmk__test">{m.t.title} · {m.i + 1}-savol</span><Badge tone={STATUS[m.status].tone}>{STATUS[m.status].label}</Badge></header>
+                  <h4>{m.q.text}</h4>
+                  <div className="ptmk__ans">
+                    {m.status === 'wrong' && <p className="is-bad"><Icon name="x" size={14} stroke={3} /><span>{staff ? 'O‘quvchi javobi' : 'Sizning javobingiz'}: <b>{m.q.options[m.my]}</b></span></p>}
+                    <p className="is-ok"><Icon name="check" size={14} stroke={3} /><span>To‘g‘ri javob: <b>{m.q.options[m.q.correct]}</b></span></p>
+                  </div>
+                  {m.q.explain
+                    ? <div className="ptrv__exp is-hot"><span><Icon name="message" size={15} />Izoh</span><p>{m.q.explain}</p></div>
+                    : staff && <p className="ptmk__noexp">Bu savolga izoh yozilmagan — test tahririda qo‘shish mumkin.</p>}
+                </li>
+              ))}
+            </ol>
+          )}
+      </Card>
+
+      <AttemptModal test={curTest} attempt={cur} student={s} onClose={() => setOpen(null)} />
+    </>
+  )
+}
+
+// Bitta topshiruv: natija, ustoz izohi va savollar
+function AttemptModal({ test, attempt, student, onClose }) {
+  const { user } = useAuth()
+  const staff = user.role !== 'student'
+  const ready = !!test && !!attempt && test.questions.every((q) => q.correct !== undefined)
+  return (
+    <Modal open={!!attempt} onClose={onClose} width={860} title={staff ? student?.name : test?.title} sub={staff ? test?.title : 'Test natijasi'}>
+      {attempt && test && (ready ? (
+        <>
+          <ScoreHero test={test} attempt={attempt} staff={staff} />
+          <FeedbackBox test={test} attempt={attempt} />
+          <QuestionReview test={test} attempt={attempt} who={staff ? 'O‘quvchi javobi' : 'Sizning javobingiz'} />
+        </>
+      ) : <Empty icon="refresh" title="Javoblar yuklanmoqda" action={<Btn icon="refresh" onClick={() => loadDB().catch(() => {})}>Yangilash</Btn>} />)}
+    </Modal>
+  )
+}
+
+// Ustozning o'quvchiga shaxsiy izohi: ustoz yozadi/tahrirlaydi, o'quvchi o'qiydi
+function FeedbackBox({ test, attempt }) {
+  const { user, db } = useAuth()
+  const toast = useToast()
+  const staff = user.role !== 'student'
+  const canWrite = staff && (user.role !== 'teacher' || test.authorId === user.id || db.groups.some((g) => g.teacherId === user.id && test.groupIds.includes(g.id)))
+  const [edit, setEdit] = useState(false)
+  const [v, setV] = useState(attempt.feedback || '')
+  const [busy, setBusy] = useState(false)
+  useEffect(() => { if (!edit) setV(attempt.feedback || '') }, [attempt.feedback, edit])
+  const author = db.users.find((u) => u.id === attempt.feedbackBy)
+
+  const save = async (text) => {
+    setBusy(true)
+    try {
+      await commit([{ col: 'testAttempts', op: 'patch', id: attempt.id, changes: { feedback: text } }])
+      if (text && text !== (attempt.feedback || '')) notify([attempt.studentId], `${user.name} «${test.title}» testi bo‘yicha sizga izoh yozdi`, `#/platform/tests/${test.id}`)
+      toast(text ? 'Izoh saqlandi — o‘quvchiga bildirishnoma yuborildi' : 'Izoh o‘chirildi')
+      setEdit(false)
+    } catch (e) { toast(e.message || 'Saqlab bo‘lmadi', 'err') } finally { setBusy(false) }
+  }
+
+  if (!staff && !attempt.feedback) return null
+  if (edit) {
+    return (
+      <section className="ptfb is-edit">
+        <label className="ptfb__head" htmlFor={`fb-${attempt.id}`}><Icon name="message" size={17} />O‘quvchiga izoh</label>
+        <Textarea id={`fb-${attempt.id}`} rows={3} maxLength={2000} value={v} onChange={(e) => setV(e.target.value)} autoFocus
+          placeholder="Masalan: 3- va 5-savollardagi mavzuni darslikning 2-bobidan qayta o‘qing…" />
+        <div className="ptfb__actions">
+          <span className="pmuted">{v.length}/2000</span>
+          <Btn onClick={() => { setEdit(false); setV(attempt.feedback || '') }} disabled={busy}>Bekor</Btn>
+          <Btn variant="primary" icon="check" onClick={() => save(v.trim())} disabled={busy || !v.trim()}>{busy ? 'Saqlanmoqda…' : 'Saqlash'}</Btn>
+        </div>
+      </section>
+    )
+  }
+  if (!attempt.feedback) {
+    return canWrite ? (
+      <button type="button" className="ptfb ptfb--empty" onClick={() => setEdit(true)}>
+        <Icon name="message" size={18} /><span><b>O‘quvchiga izoh yozing</b><small>Xatolar ustida maslahat bering — o‘quvchi bildirishnoma oladi</small></span><Icon name="plus" size={18} />
+      </button>
+    ) : null
+  }
+  return (
+    <section className="ptfb">
+      <div className="ptfb__head"><Icon name="message" size={17} />Ustoz izohi{author && <span>· {author.name}{attempt.feedbackAt ? `, ${fmtDateTime(attempt.feedbackAt)}` : ''}</span>}</div>
+      <p>{attempt.feedback}</p>
+      {canWrite && (
+        <div className="ptfb__actions">
+          <Btn size="sm" variant="ghost" icon="trash" onClick={() => save('')} disabled={busy}>O‘chirish</Btn>
+          <Btn size="sm" icon="edit" onClick={() => setEdit(true)} disabled={busy}>Tahrirlash</Btn>
+        </div>
+      )}
+    </section>
   )
 }

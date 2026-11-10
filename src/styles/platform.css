@@ -1974,3 +1974,109 @@ button.pquiz__opt { width: 100%; text-align: left; font-family: inherit; color: 
 }
 .plibfile__info > span.is-bad { color: var(--pf-red); }
 .plibfile__info > span.is-warn { color: #b54708; }
+
+/* ===== Testlar: izohlar, guruh va o'quvchi statistikasi ===== */
+.ptpill--gray { background: #eef2f6; color: var(--pf-muted); }
+.pqb__explain-add { margin-top: 10px; }
+.pqb__explain { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.pqb__explain > span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--pf-primary-2); }
+.pqb--ro .pqb__explain, .pqb--ro .pqb__explain-add { margin-top: 12px; }
+.ptrv__exp { margin-top: 12px; padding: 11px 14px; border-radius: 12px; background: #f4f7fb; border: 1px solid var(--pf-line); }
+.ptrv__exp.is-hot { background: #eff6ff; border-color: #c7defb; }
+.ptrv__exp > span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #1d6fd0; text-transform: uppercase; letter-spacing: .3px; }
+.ptrv__exp p { margin: 5px 0 0; font-size: 14px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--pf-text); }
+
+/* Ustoz izohi */
+.ptfb { display: block; margin: 0 0 18px; padding: 14px 16px; border-radius: 14px; background: #eff6ff; border: 1px solid #c7defb; }
+.ptfb__head { display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: #1d6fd0; }
+.ptfb__head span { font-weight: 500; color: var(--pf-muted); }
+.ptfb p { margin: 7px 0 0; font-size: 14.5px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ptfb.is-edit { background: #fff; border-color: var(--pf-primary); box-shadow: 0 0 0 4px rgba(74, 163, 248, .12); }
+.ptfb.is-edit textarea { margin-top: 10px; }
+.ptfb__actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.ptfb__actions .pmuted { margin-right: auto; font-size: 12.5px; }
+.ptfb--empty { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; font: inherit; color: var(--pf-text-2); background: #fff; border-style: dashed; cursor: pointer; transition: border-color .15s, background .15s; }
+.ptfb--empty:hover { border-color: var(--pf-primary); background: #f7fbff; }
+.ptfb--empty > svg { color: var(--pf-primary-2); flex-shrink: 0; }
+.ptfb--empty span { flex: 1; display: flex; flex-direction: column; }
+.ptfb--empty b { font-size: 14px; color: var(--pf-text); }
+.ptfb--empty small { font-size: 12.5px; color: var(--pf-muted); }
+
+/* Guruhlar kesimida */
+.pcard.ptgo { padding: 0 0 22px; }
+.ptgo__hint { font-size: 13px; color: var(--pf-muted); }
+.ptgo__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; padding: 0 24px; }
+.ptgo__card { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 14px 20px; border-radius: 16px; border: 1px solid var(--pf-line); background: #fff; color: var(--pf-text); text-decoration: none; overflow: hidden; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.ptgo__card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gc); }
+.ptgo__card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--gc) 45%, #fff); box-shadow: 0 14px 28px -20px rgba(20, 33, 58, .45); }
+.ptgo__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.ptgo__top > div { min-width: 0; }
+.ptgo__top b { display: block; font-size: 16px; font-weight: 700; }
+.ptgo__top span:not(.ptpill) { display: block; margin-top: 2px; font-size: 13px; color: var(--pf-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ptgo__nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ptgo__nums div { padding: 8px 10px; border-radius: 10px; background: #f6f8fb; }
+.ptgo__nums b { display: block; font-family: var(--f-head); font-size: 18px; font-weight: 800; }
+.ptgo__nums span { font-size: 12px; color: var(--pf-muted); }
+.ptgo__bar > span:first-child { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12.5px; color: var(--pf-text-2); }
+.ptgo__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+.ptgo__foot small { display: inline-flex; align-items: center; gap: 5px; color: var(--pf-muted); }
+.ptgo__foot small.is-warn { color: #b42318; font-weight: 600; }
+.ptgo__go { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--pf-primary-2); white-space: nowrap; }
+
+/* O'quvchi × test jadvali */
+.ptmx-card { overflow: hidden; }
+.ptmx { overflow-x: auto; border-top: 1px solid var(--pf-line); }
+.ptmx table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+.ptmx th, .ptmx td { padding: 10px 12px; border-bottom: 1px solid var(--pf-line); text-align: center; white-space: nowrap; }
+.ptmx thead th { position: sticky; top: 0; z-index: 1; background: #f8fafc; font-size: 12.5px; font-weight: 600; color: var(--pf-text-2); max-width: 150px; }
+.ptmx thead th a { display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; color: inherit; text-decoration: none; }
+.ptmx thead th a:hover { color: var(--pf-primary-2); }
+.ptmx thead th small { display: block; margin-top: 2px; font-weight: 500; color: var(--pf-muted); }
+.ptmx .ptmx__name { position: sticky; left: 0; z-index: 2; background: #fff; text-align: left; min-width: 220px; box-shadow: 1px 0 0 var(--pf-line); }
+.ptmx thead .ptmx__name { background: #f8fafc; z-index: 3; }
+.ptmx__name a { color: inherit; text-decoration: none; }
+.ptmx__name a:hover b { color: var(--pf-primary-2); }
+.ptmx__name span { display: flex; flex-direction: column; min-width: 0; }
+.ptmx__name small { font-size: 12px; font-weight: 500; color: var(--pf-muted); }
+.ptmx__avg { background: #fafbfd; font-weight: 600; }
+.ptmx tfoot th, .ptmx tfoot td { background: #f8fafc; border-bottom: 0; font-weight: 600; }
+.ptmx tbody tr:hover td, .ptmx tbody tr:hover th { background: #f9fbfe; }
+.ptmx__cell { display: inline-flex; align-items: center; justify-content: center; gap: 3px; min-width: 54px; height: 28px; padding: 0 8px; border-radius: 8px; border: 0; font: inherit; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+button.ptmx__cell { cursor: pointer; transition: transform .12s, box-shadow .12s; }
+button.ptmx__cell:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -8px rgba(20, 33, 58, .5); }
+.ptmx__cell.is-green { background: var(--pf-green-soft); color: #067647; }
+.ptmx__cell.is-blue { background: var(--pf-primary-soft); color: #1d6fd0; }
+.ptmx__cell.is-amber { background: var(--pf-amber-soft); color: #b54708; }
+.ptmx__cell.is-red { background: var(--pf-red-soft); color: #b42318; }
+.ptmx__cell.is-miss { background: #fff; color: #d92d20; border: 1px dashed #fecdca; font-weight: 600; }
+.ptmx__cell.is-wait { background: #fff; color: var(--pf-muted); border: 1px dashed var(--pf-line); }
+.ptmx__legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0; padding: 14px 24px 18px; font-size: 12.5px; color: var(--pf-muted); }
+.ptmx__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ptmx__legend i { width: 12px; height: 12px; border-radius: 4px; }
+.ptmx__legend i.is-green { background: var(--pf-green-soft); box-shadow: inset 0 0 0 1px #067647; }
+.ptmx__legend i.is-blue { background: var(--pf-primary-soft); box-shadow: inset 0 0 0 1px #1d6fd0; }
+.ptmx__legend i.is-amber { background: var(--pf-amber-soft); box-shadow: inset 0 0 0 1px #b54708; }
+.ptmx__legend i.is-red { background: var(--pf-red-soft); box-shadow: inset 0 0 0 1px #b42318; }
+
+/* O'quvchi statistikasi */
+.ptname-cell { display: flex; flex-direction: column; min-width: 0; max-width: 340px; }
+.ptname-cell b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptname-cell span { font-size: 12.5px; color: var(--pf-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptmk { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.ptmk__item { padding: 14px 16px; border: 1px solid var(--pf-line); border-left: 4px solid var(--pf-red); border-radius: 14px; background: #fff; }
+.ptmk__item.is-skip { border-left-color: #cbd3de; }
+.ptmk__item header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ptmk__test { font-size: 12.5px; font-weight: 600; color: var(--pf-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptmk__item h4 { margin: 8px 0 10px; font-size: 15px; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+.ptmk__ans { display: flex; flex-direction: column; gap: 6px; }
+.ptmk__ans p { display: flex; align-items: flex-start; gap: 7px; margin: 0; font-size: 13.5px; line-height: 1.45; }
+.ptmk__ans p svg { flex-shrink: 0; margin-top: 3px; }
+.ptmk__ans .is-bad { color: #b42318; }
+.ptmk__ans .is-ok { color: #067647; }
+.ptmk__ans b { color: var(--pf-text); font-weight: 600; overflow-wrap: anywhere; }
+.ptmk__noexp { margin: 10px 0 0; font-size: 12.5px; color: var(--pf-muted); font-style: italic; }
+@media (max-width: 640px) {
+  .ptgo__grid { padding: 0 16px; grid-template-columns: 1fr; }
+  .ptgo .ptcard-h { flex-direction: column; align-items: flex-start; }
+  .ptmx .ptmx__name { min-width: 160px; }
+}

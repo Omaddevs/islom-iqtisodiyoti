@@ -115,9 +115,9 @@ export async function loadState(u) {
         const ids = item.groupIds ?? (item.groupId ? [item.groupId] : [])
         if (ids.length && !ids.some((id) => myGroups.has(id))) continue
         if (r.collection === 'articles' && !item.published) continue
-        // To'g'ri javoblar faqat test topshirilgandan keyin ko'rinadi
+        // To'g'ri javoblar va izohlar faqat test topshirilgandan keyin ko'rinadi (izoh javobni ochib qo'yadi)
         if (r.collection === 'tests' && !attempted.has(r.id)) {
-          item = { ...item, questions: (item.questions || []).map(({ correct, ...q }) => q) } // eslint-disable-line no-unused-vars
+          item = { ...item, questions: (item.questions || []).map(({ correct, explain, ...q }) => q) } // eslint-disable-line no-unused-vars
         }
       }
       if (['testAttempts', 'submissions', 'vocabProgress'].includes(r.collection) && r.owner_id !== u.id) continue
@@ -408,7 +408,9 @@ function cleanQuestions(list) {
     if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 8) fail(422, `${label}: 2 tadan 8 tagacha variant bo‘lishi kerak`)
     const options = q.options.map((o) => text(o, { min: 1, max: 1000, label: `${label} varianti` }))
     if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct >= options.length) fail(422, `${label}: to‘g‘ri javobni belgilang`)
-    return { id, text: text(q.text, { min: 1, max: 2000, label }), options, correct: q.correct }
+    // Izoh (tushuntirish) — o'quvchi testni topshirgach ko'radi; savol tuzilmasiga kirmaydi, keyin ham tahrirlanadi
+    const explain = text(q.explain, { max: 3000, label: `${label} izohi` })
+    return { id, text: text(q.text, { min: 1, max: 2000, label }), options, correct: q.correct, ...(explain ? { explain } : {}) }
   })
 }
 const sameQuestions = (a, b) => JSON.stringify(cleanStored(a)) === JSON.stringify(cleanStored(b))
@@ -530,6 +532,18 @@ const recordOps = {
         if ('fileId' in changes) changes = await attachFile(c, r.org_id, changes)
       }
       return updateRec(c, col, id, safeLinks({ ...d, ...noKeys({ ...changes }, ['id', 'orgId', 'authorId']) }))
+    }
+    if (col === 'testAttempts') {
+      // Natija o'zgarmaydi; ustoz faqat o'quvchiga izoh (feedback) yozadi
+      if (u.role === 'student' || !inOrg(u, r.org_id)) deny()
+      const t = await getRec(c, 'tests', d.testId)
+      if (!t) fail(404, 'Test topilmadi')
+      const ok = adminOf(u, r.org_id) || t.owner_id === u.id
+        || (u.role === 'teacher' && !!(await row(c, 'SELECT 1 FROM groups WHERE teacher_id = $1 AND id = ANY($2) LIMIT 1', [u.id, t.data.groupIds || []])))
+      if (!ok) deny('Faqat shu test guruhi ustozi izoh yoza oladi')
+      if (Object.keys(changes).some((k) => k !== 'feedback')) deny('Natijada faqat ustoz izohini o‘zgartirish mumkin')
+      const fb = text(changes.feedback, { max: 2000, label: 'Izoh' })
+      return updateRec(c, col, id, { ...d, feedback: fb || null, feedbackBy: fb ? u.id : null, feedbackAt: fb ? Date.now() : null })
     }
     if (col === 'submissions') {
       if (r.owner_id === u.id) {

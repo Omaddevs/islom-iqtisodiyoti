@@ -222,9 +222,12 @@ function GroupDetail({ id }) {
               <Table rows={students} empty={<Empty icon="users" title="Guruhda o‘quvchi yo‘q" action={canEdit && <Btn variant="primary" onClick={() => setCreateOpen(true)}>O‘quvchi qo‘shish</Btn>} />} cols={[
                 { key: 'name', label: 'O‘quvchi', render: (s) => <div className="pcell-user"><UAvatar user={s} size={36} /><div><b>{s.name}</b><span className="mono">{s.phone}</span></div></div> },
                 { key: 'hw', label: 'Vazifalar', render: (s) => { const { hw } = stat(s); return hw == null ? '—' : <div style={{ minWidth: 100 }}><span style={{ fontSize: 12.5 }}>{hw}%</span><Progress2 v={hw} /></div> } },
-                { key: 'avg', label: 'Test o‘rtachasi', render: (s) => { const { avg } = stat(s); return avg == null ? <span className="pmuted">—</span> : <Badge tone={avg >= 60 ? 'green' : 'red'}>{avg}%</Badge> } },
+                { key: 'avg', label: 'Test o‘rtachasi', render: (s) => { const { avg } = stat(s); return avg == null ? <span className="pmuted">—</span> : <a href={`#/platform/tests/student.${s.id}`} title="Test statistikasi"><Badge tone={avg >= 60 ? 'green' : 'red'}>{avg}%</Badge></a> } },
                 { key: 'st', label: 'Holat', render: (s) => s.status === 'blocked' ? <Badge tone="red">Bloklangan</Badge> : <Badge tone="green" dot>Faol</Badge> },
-                { key: 'a', label: '', align: 'right', render: (s) => canEdit && <Menu items={[{ label: 'Kirish ma’lumotlari', icon: 'key', onClick: () => setCreds(s) }, { label: 'Guruhdan chiqarish', icon: 'minus', danger: true, onClick: () => setRm(s) }]} /> },
+                { key: 'a', label: '', align: 'right', render: (s) => <Menu items={[
+                  { label: 'Test statistikasi', icon: 'chart', onClick: () => { window.location.hash = `#/platform/tests/student.${s.id}` } },
+                  ...(canEdit ? [{ label: 'Kirish ma’lumotlari', icon: 'key', onClick: () => setCreds(s) }, { label: 'Guruhdan chiqarish', icon: 'minus', danger: true, onClick: () => setRm(s) }] : []),
+                ]} /> },
               ]} />
             </Card>
           )}
@@ -249,7 +252,7 @@ function GroupDetail({ id }) {
                 {homework.length === 0 && <Empty icon="fileText" title="Vazifa yo‘q" />}
                 {homework.map((h) => <a key={h.id} href={`#/platform/homework/${h.id}`} className="pitem"><div className="pitem__icon" style={{ background: 'var(--pf-amber-soft)', color: '#d97706' }}><Icon name="fileText" size={18} /></div><div className="pitem__body"><b>{h.title}</b><span>Muddat: {fmtDate(h.dueAt)} · {db.submissions.filter((s) => s.homeworkId === h.id).length}/{students.length} topshirdi</span></div></a>)}
               </Card>
-              <Card title="Testlar" action={<Btn size="sm" variant="ghost" as="a" href="#/platform/tests">Barchasi</Btn>}>
+              <Card title="Testlar" action={<Btn size="sm" variant="ghost" icon="chart" as="a" href={`#/platform/tests/group.${g.id}`}>Statistika</Btn>}>
                 {tests.length === 0 && <Empty icon="clipboard" title="Test yo‘q" />}
                 {tests.map((x) => <a key={x.id} href={`#/platform/tests/${x.id}`} className="pitem"><div className="pitem__icon" style={{ background: 'var(--pf-violet-soft)', color: 'var(--pf-violet)' }}><Icon name="clipboard" size={18} /></div><div className="pitem__body"><b>{x.title}</b><span>{x.questions.length} savol · {db.testAttempts.filter((a) => a.testId === x.id).length} topshirdi</span></div></a>)}
               </Card>
