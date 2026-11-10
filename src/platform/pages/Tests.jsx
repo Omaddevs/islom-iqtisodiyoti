@@ -12,6 +12,8 @@ export default function Tests({ param }) {
   // #/platform/tests/group.<guruhId> — guruh statistikasi, #/platform/tests/student.<o'quvchiId> — o'quvchi statistikasi
   if (param?.startsWith('group.')) return user.role === 'student' ? <StudentTestStats sid={user.id} /> : <GroupTestStats gid={param.slice(6)} />
   if (param?.startsWith('student.')) return <StudentTestStats sid={user.role === 'student' ? user.id : param.slice(8)} />
+  // #/platform/tests/preview.<testId> — ustoz testni o'quvchi kabi sinab ko'radi (o'quvchi uchun oddiy topshirish)
+  if (param?.startsWith('preview.')) return <TakeTest key={param} id={param.slice(8)} preview={user.role !== 'student'} />
   if (param) return user.role === 'student' ? <TakeTest id={param} /> : <TestResults id={param} />
   return <TestList />
 }
@@ -262,7 +264,10 @@ function TestCard({ r, isStaff, menu }) {
         </div>
       )}
       <div className="ptcardx__foot">
-        {isStaff ? <Btn variant="soft" icon="chart" as="a" href={href}>Natijalar</Btn>
+        {isStaff ? <div className="prow" style={{ gap: 8 }}>
+          <Btn variant="primary" icon="play" as="a" href={`#/platform/tests/preview.${t.id}`} title="Testni o‘quvchi kabi ishlab ko‘rish — natija saqlanmaydi">Boshlash</Btn>
+          <Btn variant="soft" icon="chart" as="a" href={href}>Natijalar</Btn>
+        </div>
           : my ? <Btn variant="soft" icon="eye" as="a" href={href}>Natijani ko‘rish</Btn>
             : expired ? <span className="pmuted" style={{ fontSize: 13.5 }}>Test yopilgan</span>
               : <Btn variant="primary" icon="play" as="a" href={href}>Testni boshlash</Btn>}
@@ -690,12 +695,15 @@ const readRun = (k) => {
 }
 const writeRun = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k) } catch { /* xotira */ } }
 
-function TakeTest({ id }) {
+// Sinov rejimida ham faqat mavjud savol va variantlarga berilgan javoblar hisoblanadi (serverdagi kabi)
+const cleanPreview = (t, answers) => Object.fromEntries(t.questions.filter((q) => Number.isInteger(answers?.[q.id]) && answers[q.id] >= 0 && answers[q.id] < q.options.length).map((q) => [q.id, answers[q.id]]))
+// `preview` — ustozning sinov rejimi: test o'quvchi kabi ishlanadi, natija bazaga yozilmaydi va statistikaga kirmaydi
+function TakeTest({ id, preview = false }) {
   const { user, db } = useAuth()
   const toast = useToast()
   const t = db.tests.find((x) => x.id === id)
-  const existing = db.testAttempts.find((a) => a.testId === id && a.studentId === user.id)
-  const storeKey = `ii_test_run_${user.id}_${id}`
+  const existing = preview ? null : db.testAttempts.find((a) => a.testId === id && a.studentId === user.id)
+  const storeKey = `ii_test_${preview ? 'preview' : 'run'}_${user.id}_${id}`
   // Javoblar va boshlangan vaqt saqlanadi: sahifa yangilansa ham test davom etadi, taymer qaytadan boshlanmaydi
   const [run, setRun] = useState(() => (existing ? null : readRun(storeKey)))
   const [fresh, setFresh] = useState(null)
@@ -718,6 +726,14 @@ function TakeTest({ id }) {
   // Ball serverda hisoblanadi; to'g'ri javoblar topshirilgandan keyingina yuklanadi
   const finish = async (auto = false) => {
     if (sending.current || !run) return
+    if (preview) {
+      const answers = cleanPreview(t, run.answers)
+      const score = t.questions.reduce((s, q) => s + (answers[q.id] === q.correct ? 1 : 0), 0)
+      setFresh({ id: `preview-${run.startedAt}`, testId: t.id, studentId: user.id, answers, score, total: t.questions.length, startedAt: run.startedAt, finishedAt: Date.now() })
+      setRun(null)
+      toast(auto ? 'Vaqt tugadi — sinov yakunlandi' : 'Sinov yakunlandi — natija saqlanmadi')
+      return
+    }
     sending.current = true
     setBusy(true)
     try {
@@ -775,16 +791,23 @@ function TakeTest({ id }) {
   if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" text="Test o‘chirilgan yoki sizga berilmagan bo‘lishi mumkin." action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
   const crumbs = [{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]
 
+  const previewBanner = preview && (
+    <div className="ptpreview"><Icon name="eye" size={18} /><span><b>Sinov rejimi.</b> Testni o‘quvchi ko‘radigan ko‘rinishda ishlayapsiz — natija saqlanmaydi va statistikaga kirmaydi.</span></div>
+  )
   if (result) {
     return (
       <>
-        <PageHead crumbs={crumbs} title="Test natijasi" sub={t.title} actions={<Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
+        <PageHead crumbs={crumbs} title={preview ? 'Sinov natijasi' : 'Test natijasi'} sub={t.title}
+          actions={preview
+            ? <><Btn icon="refresh" onClick={() => { setFresh(null); setRun(null); sending.current = false }}>Qayta boshlash</Btn><Btn as="a" href={`#/platform/tests/${t.id}`} icon="chart">Natijalar</Btn></>
+            : <Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
+        {previewBanner}
         {!reviewReady ? (
           <Card><Empty icon="refresh" title="Javoblar yuklanmoqda" text={`Natijangiz saqlandi: ${result.score}/${result.total}. To‘g‘ri javoblarni ko‘rish uchun yangilang.`} action={<Btn variant="primary" icon="refresh" onClick={() => loadDB().catch((e) => toast(e.message, 'err'))}>Yangilash</Btn>} /></Card>
         ) : (
           <>
             <ScoreHero test={t} attempt={result} />
-            <FeedbackBox test={t} attempt={result} />
+            {!preview && <FeedbackBox test={t} attempt={result} />}
             <StandardAnalysis test={t} attempt={result} />
             <ChartPanel title="Natija grafigi" storeKey="test_result" datasets={datasets} defaultType="donut" />
             <section className="pcard">
@@ -798,10 +821,11 @@ function TakeTest({ id }) {
   }
 
   if (!run) {
-    const closed = t.dueAt < Date.now()
+    const closed = !preview && t.dueAt < Date.now()
     return (
       <>
         <PageHead crumbs={crumbs} title={t.title} sub={t.description} />
+        {previewBanner}
         <section className="pcard ptintro">
           <span className="ptintro__icon"><Icon name={closed ? 'lock' : 'clipboard'} size={30} /></span>
           <h2>{closed ? 'Test muddati tugagan' : 'Testni boshlashga tayyormisiz?'}</h2>
@@ -812,7 +836,7 @@ function TakeTest({ id }) {
           </dl>
           {closed ? <p className="pmuted">Bu testni endi topshirib bo‘lmaydi. Savollaringiz bo‘lsa, ustozingizga murojaat qiling.</p> : (
             <ul className="ptintro__rules">
-              <li><Icon name="check" size={16} />Testni faqat bir marta topshirish mumkin.</li>
+              <li><Icon name="check" size={16} />{preview ? 'Sinov rejimida testni xohlagancha qayta ishlash mumkin, o‘quvchilar uchun esa — faqat bir marta.' : 'Testni faqat bir marta topshirish mumkin.'}</li>
               <li><Icon name="check" size={16} />Boshlaganingizdan so‘ng vaqt to‘xtamaydi, vaqt tugasa test avtomatik topshiriladi.</li>
               <li><Icon name="check" size={16} />Sahifa yangilansa, javoblaringiz saqlanib qoladi.</li>
               <li><Icon name="check" size={16} />Topshirgach, xatolaringiz va to‘g‘ri javoblarni ko‘rasiz.</li>
@@ -837,6 +861,7 @@ function TakeTest({ id }) {
   const toggleFlag = () => setRun((r) => ({ ...r, flags: flags.includes(q.id) ? flags.filter((x) => x !== q.id) : [...flags, q.id] }))
   return (
     <>
+      {previewBanner}
       <div className="ptq__bar">
         <div className="ptq__ttl"><h1>{t.title}</h1><span>{answered} / {total} ta savolga javob berildi</span></div>
         <span className={cx('ptimer', left < 60 && 'is-low')} role="timer" aria-label="Qolgan vaqt"><Icon name="timer" size={18} /> {fmtDuration(left)}</span>
@@ -941,11 +966,14 @@ function TestResults({ id }) {
   return (
     <>
       <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddat ${fmtDateTime(t.dueAt)}`}
-        actions={groups.length > 1 && (
-          <label className="pdsel"><span>{groupId === 'all' ? 'Barcha guruhlar' : groups.find((g) => g.id === groupId)?.name}</span><Icon name="chevDown" size={16} />
-            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} aria-label="Guruh"><option value="all">Barcha guruhlar</option>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select>
-          </label>
-        )} />
+        actions={<>
+          {groups.length > 1 && (
+            <label className="pdsel"><span>{groupId === 'all' ? 'Barcha guruhlar' : groups.find((g) => g.id === groupId)?.name}</span><Icon name="chevDown" size={16} />
+              <select value={groupId} onChange={(e) => setGroupId(e.target.value)} aria-label="Guruh"><option value="all">Barcha guruhlar</option>{groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select>
+            </label>
+          )}
+          <Btn variant="primary" icon="play" as="a" href={`#/platform/tests/preview.${t.id}`} title="Testni o‘quvchi kabi ishlab ko‘rish — natija saqlanmaydi">Boshlash</Btn>
+        </>} />
       <div className="pgrid pgrid--4">
         <div className="pstat pstat--blue"><span className="pstat__icon"><Icon name="users" size={22} /></span><span className="pstat__body"><span className="pstat__value">{done.length}/{rows.length}</span><span className="pstat__label">Topshirdi</span></span></div>
         <div className="pstat pstat--green"><span className="pstat__icon"><Icon name="chart" size={22} /></span><span className="pstat__body"><span className="pstat__value">{avg}</span><span className="pstat__label">O‘rtacha natija</span></span></div>
