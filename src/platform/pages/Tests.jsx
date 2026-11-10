@@ -30,6 +30,9 @@ const gradeOf = (p) => GRADES.find((g) => p >= g.min)
 const PERIODS = [{ value: '7', label: 'So‘nggi 7 kun' }, { value: '30', label: 'So‘nggi 30 kun' }, { value: 'all', label: 'Butun davr' }]
 const avgOf = (list) => (list.length ? Math.round(list.reduce((s, a) => s + pct(a.score, a.total), 0) / list.length) : 0)
 const LETTER = (i) => String.fromCharCode(65 + i)
+// Savol tasnifi (ixtiyoriy): turi test vaqtida ko'rinadi, Bloom darajasi va bo'lim — faqat natijada
+const QKIND = { scenario: 'Vaziyatli', calc: 'Hisob-kitob', theory: 'Nazariy-tahliliy' }
+const BLOOM = { apply: 'Qo‘llash', analyze: 'Tahlil', evaluate: 'Baholash' }
 const STATUS = {
   right: { label: 'To‘g‘ri', color: '#10b981', icon: 'checkCircle', tone: 'green' },
   wrong: { label: 'Xato', color: '#ef4444', icon: 'alertCircle', tone: 'red' },
@@ -272,16 +275,78 @@ function TestCard({ r, isStaff, menu }) {
 // ---- Test konstruktori ----
 const MAX_OPTS = 8
 const emptyQ = () => ({ id: uid('q'), text: '', options: ['', '', '', ''], correct: 0, explain: '' })
-// Savol izohi maydoni: o'quvchi testni topshirgach ko'radi (ayniqsa xato qilganda)
-function ExplainField({ value, onChange, n }) {
-  const [open, setOpen] = useState(!!value)
-  if (!open) return <button type="button" className="ptlink pqb__explain-add" onClick={() => setOpen(true)}><Icon name="message" size={15} />Izoh qo‘shish</button>
+const META_KEYS = ['explain', 'quote', 'ref', 'section', 'kind', 'bloom']
+// Savolning izoh va tasnif maydonlari (bo'sh qiymatlar saqlanmaydi)
+const metaOf = (q, keep = null) => {
+  const out = {}
+  for (const k of META_KEYS) { const v = (q[k] || '').trim(); if (v) out[k] = v }
+  const notes = (keep || q.options.map((_, i) => i)).map((i) => (q.notes?.[i] || '').trim())
+  if (notes.some(Boolean)) out.notes = notes
+  return out
+}
+// Savol izohi va tasnifi: o'quvchi testni topshirgach ko'radi (xato qilganda — o'z variantining izohi bilan)
+function QuestionMeta({ q, onChange, n }) {
+  const has = META_KEYS.some((k) => q[k]) || q.notes?.some(Boolean)
+  const [open, setOpen] = useState(has)
+  if (!open) return <button type="button" className="ptlink pqb__explain-add" onClick={() => setOpen(true)}><Icon name="message" size={15} />Izoh va manba qo‘shish</button>
+  const setNote = (oi, v) => onChange('notes', q.options.map((_, k) => (k === oi ? v : q.notes?.[k] || '')))
   return (
-    <label className="pqb__explain">
-      <span><Icon name="message" size={14} />Izoh — o‘quvchi topshirgach ko‘radi</span>
-      <Textarea rows={2} maxLength={3000} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder="Nega aynan shu javob to‘g‘ri? Qoidani yoki manbani yozing…" aria-label={`${n}-savol izohi`} />
-    </label>
+    <div className="pqb__meta">
+      <div className="pqb__meta-row">
+        <label><span>Savol turi</span>
+          <select className="pinput" value={q.kind || ''} onChange={(e) => onChange('kind', e.target.value)}><option value="">—</option>{Object.entries(QKIND).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+        <label><span>Bloom darajasi</span>
+          <select className="pinput" value={q.bloom || ''} onChange={(e) => onChange('bloom', e.target.value)}><option value="">—</option>{Object.entries(BLOOM).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+        <label><span>Bo‘lim</span><Input value={q.section || ''} maxLength={120} onChange={(e) => onChange('section', e.target.value)} placeholder="Qabz masalasi" /></label>
+      </div>
+      <label className="pqb__explain">
+        <span><Icon name="message" size={14} />Izoh — nega to‘g‘ri javob to‘g‘ri (o‘quvchi topshirgach ko‘radi)</span>
+        <Textarea rows={3} maxLength={4000} value={q.explain || ''} onChange={(e) => onChange('explain', e.target.value)} placeholder="Qoida, uning shar’iy asosi va vaziyatga tatbiqi. Hisob-kitob bo‘lsa — bosqichma-bosqich." aria-label={`${n}-savol izohi`} />
+      </label>
+      <div className="pqb__notes">
+        <span>Variantlar haqida (o‘quvchi aynan shu variantni tanlasa ko‘radi)</span>
+        {q.options.map((o, oi) => (
+          <label key={oi} className={cx(oi === q.correct && 'is-right')}><i>{LETTER(oi)}</i>
+            <Input value={q.notes?.[oi] || ''} maxLength={1000} onChange={(e) => setNote(oi, e.target.value)} placeholder={oi === q.correct ? 'To‘g‘ri javob — izoh shart emas' : 'Nega bu variant noto‘g‘ri?'} />
+          </label>
+        ))}
+      </div>
+      <div className="pqb__meta-row pqb__meta-row--src">
+        <label><span>Manba (band)</span><Input value={q.ref || ''} maxLength={200} onChange={(e) => onChange('ref', e.target.value)} placeholder="AAOIFI SS 1, 2/6/2" /></label>
+        <label><span>Iqtibos</span><Input value={q.quote || ''} maxLength={800} onChange={(e) => onChange('quote', e.target.value)} placeholder="Bandning qisqa matni (1–2 gap)" /></label>
+      </div>
+    </div>
   )
+}
+
+// JSON fayldan savollar: { title, description, timeLimit, questions: [{ text, options, correct: 1 | "B", explain, notes, ref, quote, section, kind, bloom }] }
+function parseTestFile(raw) {
+  let d
+  try { d = JSON.parse(raw.replace(/^﻿/, '')) } catch { throw new Error('Fayl JSON formatida emas') }
+  const list = Array.isArray(d) ? d : d?.questions
+  if (!Array.isArray(list) || !list.length) throw new Error('Faylda «questions» ro‘yxati topilmadi')
+  if (list.length > 200) throw new Error('Testda 200 tadan ortiq savol bo‘lishi mumkin emas')
+  const questions = list.map((q, n) => {
+    const label = `${n + 1}-savol`
+    const options = Array.isArray(q?.options) ? q.options.map((o) => String(o ?? '').trim()) : []
+    if (!String(q?.text || '').trim()) throw new Error(`${label}: matn yo‘q`)
+    if (options.length < 2 || options.length > MAX_OPTS || options.some((o) => !o)) throw new Error(`${label}: 2 tadan ${MAX_OPTS} tagacha to‘ldirilgan variant bo‘lishi kerak`)
+    const correct = typeof q.correct === 'string' && /^[A-H]$/i.test(q.correct.trim()) ? q.correct.trim().toUpperCase().charCodeAt(0) - 65 : Number(q.correct)
+    if (!Number.isInteger(correct) || correct < 0 || correct >= options.length) throw new Error(`${label}: to‘g‘ri javob noto‘g‘ri ko‘rsatilgan`)
+    const pick = (k) => (typeof q[k] === 'string' ? q[k].trim() : '')
+    return {
+      id: uid('q'), text: String(q.text).trim(), options, correct,
+      explain: pick('explain'), quote: pick('quote'), ref: pick('ref'), section: pick('section'),
+      kind: QKIND[q.kind] ? q.kind : '', bloom: BLOOM[q.bloom] ? q.bloom : '',
+      notes: Array.isArray(q.notes) ? options.map((_, k) => String(q.notes[k] ?? '').trim()) : [],
+    }
+  })
+  return {
+    questions,
+    title: typeof d.title === 'string' ? d.title.trim() : '',
+    description: typeof d.description === 'string' ? d.description.trim() : '',
+    timeLimit: Number.isFinite(Number(d.timeLimit)) && Number(d.timeLimit) >= 1 ? Math.min(600, Math.round(Number(d.timeLimit))) : null,
+  }
 }
 function TestForm({ open, test, onClose }) {
   const { user, db, scope } = useAuth()
@@ -300,8 +365,26 @@ function TestForm({ open, test, onClose }) {
   const delOpt = (i, oi) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => {
     if (j !== i) return q
     const correct = oi === q.correct ? 0 : oi < q.correct ? q.correct - 1 : q.correct
-    return { ...q, options: q.options.filter((_, k) => k !== oi), correct }
+    return { ...q, options: q.options.filter((_, k) => k !== oi), correct, ...(q.notes ? { notes: q.notes.filter((_, k) => k !== oi) } : {}) }
   }) }))
+  // JSON fayldan import: mavjud savollar o'rniga (forma bo'sh bo'lmasa — tasdiq so'raladi)
+  const fileRef = useRef(null)
+  const [pending, setPending] = useState(null)
+  const applyImport = (r) => {
+    setF((x) => ({ ...x, questions: r.questions, title: x.title?.trim() ? x.title : r.title, description: x.description?.trim() ? x.description : r.description, timeLimit: r.timeLimit || x.timeLimit }))
+    toast(`${r.questions.length} ta savol yuklandi — tekshirib, «Yaratish»ni bosing`)
+  }
+  const onFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) return setErr('Fayl juda katta (2 MB dan oshmasin)')
+    try {
+      const r = parseTestFile(await file.text())
+      const filled = f.questions?.some((q) => q.text.trim() || q.options.some((o) => o.trim()))
+      if (filled) setPending(r); else applyImport(r)
+    } catch (x) { setErr(x.message) }
+  }
 
   const submit = () => {
     if (!f.title?.trim()) return setErr('Test nomini kiriting')
@@ -323,19 +406,18 @@ function TestForm({ open, test, onClose }) {
         if (new Set(kept.map((x) => x.o.toLowerCase())).size !== kept.length) return setErr(`${label}: variantlar takrorlanmasin`)
         const correct = kept.findIndex((x) => x.i === q.correct)
         if (correct < 0) return setErr(`${label}: to‘g‘ri javob to‘ldirilgan variantlardan biri bo‘lishi kerak`)
-        qs.push({ id: q.id, text: q.text.trim(), options: kept.map((x) => x.o), correct, ...(q.explain?.trim() ? { explain: q.explain.trim() } : {}) })
+        qs.push({ id: q.id, text: q.text.trim(), options: kept.map((x) => x.o), correct, ...metaOf(q, kept.map((x) => x.i)) })
       }
       if (!qs.length) return setErr('Kamida bitta savol kiriting')
       data.questions = qs
     } else {
-      // Qulflangan testda faqat izohlar o'zgaradi — savol, variant va to'g'ri javob o'sha-o'sha
+      // Qulflangan testda faqat izoh va tasnif o'zgaradi — savol, variant va to'g'ri javob o'sha-o'sha
       const old = test.questions
       const qs = old.map((q) => {
-        const e = (f.questions.find((x) => x.id === q.id)?.explain || '').trim()
-        const { explain, ...rest } = q // eslint-disable-line no-unused-vars
-        return e ? { ...rest, explain: e } : rest
+        const edited = f.questions.find((x) => x.id === q.id) || q
+        return { id: q.id, text: q.text, options: q.options, correct: q.correct, ...metaOf({ ...edited, options: q.options }) }
       })
-      if (qs.some((q, i) => (q.explain || '') !== (old[i].explain || ''))) data.questions = qs
+      if (JSON.stringify(qs) !== JSON.stringify(old.map((q) => ({ id: q.id, text: q.text, options: q.options, correct: q.correct, ...metaOf(q) })))) data.questions = qs
     }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
@@ -363,13 +445,20 @@ function TestForm({ open, test, onClose }) {
             ? <ChipSelect value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} />
             : <span className="pfield__hint">Avval guruh yarating: test guruh o‘quvchilariga beriladi.</span>}
         </div>
-        <div className="pfield__label">Savollar ({f.questions?.length || 0})</div>
-        {locked && <p className="ptform__lock"><Icon name="lock" size={16} />O‘quvchilar bu testni topshirgan, shuning uchun savollar qulflangan: o‘zgarish eski natijalarni buzadi. Izohlarni esa qo‘shish va tahrirlash mumkin — o‘quvchilar darhol ko‘radi.</p>}
+        <div className="ptform__qhead">
+          <span className="pfield__label">Savollar ({f.questions?.length || 0})</span>
+          {!locked && <>
+            <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={onFile} />
+            <Btn size="sm" icon="upload" onClick={() => fileRef.current?.click()}>Fayldan yuklash</Btn>
+          </>}
+        </div>
+        {!locked && <p className="pfield__hint ptform__importhint">Tayyor test bankini JSON fayl ko‘rinishida yuklash mumkin: savollar, variantlar, to‘g‘ri javob, izohlar, manba va Bloom darajasi bilan.</p>}
+        {locked && <p className="ptform__lock"><Icon name="lock" size={16} />O‘quvchilar bu testni topshirgan, shuning uchun savollar qulflangan: o‘zgarish eski natijalarni buzadi. Izoh, manba va tasnifni esa qo‘shish va tahrirlash mumkin — o‘quvchilar darhol ko‘radi.</p>}
         {(f.questions || []).map((q, i) => (locked ? (
           <div key={q.id} className="pqb pqb--ro">
             <b>{i + 1}. {q.text}</b>
             <ul>{q.options.map((o, oi) => <li key={oi} className={cx(oi === q.correct && 'is-right')}><i>{LETTER(oi)}</i>{o}{oi === q.correct && <Icon name="check" size={15} />}</li>)}</ul>
-            <ExplainField value={q.explain} onChange={(v) => setQ(i, 'explain', v)} n={i + 1} />
+            <QuestionMeta q={q} onChange={(k, v) => setQ(i, k, v)} n={i + 1} />
           </div>
         ) : (
           <div key={q.id} className="pqb">
@@ -391,11 +480,13 @@ function TestForm({ open, test, onClose }) {
               <span className="pfield__hint">Doira bilan to‘g‘ri javobni belgilang</span>
               {q.options.length < MAX_OPTS && <button type="button" className="ptlink" onClick={() => addOpt(i)}><Icon name="plus" size={15} />Variant qo‘shish</button>}
             </div>
-            <ExplainField value={q.explain} onChange={(v) => setQ(i, 'explain', v)} n={i + 1} />
+            <QuestionMeta q={q} onChange={(k, v) => setQ(i, k, v)} n={i + 1} />
           </div>
         )))}
         {!locked && <Btn icon="plus" onClick={() => set('questions', [...f.questions, emptyQ()])}>Savol qo‘shish</Btn>}
       </div>
+      <Confirm open={!!pending} onClose={() => setPending(null)} title="Savollarni almashtirish" confirmLabel="Almashtirish"
+        text={`Formadagi savollar o‘rniga fayldagi ${pending?.questions.length || 0} ta savol qo‘yiladi.`} onConfirm={() => applyImport(pending)} />
     </Modal>
   )
 }
@@ -453,16 +544,115 @@ function QuestionReview({ test, attempt, who = 'Sizning javobingiz' }) {
                 )
               })}
             </div>
-            {x.q.explain && (
-              <div className={cx('ptrv__exp', x.status !== 'right' && 'is-hot')}>
-                <span><Icon name="message" size={15} />{x.status === 'right' ? 'Izoh' : 'Izoh: nega bu javob to‘g‘ri'}</span>
-                <p>{x.q.explain}</p>
-              </div>
-            )}
+            <ReviewNotes x={x} who={who} />
           </li>
         ))}
       </ol>
     </div>
+  )
+}
+
+// Savol ostidagi izohlar: nega to'g'ri, tanlangan variant nega noto'g'ri, boshqa variantlar, manba
+function ReviewNotes({ x, who }) {
+  const { q, my, status } = x
+  const notes = q.notes || []
+  const mine = status === 'wrong' && notes[my]
+  const others = q.options.map((o, oi) => ({ oi, note: notes[oi] })).filter((n) => n.note && n.oi !== q.correct && !(status === 'wrong' && n.oi === my))
+  const tags = [q.kind && QKIND[q.kind], q.bloom && BLOOM[q.bloom] && `Bloom: ${BLOOM[q.bloom]}`, q.section].filter(Boolean)
+  if (!q.explain && !mine && !others.length && !q.ref && !tags.length) return null
+  return (
+    <div className="ptrv__more">
+      {q.explain && (
+        <div className={cx('ptrv__exp', status !== 'right' && 'is-hot')}>
+          <span><Icon name="message" size={15} />Nima uchun {LETTER(q.correct)} to‘g‘ri</span>
+          <p>{q.explain}</p>
+        </div>
+      )}
+      {mine && (
+        <div className="ptrv__exp is-bad">
+          <span><Icon name="alertCircle" size={15} />{who === 'Sizning javobingiz' ? 'Siz tanlagan' : 'Tanlangan'} {LETTER(my)} variant nima uchun noto‘g‘ri</span>
+          <p>{mine}</p>
+        </div>
+      )}
+      {others.length > 0 && (
+        <details className="ptrv__others" open={status !== 'right'}>
+          <summary>Boshqa variantlar</summary>
+          <ul>{others.map((n) => <li key={n.oi}><b>{LETTER(n.oi)})</b> {n.note}</li>)}</ul>
+        </details>
+      )}
+      {(q.ref || q.quote) && (
+        <div className="ptrv__src">
+          <Icon name="bookOpen" size={15} />
+          <div>{q.ref && <b>Manba: {q.ref}</b>}{q.quote && <q>{q.quote}</q>}</div>
+        </div>
+      )}
+      {tags.length > 0 && <div className="ptrv__tags">{tags.map((t) => <span key={t}>{t}</span>)}</div>}
+    </div>
+  )
+}
+
+// ---- Standart bo'yicha yakuniy tahlil (savollarda Bloom darajasi yoki bo'lim ko'rsatilgan testlar uchun) ----
+const LEVELS = [
+  { min: 85, label: 'A’lo: imtihonga tayyor', tone: 'green' },
+  { min: 70, label: 'Yaxshi: ayrim bo‘limlarni takrorlash kerak', tone: 'blue' },
+  { min: 50, label: 'Qoniqarli: tizimli takrorlash zarur', tone: 'amber' },
+  { min: 0, label: 'Standartni qayta o‘rganish tavsiya etiladi', tone: 'red' },
+]
+const hasTaxonomy = (t) => t.questions.some((q) => q.bloom || q.section)
+const byKey = (items, key) => {
+  const m = new Map()
+  for (const x of items) { const k = key(x); if (!k) continue; if (!m.has(k)) m.set(k, []); m.get(k).push(x) }
+  return [...m.entries()].map(([k, list]) => ({ k, n: list.length, ok: list.filter((x) => x.status === 'right').length, list }))
+}
+const mark = (p) => (p >= 80 ? { s: '✅', t: 'Yaxshi', tone: 'green' } : p >= 50 ? { s: '⚠️', t: 'Takrorlang', tone: 'amber' } : { s: '❌', t: 'Qayta o‘rganing', tone: 'red' })
+
+function StandardAnalysis({ test, attempt, staff }) {
+  const items = useMemo(() => reviewOf(test, attempt), [test, attempt])
+  if (!hasTaxonomy(test)) return null
+  const p = pct(attempt.score, attempt.total)
+  const level = LEVELS.find((l) => p >= l.min)
+  const blooms = byKey(items, (x) => x.q.bloom).sort((a, b) => Object.keys(BLOOM).indexOf(a.k) - Object.keys(BLOOM).indexOf(b.k))
+  const sections = byKey(items, (x) => x.q.section)
+  const wrong = items.filter((x) => x.status !== 'right')
+  const weak = sections.filter((s) => pct(s.ok, s.n) < 80).sort((a, b) => pct(a.ok, a.n) - pct(b.ok, b.n))
+  const refs = [...new Set(wrong.map((x) => x.q.ref).filter(Boolean))]
+  return (
+    <section className="pcard ptsa">
+      <header className="ptsa__head">
+        <h3 className="pdt"><span className="pdt__ico"><Icon name="award" size={18} /></span>Standart bo‘yicha tahlil</h3>
+        <span className={cx('ptpill', `ptpill--${level.tone}`, 'ptpill--lg')}>{attempt.score}/{attempt.total} · {p}%</span>
+      </header>
+      <p className={cx('ptsa__level', `is-${level.tone}`)}><b>{level.label}</b></p>
+      <div className="ptsa__grid">
+        {blooms.length > 0 && (
+          <div className="ptsa__tbl">
+            <h4>Bloom darajalari bo‘yicha</h4>
+            <table><thead><tr><th>Daraja</th><th>Savollar</th><th>To‘g‘ri</th><th>Foiz</th></tr></thead>
+              <tbody>{blooms.map((b) => <tr key={b.k}><td>{BLOOM[b.k]}</td><td>{b.n}</td><td>{b.ok}</td><td>{pill(pct(b.ok, b.n))}</td></tr>)}</tbody></table>
+          </div>
+        )}
+        {sections.length > 0 && (
+          <div className="ptsa__tbl">
+            <h4>Standart bo‘limlari bo‘yicha</h4>
+            <table><thead><tr><th>Bo‘lim</th><th>Savollar</th><th>To‘g‘ri</th><th>Holat</th></tr></thead>
+              <tbody>{sections.map((s) => { const m = mark(pct(s.ok, s.n)); return <tr key={s.k}><td>{s.k}</td><td>{s.n}</td><td>{s.ok}</td><td><span className={cx('ptsa__mark', `is-${m.tone}`)} title={m.t}>{m.s} {m.t}</span></td></tr> })}</tbody></table>
+          </div>
+        )}
+      </div>
+      {wrong.length > 0 && (
+        <div className="ptsa__wrong">
+          <h4>Xato qilingan savollar</h4>
+          <table><thead><tr><th>№</th><th>Mavzu</th><th>Qayta o‘qish kerak bo‘lgan band</th></tr></thead>
+            <tbody>{wrong.map((x) => <tr key={x.q.id}><td>{x.i + 1}</td><td>{x.q.section || '—'}{x.status === 'skip' && <small> · javob berilmagan</small>}</td><td>{x.q.ref || '—'}</td></tr>)}</tbody></table>
+        </div>
+      )}
+      <div className="ptsa__tip">
+        <Icon name="zap" size={18} />
+        <p>{wrong.length === 0
+          ? `${staff ? 'O‘quvchi barcha' : 'Barcha'} savollarga to‘g‘ri javob ${staff ? 'bergan' : 'berdingiz'}. Bilimni mustahkamlash uchun baholash darajasidagi murakkab vaziyatlarni mustaqil tahlil qilib ko‘ring.`
+          : `${weak.length ? `Avval quyidagi bo‘limlarni qayta o‘qing: ${weak.map((s) => `${s.k} (${s.ok}/${s.n})`).join(', ')}. ` : ''}${refs.length ? `Bandlar: ${refs.join('; ')}. ` : ''}Har bir xato savol ostidagi izohda to‘g‘ri javobning sababi va ${staff ? 'tanlangan' : 'siz tanlagan'} variantning xatosi ko‘rsatilgan.`}</p>
+      </div>
+    </section>
   )
 }
 
@@ -595,6 +785,7 @@ function TakeTest({ id }) {
           <>
             <ScoreHero test={t} attempt={result} />
             <FeedbackBox test={t} attempt={result} />
+            <StandardAnalysis test={t} attempt={result} />
             <ChartPanel title="Natija grafigi" storeKey="test_result" datasets={datasets} defaultType="donut" />
             <section className="pcard">
               <h3 className="pdt ptrv__ttl"><span className="pdt__ico"><Icon name="clipboard" size={18} /></span>Savollar va to‘g‘ri javoblar</h3>
@@ -654,7 +845,7 @@ function TakeTest({ id }) {
       <div className="pgrid pgrid--main ptq">
         <section className="pquiz__q">
           <div className="ptq__head">
-            <span className="ptq__count">{cur + 1}-savol, jami {total} ta</span>
+            <span className="ptq__count">{cur + 1}-savol, jami {total} ta{q.kind && QKIND[q.kind] && <em className="ptq__kind">{QKIND[q.kind]}</em>}</span>
             <button type="button" className={cx('ptq__flag', flags.includes(q.id) && 'is-on')} aria-pressed={flags.includes(q.id)} onClick={toggleFlag}><Icon name="bookmark" size={16} />Keyinroq qaytish</button>
           </div>
           <h3>{q.text}</h3>
@@ -729,7 +920,17 @@ function TestResults({ id }) {
     { key: 'students', label: 'O‘quvchilar', sub: 'Har bir o‘quvchining natijasi', max: 100, unit: '%', head: ['O‘quvchi', 'Natija'], defaultType: 'bar',
       parts: { label: 'To‘g‘ri javoblarning o‘quvchilar bo‘yicha ulushi', value: (r) => r.score, unit: ' ta' },
       rows: data.done.map((r) => ({ key: r.id, label: r.s.name, short: r.s.name.split(' ')[0], value: pct(r.a.score, r.a.total), score: r.a.score, shown: `${pct(r.a.score, r.a.total)}% · ${r.a.score}/${r.a.total}` })) },
-  ]), [data])
+    // Savollarda tasnif bo'lsa: bo'limlar va Bloom darajalari bo'yicha to'g'ri javoblar ulushi
+    ...[['section', 'Bo‘limlar', 'Standart bo‘limlari bo‘yicha to‘g‘ri javoblar ulushi', (q) => q.section, (k) => k],
+      ['bloom', 'Bloom', 'Bloom darajalari bo‘yicha to‘g‘ri javoblar ulushi', (q) => q.bloom, (k) => BLOOM[k] || k]]
+      .filter(([, , , key]) => t.questions.some(key))
+      .map(([k, label, sub, key, name]) => {
+        const groups = new Map()
+        for (const x of data.qStats) { const g = key(x.q); if (!g) continue; const v = groups.get(g) || { ok: 0, all: 0 }; v.ok += x.ok; v.all += data.list.length; groups.set(g, v) }
+        return { key: k, label, sub, max: 100, unit: '%', head: [label, 'To‘g‘ri javoblar'], parts: null,
+          rows: data.list.length ? [...groups.entries()].map(([g, v]) => ({ key: g, label: name(g), value: pct(v.ok, v.all), shown: `${pct(v.ok, v.all)}% · ${v.ok}/${v.all}` })) : [] }
+      }),
+  ]), [data, t])
 
   if (!t) return <Card><Empty icon="clipboard" title="Test topilmadi" action={<Btn as="a" href="#/platform/tests">Orqaga</Btn>} /></Card>
   const { groups, rows, done, list, qStats } = data
@@ -1088,6 +1289,7 @@ function AttemptModal({ test, attempt, student, onClose }) {
         <>
           <ScoreHero test={test} attempt={attempt} staff={staff} />
           <FeedbackBox test={test} attempt={attempt} />
+          <StandardAnalysis test={test} attempt={attempt} staff={staff} />
           <QuestionReview test={test} attempt={attempt} who={staff ? 'O‘quvchi javobi' : 'Sizning javobingiz'} />
         </>
       ) : <Empty icon="refresh" title="Javoblar yuklanmoqda" action={<Btn icon="refresh" onClick={() => loadDB().catch(() => {})}>Yangilash</Btn>} />)}

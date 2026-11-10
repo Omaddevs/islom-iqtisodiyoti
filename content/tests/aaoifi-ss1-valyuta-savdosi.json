@@ -1,0 +1,447 @@
+{
+  "title": "AAOIFI 1-shariat standarti: Valyutalar savdosi — 20 ta murakkab test",
+  "description": "Qo‘llash, tahlil va baholash darajasidagi vaziyatli va hisob-kitobli savollar. Topshirgach har bir savol bo‘yicha izoh, variantlar tahlili va standart bandi ko‘rsatiladi.",
+  "timeLimit": 40,
+  "questions": [
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Qabz (2/6)",
+      "text": "«Ishonch» islom banki 3-mart kuni mijoz Akmal bilan 10 000 AQSH dollarini 1 dollar = 12 800 so‘m kursida sotish bo‘yicha spot shartnoma tuzdi. Akmal kassaga 128 000 000 so‘mni to‘liq to‘ladi. Bank esa o‘sha zahoti faqat 6 000 dollar berdi, qolgan 4 000 dollarni ertasi kuni berishga kelishib, tomonlar ajralishdi. Qabz (valyutani haqiqiy yoki huquqiy egalikka olish) qoidasiga ko‘ra bitimning holati qanday?",
+      "options": [
+        "Bitim 10 000 dollarning barchasi uchun durust, chunki Akmal so‘mni to‘liq to‘lagan",
+        "Bitim faqat 6 000 dollar (76 800 000 so‘m) qismi uchun durust, qolgan qismi uchun emas",
+        "Bitim to‘liq bekor, chunki bank valyutani ajralishdan oldin to‘liq topshirmagan",
+        "Bitim durust, lekin bank kechikkan 4 000 dollar uchun ta’vid (zararni qoplash) to‘laydi"
+      ],
+      "correct": "B",
+      "explain": "Sarf (valyuta ayirboshlash)da ikki tomon ajralishidan oldin har ikki valyuta qabz qilinishi shart. Agar qabz qisman bo‘lsa, standart butun bitimni emas, faqat qabz qilingan qismni durust deb hisoblaydi. Illat — valyutaning bir qismi nasiyaga (keyinga) qolishi riba an-nasiyaga olib keladi; shuning uchun 4 000 dollarlik qism bo‘yicha bitim durust emas va unga to‘langan so‘m qaytariladi yoki keyin qaytadan, qabz bilan alohida bitim tuziladi.\n\nHisob-kitob:\n1) Durust qism: 6 000 × 12 800 = 76 800 000 so‘m.\n2) Durust bo‘lmagan qism: 4 000 × 12 800 = 51 200 000 so‘m — Akmalga qaytariladi.\n3) Tekshiruv: 76 800 000 + 51 200 000 = 128 000 000 so‘m.\nA variantdagi «10 000 dollar» bir tomon to‘liq to‘lagani yetarli deb hisoblashdan, C variantdagi «to‘liq bekor» esa qisman durustlik qoidasini e’tiborsiz qoldirishdan kelib chiqadi.",
+      "notes": [
+        "Bir tomonning to‘liq to‘lashi yetarli emas: standart ikkala valyutaning ham ajralishdan oldin qabz qilinishini talab qiladi.",
+        "",
+        "Qisman qabzda bitim butunlay bekor bo‘lmaydi — qabz qilingan 6 000 dollarlik qism uchun durust qoladi.",
+        "Kechikish uchun ta’vid an’anaviy bank jarimasi mantig‘i; muammo kechikkan qism bo‘yicha bitimning o‘zi durust emasligida."
+      ],
+      "ref": "AAOIFI SS 1, 2/6 Valyutalar savdosida qabz masalasi, 2/6/2",
+      "quote": "Agar bir tomon valyutani qisman qabz qiladigan bo‘lsa, bitim o‘sha qabz qilib olingan qism uchungina durust bo‘ladi, qolgan qismi uchun bitim durust bo‘lmaydi."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Qarz to‘lovlari va muqassa (2/5, 2/10)",
+      "text": "Bank mijozga nasiya (muddatli to‘lovli) murobaha (tannarx va ustamani oshkor qilib sotish) asosida uskuna sotgan; navbatdagi to‘lov 5 000 AQSH dollari. Shartnoma tuzilgan kuni kurs 1 dollar = 12 500 so‘m, to‘lov kuni esa 1 dollar = 12 900 so‘m. Bank va mijoz shu to‘lovni so‘mda qilishga kelishdi. Standartga ko‘ra mijoz necha so‘m to‘laydi?",
+      "options": [
+        "62 500 000 so‘m — shartnoma tuzilgan kundagi kurs bo‘yicha",
+        "63 500 000 so‘m — ikki kursning o‘rtachasi bo‘yicha",
+        "65 000 000 so‘m — shartnomada oldindan qotirilgan 13 000 so‘m kursida",
+        "64 500 000 so‘m — to‘lov amalga oshiriladigan kundagi kurs bo‘yicha"
+      ],
+      "correct": "D",
+      "explain": "Qarzli bitimdagi davriy to‘lovni bitim valyutasidan boshqa valyutada to‘lashga kelishish joiz, ammo faqat to‘lov amalga oshiriladigan kungi kurs bo‘yicha. Sababi — bu aslida zimmadagi dollar qarzini so‘mga almashtirish (sarf): u o‘sha kungi haqiqiy qiymatda va darhol bajarilsa, qarz to‘liq yopiladi va qarzdan foyda (riba) olinmaydi.\n\nHisob-kitob:\n1) To‘g‘ri summa: 5 000 × 12 900 = 64 500 000 so‘m.\n2) A variant: 5 000 × 12 500 = 62 500 000 — eski kurs qo‘llangan.\n3) B variant: (12 500 + 12 900) / 2 = 12 700; 5 000 × 12 700 = 63 500 000 — o‘rtacha kurs, standartda yo‘q.\n4) C variant: 5 000 × 13 000 = 65 000 000 — oldindan qotirilgan kurs, ya’ni kelajakdagi ayirboshlashni bugun belgilash.",
+      "notes": [
+        "Shartnoma kunidagi kurs qo‘llansa, dollar qarzining bugungi qiymati to‘lanmaydi — standart to‘lov kunidagi kursni talab qiladi.",
+        "O‘rtacha kurs standartda ko‘zda tutilmagan; to‘lov kunidagi joriy kurs olinadi.",
+        "Kelajakdagi to‘lov kursini oldindan qotirish valyutani muddatli (forward) almashtirishga aylanadi va taqiqlanadi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 1, 2-bo‘lim Valyutalar savdosiga oid shariat hukmi, 2/5 (shuningdek 2/10/2)",
+      "quote": "Muassasa va mijoz qarzli bitimlar doirasidagi davriy to‘lovni qilish chog‘ida mazkur to‘lovni bitim valyutasidan boshqa valyutada, o‘sha kungi (ya’ni to‘lov amalga oshiriladigan kungi) ayirboshlash kursida amalga oshirishga kelishib olishlari joiz."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Qarz to‘lovlari va muqassa (2/5, 2/10)",
+      "text": "Aziz «Barakat» kompaniyasidan 4 000 yevro qarz. «Barakat» esa Azizdan 60 000 000 so‘m qarz. Ikki tomon 1 yevro = 14 000 so‘m kursini kelishib, qarzlarni o‘zaro yopishga qaror qildi. Muqassa (turli valyutadagi o‘zaro qarzlarni hisob-kitob qilish)dan keyin holat qanday bo‘ladi?",
+      "options": [
+        "Azizning qarzi to‘liq yopiladi, «Barakat» Azizga 4 000 000 so‘m qarzdor qoladi",
+        "«Barakat»ning qarzi to‘liq yopiladi, Aziz unga 4 000 000 so‘m qarzdor qoladi",
+        "Qarzlar yopilmaydi: turli valyutadagi qarzlar avval naqd topshirilishi kerak",
+        "Azizning qarzi yopiladi, «Barakat» esa Azizga yana 4 000 yevro qarzdor bo‘lib qoladi"
+      ],
+      "correct": "A",
+      "explain": "Zimmadagi turli valyutadagi qarzlarni o‘zaro ayirboshlash, agar bu ikki tomon zimmasidagi qarzning yopilishiga olib kelsa, joiz. Tomonlar kursni kelishib, qarzlarni to‘liq yoki qisman yopishi mumkin. Bu yerda yangi nasiya paydo bo‘lmaydi: ikki qarz bir zumda o‘zaro yopiladi, faqat qoldiq so‘mda saqlanadi.\n\nHisob-kitob:\n1) Azizning qarzi so‘mda: 4 000 × 14 000 = 56 000 000 so‘m.\n2) Qoldiq: 60 000 000 - 56 000 000 = 4 000 000 so‘m.\n3) Katta qarz «Barakat»da bo‘lgani uchun qoldiq ham uning zimmasida qoladi.\nB variant qarz yo‘nalishini almashtirish, D variant qoldiqni so‘m o‘rniga yevroda hisoblash xatosidan chiqadi.",
+      "notes": [
+        "",
+        "Qarz yo‘nalishi almashtirilgan: 56 mln so‘mlik qarz 60 mln so‘mlik qarzdan kichik, demak qoldiq «Barakat» zimmasida.",
+        "Standart zimmadagi qarzlarni naqd topshirmasdan, o‘zaro yopish yo‘li bilan ayirboshlashga ruxsat beradi.",
+        "Qoldiq so‘mda hisoblanadi: 4 000 000 so‘m 4 000 yevro emas (bu taxminan 285,7 yevro)."
+      ],
+      "ref": "AAOIFI SS 1, 2/10 Zimmada qarz sifatida turgan valyutalarni ayirboshlash, 2/10/1",
+      "quote": "Bu ikki shaxs qarz miqdoriga qarab o‘zaro qarzni to‘liq yoki qisman yopish uchun valyutalar almashinuv (ayirboshlash) kursini kelishib olishlari mumkin. Mazkur amaliyot Muqassa deb ham nomlanadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Qabz (2/6)",
+      "text": "Mijoz Dilnoza bankdagi dollar hisobvarag‘ida turgan 2 000 dollar evaziga shu bankning o‘zida spot shartnoma bo‘yicha yevro sotib oldi. Yevro uning yevro hisobvarag‘iga darhol yozildi, Dilnoza naqd pul olmadi. Bu bitimda qabz masalasini qanday baholash kerak?",
+      "options": [
+        "Qabz bo‘lmagan, chunki Dilnoza pulni qo‘liga olmagan, bitim nasiya hisoblanadi",
+        "Qabz faqat Dilnoza yevroni kassadan naqd olib chiqqanidan keyin amalga oshadi",
+        "Hisobvaraqqa darhol yozilish hukmiy (huquqiy) qabz hisoblanadi, bitim joiz",
+        "Bitim joiz, ammo bank uni muddatli va’da sifatida alohida rasmiylashtirishi kerak"
+      ],
+      "correct": "C",
+      "explain": "Qabz haqiqiy (qo‘lma-qo‘l) yoki hukmiy bo‘lishi mumkin. Hukmiy qabz — aktivni tasarruf etish imkoni bilan topshirish, garchi jismoniy topshirish bo‘lmasa ham. Standart mijoz va muassasa o‘rtasida spot shartnoma tuzilib, mijoz hisobidagi valyuta evaziga boshqa valyuta sotib olinishini hukmiy qabzning qabul qilingan ko‘rinishi sifatida aniq sanaydi. Yevro darhol yozilgani uchun Dilnoza uni tasarruf eta oladi — qabz bor.",
+      "notes": [
+        "Qabz faqat qo‘lga olish emas: standart hisobvaraqqa yozilishni ham hukmiy qabz deb tan oladi, shuning uchun nasiya yo‘q.",
+        "Naqd olib chiqish talab qilinmaydi — hukmiy qabz haqiqiy qabz bilan bir xil hukmga ega.",
+        "",
+        "Va’da sifatida rasmiylashtirishga hojat yo‘q; bu spot bitim, qabz shu zahoti bo‘lgan."
+      ],
+      "ref": "AAOIFI SS 1, 2/6 Valyutalar savdosida qabz masalasi, 2/6/5 va 2/6/5/1 (2-holat)",
+      "quote": "Mijoz va muassasa o‘rtasida spot valyuta ayirboshlash shartnomasi tuzilsa va mijoz hisobraqamidagi mavjud valyuta evaziga boshqa valyuta sotib olsa."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Vakillik (2/7)",
+      "text": "Rustam do‘sti Botirni faqat valyuta narxini kelishish va shartnoma tuzish uchun vakil qildi, valyutani qabz qilish (qabul qilib olish) huquqini bermadi. Botir valyuta ayirboshlovchi bilan 3 000 dollarni so‘mga almashtirish shartnomasini tuzdi. Bitim durust bo‘lishi uchun qaysi shart bajarilishi kerak?",
+      "options": [
+        "Botir qabz huquqi bo‘lmasa ham dollarni o‘zi olib, keyinroq Rustamga topshirishi kerak",
+        "Qabz tomonlar ajralgach, bir hafta ichida bo‘lsa ham yetarli hisoblanadi",
+        "Ajralishdan oldin Rustamning o‘zi yoki qabz uchun tayinlangan vakil valyutani olishi",
+        "Shartnomani vakil emas, Rustamning o‘zi qaytadan imzolashi lozim bo‘ladi"
+      ],
+      "correct": "C",
+      "explain": "Valyutani faqat savdo (shartnoma tuzish) uchun, qabz huquqisiz vakil qilish joiz. Ammo sarfning asosiy sharti — ajralishdan oldin qabz — o‘z kuchida qoladi: shartnoma tomonlari ajralishidan oldin vakil qiluvchining o‘zi yoki qabz uchun tayinlangan boshqa vakil valyutani qabz qilishi shart. Bu cheklangan vakillik bo‘lib, mutlaq vakillikka zid emas.",
+      "notes": [
+        "Botirda qabz vakolati yo‘q; vakolatsiz qabz Rustam nomidan egalikni ta’minlamaydi.",
+        "Ajralgandan keyingi qabz sarf uchun yetarli emas — qabz ajralishdan oldin bo‘lishi shart.",
+        "",
+        "Shartnomani vakil tuzishi joiz; muammo imzoda emas, qabzning vaqtida."
+      ],
+      "ref": "AAOIFI SS 1, 2/7 Valyutalar savdosida vakillik, 2/7/2",
+      "quote": "Boshqa shaxsni unga qabz qilish huquqini bermasdan valyutalarning faqat savdosi uchun vakil qilish joiz, lekin bunda shartnoma tuzuvchi tomonlar ajralishidan oldin vakil qiluvchi shaxsning o‘zi yoki qabz qilish uchun tayinlangan boshqa vakil valyutani qabz qilib olishi shart qilinadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Ayirboshlash va havola (2/11)",
+      "text": "Mijoz bank kassasiga 25 000 000 so‘m topshirib, uni Dubaydagi hamkoriga BAA dirhamida o‘tkazishni so‘radi. Bank so‘mni joriy kursda dirhamga almashtirdi, kvitansiya berdi va o‘tkazma uchun 50 000 so‘m xizmat haqi oldi. Bu amaliyot standartga ko‘ra qanday baholanadi?",
+      "options": [
+        "Joiz: sarf (ayirboshlash) va havola (o‘tkazma) birikmasi, haq olish ham joiz",
+        "Joiz emas: o‘tkazma mijoz topshirgan valyutaning o‘zida bo‘lishi shart",
+        "Joiz, faqat xizmat haqi o‘tkazma summasiga nisbatan foiz ko‘rinishida olinishi kerak",
+        "Joiz emas: ayirboshlash va o‘tkazmani bitta amalda qo‘shib bo‘lmaydi"
+      ],
+      "correct": "A",
+      "explain": "Pul o‘tkazmasi mijoz topshirgan valyutadan boshqa valyutada amalga oshirilishi mumkin. Bu ikki bitimdan iborat: haqiqiy qabz yoki bank kvitansiyasi bilan tasdiqlangan hukmiy qabzli sarf hamda sotib olingan valyutani o‘tkazish (havola). Kvitansiya qabzni ta’minlaydi, o‘tkazish esa alohida xizmat bo‘lgani uchun muassasa xizmat haqi olishi joiz.",
+      "notes": [
+        "",
+        "Standart o‘tkazmani boshqa valyutada qilishga aniq ruxsat beradi.",
+        "Xizmat haqi foiz bo‘lishi shart emas; standart shunchaki xizmat haqi olishga ruxsat beradi.",
+        "Standart aynan shu ikki bitimning birikmasini joiz amaliyot sifatida tavsiflaydi."
+      ],
+      "ref": "AAOIFI SS 1, 2/11 Valyuta ayirboshlash va pul o‘tkazish (havola) amaliyotlarini birlashtirish",
+      "quote": "Pul o‘tkazmasi (havola) mijoz tomonidan taqdim etilgan valyutadan boshqa valyutada amalga oshirilishi mumkin… Muassasa mijozdan pul o‘tkazmasi uchun xizmat haqi olishi mumkin."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Va’dalashuv va kafolat (2/9)",
+      "text": "Eksportchi kompaniya 3 oydan keyin 100 000 dollar tushum kutmoqda va kurs o‘zgarishidan himoyalanmoqchi. Bank va kompaniya «3 oydan keyin 1 dollar = 13 000 so‘m kursida almashamiz» degan, har ikki tomon uchun majburiy ikki tomonlama va’dalashuv imzolamoqchi. Bu kelishuvni qanday baholash to‘g‘ri?",
+      "options": [
+        "Joiz, chunki maqsad spekulyatsiya emas, balki xatardan himoyalanish (hedj)",
+        "Joiz, chunki hozir valyuta almashilmayapti, faqat va’da berilmoqda",
+        "Joiz, agar 3 oydan keyin har ikki valyuta bir majlisda topshirilsa",
+        "Taqiqlanadi: majburiy ikki tomonlama va’dalashuv hedj uchun ham joiz emas"
+      ],
+      "correct": "D",
+      "explain": "Har ikki tomon uchun majburiy bo‘lgan ikki tomonlama va’dalashuv amalda kursi bugun qotirilgan muddatli (forward) shartnomaning o‘zi bo‘lib qoladi: majburiyat va narx hozir belgilanadi, qabz esa kelajakka suriladi. Shu sababli standart uni, hatto valyuta qadrsizlanishi xatarini bartaraf etish maqsadida bo‘lsa ham, taqiqlaydi. Maqsadning yaxshiligi shartnoma tuzilmasidagi nuqsonni tuzatmaydi.",
+      "notes": [
+        "Standart aynan hedj maqsadini ham istisno qilmaydi: «hatto qadrsizlanish xatarini bartaraf etish uchun bo‘lsa ham» taqiqlangan.",
+        "Majburiy ikki tomonlama va’da shaklan va’da bo‘lsa ham, mohiyatan muddatli shartnomaga teng.",
+        "Kelajakdagi qabz muammoni hal qilmaydi: majburiyat va kurs bugun qotiriladi, bu forward bitimga aylanadi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 1, 2/9 Valyutalar savdosida ikki tomonlama va’dalashuv, 2/9/1",
+      "quote": "Valyutalar savdosida ikki tomonlama va’dalashuv, agar tomonlar uchun uning bajarilishi majburiy bo‘lsa, hatto bu valyuta qadrsizlanishi xatarini bartaraf etish uchun qo‘llanayotgan amaliyot bo‘lsa ham, taqiqlanadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Va’dalashuv va kafolat (2/9)",
+      "text": "Bank eksportchi mijozga faqat o‘zi uchun majburiy bo‘lgan va’d (bir tomonlama va’da) berdi: «3 oydan keyin xohlasangiz, dollaringizni 13 000 so‘mdan sotib olaman». Mijoz hech qanday majburiyat olmadi va 3 oydan keyin almashtirish-almashtirmaslikni o‘zi hal qiladi. Bu kelishuv qanday baholanadi?",
+      "options": [
+        "Taqiqlanadi, chunki majburiy bo‘lgan har qanday va’da forward shartnomaga teng",
+        "Joiz, chunki bir tomonlama va’da majburiy bo‘lsa ham standartda ruxsat etilgan",
+        "Joiz, faqat bankning va’dasi majburiy emas, ixtiyoriy bo‘lgan taqdirda",
+        "Taqiqlanadi, chunki kursni oldindan belgilashning o‘zi nasiya savdosi hisoblanadi"
+      ],
+      "correct": "B",
+      "explain": "Standart ikki tomonlama majburiy va’dalashuvni taqiqlaydi, ammo faqat bir tomonlama va’dani, uning bajarilishi majburiy bo‘lsa ham, joiz deb biladi. Bu yerda faqat bank majburiyat olgan, mijoz esa erkin. Ikki tomon bog‘lanmagani uchun muddatli shartnoma vujudga kelmaydi; haqiqiy ayirboshlash 3 oydan keyin, agar mijoz xohlasa, o‘sha paytda spot va qabz bilan tuziladi.",
+      "notes": [
+        "Majburiylik bir tomonlama bo‘lsa, shartnoma tuzilmaydi — standart bunday va’dani aniq joiz deydi.",
+        "",
+        "Standart bir tomonlama va’daning majburiy bo‘lishiga ham ruxsat beradi; ixtiyoriylik sharti yo‘q.",
+        "Va’dada kursni aytish hali savdo emas; savdo keyin, qabz bilan tuziladi."
+      ],
+      "ref": "AAOIFI SS 1, 2/9 Valyutalar savdosida ikki tomonlama va’dalashuv, 2/9/1",
+      "quote": "Faqat bir tomonlama va’da, uning bajarilishi majburiy bo‘lsa ham, joiz hisoblanadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Va’dalashuv va kafolat (2/9)",
+      "text": "Bank mijozdan bugun 50 000 dollar sotib oladi va shu bitimga «1 oydan keyin shu dollarni mijozga qaytarib sotaman» degan shartni bog‘laydi. Har ikki tomon majburiyat oladi, bugun valyutalar to‘liq almashilmaydi. Bu sxemani taqiqlangan qiladigan sabablar qaysi javobda to‘g‘ri ko‘rsatilgan?",
+      "options": [
+        "Qabz yo‘qligi, ikki sarfning bir-biriga bog‘lanishi va majburiy ikki tomonlama va’da",
+        "Faqat bankning shu sxemadan foyda olishi; sxemaning tuzilishi esa standartga to‘liq mos",
+        "Faqat muddatning uzunligi; bir haftagacha bo‘lsa, sxema joiz bo‘lardi",
+        "Faqat yozma shartnoma yo‘qligi; notarial tasdiq bilan sxema joiz bo‘lardi"
+      ],
+      "correct": "A",
+      "explain": "Bu bank amaliyotida «valyutalarni parallel sotib olish va sotish» deb ataladigan sxema. Standart uni shartnomani buzuvchi uchta sababdan biri mavjudligi uchun taqiqlaydi: valyutalarni topshirish-qabul qilish amalga oshmasligi (nasiyaga sotish), bir sarf shartnomasining boshqasiga bog‘lanishi (shartli bitim) va tomonlar uchun majburiy ikki tomonlama va’dalashuv. Ushbu vaziyatda uchala sabab ham bor.",
+      "notes": [
+        "",
+        "Muammo foydada emas, shartnoma tuzilmasida: qabz yo‘q, bitimlar bog‘langan, va’da ikki tomonlama.",
+        "Muddat qisqarsa ham qabzsizlik va bitimlarning bog‘liqligi saqlanib qoladi.",
+        "Rasmiylashtirish shakli shar’iy nuqsonni yo‘qotmaydi."
+      ],
+      "ref": "AAOIFI SS 1, 2/9 Valyutalar savdosida ikki tomonlama va’dalashuv, 2/9/2",
+      "quote": "«Valyutalarni parallel sotib olish va sotish» deb ataluvchi moliyaviy amaliyot… taqiqlangan: a) ikki valyutani topshirish va qabul qilib olish jarayoni amalga oshirilmaganligi; b) bir valyuta almashinuvi shartnomasini boshqa bir valyuta almashinuvi shartnomasiga bog‘lash; c) majburiy bo‘lgan ikki tomonlama va’dalashuv."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Qabz (2/6)",
+      "text": "Valyuta ayirboshlash shoxobchasi mijozga 1 000 dollar sotib, uning evaziga so‘mdagi chekni qabul qildi. Chek egasining hisobvarag‘ida yetarli mablag‘ bor, lekin chekni to‘laydigan bank bu mablag‘ni chek bo‘yicha to‘lov uchun band qilmagan. Chekni qabul qilish hukmiy qabz hisoblanadimi?",
+      "options": [
+        "Ha, chek qimmatli qog‘oz bo‘lgani uchun uni olishning o‘zi qabz hisoblanadi",
+        "Ha, chek egasining hisobvarag‘ida yetarli mablag‘ borligi buning uchun kifoya",
+        "Yo‘q, chek bo‘yicha qabz faqat pul naqd yechib olingandagina amalga oshadi",
+        "Yo‘q, mablag‘ bank tomonidan chek to‘lovi uchun band qilinmagan"
+      ],
+      "correct": "D",
+      "explain": "Chekni qabul qilish valyutaga huquqiy (konstruktiv) egalik hisoblanadi, ammo ikki shart birga bajarilishi kerak: chekdagi summa chek egasining hisobvarag‘ida mavjud bo‘lishi va bank bu mablag‘ni chek bo‘yicha to‘lov uchun band qilgan bo‘lishi. Band qilinmagan mablag‘ boshqa maqsadga sarflanib ketishi mumkin, demak tasarruf imkoni kafolatlanmagan — hukmiy qabz yo‘q.",
+      "notes": [
+        "Chek qog‘ozining o‘zi qabz emas; qabz uchun mablag‘ning mavjudligi va band qilinishi shart.",
+        "Mablag‘ mavjudligi — ikki shartdan faqat bittasi; band qilish sharti bajarilmagan.",
+        "Standart chekni ma’lum shartlarda naqd yechmasdan ham hukmiy qabz deb tan oladi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 1, 2/6 Valyutalar savdosida qabz masalasi, 2/6/5/2",
+      "quote": "Sotuvchi chekni qabul qilishi valyutaga nisbatan huquqiy (konstruktiv) egalikni anglatadi, faqat buning uchun chekda yozilgan valyuta miqdori chek egasi hisobraqamida mavjud bo‘lishi va muassasa bu mablag‘larni chek bo‘yicha to‘lov qilish uchun band qilib qo‘ygan bo‘lishi kerak."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Qabz (2/6)",
+      "text": "Valyuta sotuvchi xaridordan to‘lovni kredit kartasi orqali oldi, xaridor to‘lov kvitansiyasini imzoladi. Kartani chiqargan bank esa sotuvchiga mablag‘ni shartnoma bo‘yicha 30 kundan keyin o‘tkazadi. Imzolangan kvitansiyani qabul qilish valyutaga egalik (qabz) hisoblanadimi?",
+      "options": [
+        "Ha, imzolangan kvitansiyani olish har qanday holatda qabz hisoblanadi",
+        "Ha, agar 30 kun bozor amaliyotida odatiy muddat deb qabul qilingan bo‘lsa",
+        "Yo‘q, chunki karta chiqargan bank mablag‘ni darhol to‘lay olishi shart",
+        "Yo‘q, chunki kredit kartasi bilan valyuta savdosi umuman man etilgan"
+      ],
+      "correct": "C",
+      "explain": "Kredit karta kvitansiyasini qabul qilish valyutaga egalikni anglatadi, faqat kartani chiqargan muassasa mablag‘ni karta qabul qiluvchiga kechiktirmasdan (darhol) to‘lay olsa. 30 kunlik kechiktirish sharti bilan sotuvchi mablag‘ni tasarruf eta olmaydi — bu sarfning bir tomonini nasiyaga aylantiradi.",
+      "notes": [
+        "«Har qanday holatda» emas: standart darhol to‘lov shartini qo‘yadi.",
+        "Bozor amaliyotidagi odatiy kechikish haqidagi qoida bank o‘tkazmalariga tegishli (2/6/5/1); karta uchun darhol to‘lov talab qilinadi.",
+        "",
+        "Standart karta kvitansiyasini shart bajarilganda egalik deb tan oladi, demak karta bilan savdo man etilmagan."
+      ],
+      "ref": "AAOIFI SS 1, 2/6 Valyutalar savdosida qabz masalasi, 2/6/5/3",
+      "quote": "Sotuvchi kredit karta egasi (xaridor) tomonidan imzolangan to‘lov pattasi (kvitansiya)ni qabul qilib olishi valyutaga nisbatan egalikni anglatadi, faqat kartani chiqaruvchi muassasa pul mablag‘larini kartani qabul qiluvchi tomonga kechiktirmasdan (ya’ni darhol) to‘lay olishi shart."
+    },
+    {
+      "kind": "theory",
+      "bloom": "analyze",
+      "section": "Qamrov (1-band)",
+      "text": "Bank shariat bo‘limiga to‘rtta mahsulot bo‘yicha xulosa so‘rovi keldi. Ulardan qaysi biri AAOIFI 1-standarti qamroviga (amal qilish doirasiga) kirmaydi va boshqa qoidalar asosida baholanishi kerak?",
+      "options": [
+        "Mijozlar o‘rtasidagi turli valyutadagi qarzlarni o‘zaro hisob-kitob qilish",
+        "Mijozning muddatli veksellarini chegirma (diskont) bilan sotib olish",
+        "Kredit kartasi bilan valyuta to‘lovini qabul qilishda qabzni aniqlash",
+        "Xorijga pul o‘tkazishda valyutani almashtirib, keyin jo‘natish"
+      ],
+      "correct": "B",
+      "explain": "Standart qamrovi valyutalarni qabz qilish, zamonaviy aloqa vositalari, tomonlar o‘rtasidagi qarz majburiyatlarini hisob-kitob qilishdagi ayirboshlash, ikki tomonlama va’dalashuv va moliya muassasalarining valyuta amaliyotlarini o‘z ichiga oladi. Veksellarni diskont qilish esa standartda qamrovdan tashqari masala sifatida aniq ko‘rsatilgan. Shu bilan birga, valyuta ayirboshlash bilan bog‘liq bo‘lmagan pul o‘tkazmalari ham qamrovga kirmaydi — lekin D variantda ayirboshlash bor.",
+      "notes": [
+        "Qarz majburiyatlarini hisob-kitob qilishdagi ayirboshlash qamrovda aniq sanalgan (2/10 bilan ham tartibga solinadi).",
+        "",
+        "Kredit karta orqali qabz qamrovga kiradi va 2/6/5/3 bandda tartibga solingan.",
+        "Ayirboshlash bilan bog‘liq o‘tkazma qamrovga kiradi (2/11); qamrovdan faqat ayirboshlashsiz o‘tkazmalar chiqarilgan."
+      ],
+      "ref": "AAOIFI SS 1, 1-band Me’yorning qamrovi (amal qilish doirasi)",
+      "quote": "Ushbu me’yor quyidagi masalalarni o‘z ichiga olmaydi: valyutalar savdosiga oid bo‘lmagan masalalar, zargarlik faoliyatining oltin va kumush savdosiga ta’siri, valyuta ayirboshlash bilan bog‘liq bo‘lmagan pul o‘tkazmalari, veksellarni diskont (chegirma) qilish."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Masofaviy aloqa (2/8)",
+      "text": "Toshkentdagi bank soat 9:00 da Istanbuldagi hamkoriga elektron xat orqali taklif (oferta — iyjob) yubordi: «1 000 000 turk lirasini 2 soat davomida 1 lira = 380 so‘m kursida sotaman». Hamkor 10:30 da taklifni qabul qildi, ammo valyutalar hali o‘tkazilmadi. Bu holatni qanday baholash to‘g‘ri?",
+      "options": [
+        "Taklif 2 soat bank uchun majburiy, shartnoma esa qabul va ikki tomonlama qabz bilan tuziladi",
+        "Hamkor qabul qilgan paytdan shartnoma tuzilgan, qabz esa keyingi kunlarda bo‘lishi mumkin",
+        "Taklif bank uchun majburiy emas, bank uni 2 soatlik muddat ichida ham istalgan payt qaytarib oladi",
+        "Masofaviy aloqa vositalari orqali valyuta shartnomasini tuzishning umuman imkoni yo‘q"
+      ],
+      "correct": "A",
+      "explain": "Zamonaviy aloqa vositalari orqali tuzilgan shartnoma bir joyda imzolangan shartnoma bilan bir xil huquqiy oqibatga ega. Muddatli taklif o‘sha muddat davomida taklif qilgan tomon uchun majburiy bo‘ladi. Biroq valyuta shartnomasi faqat taklif qabul qilinib, ikki tomonlama haqiqiy yoki hukmiy qabz amalga oshgandagina tuzilgan hisoblanadi. Demak, 10:30 dagi qabul bilan ish tugamaydi — qabz ham bo‘lishi kerak.",
+      "notes": [
+        "",
+        "Valyuta savdosida qabul yetarli emas: shartnoma qabz bilan tuziladi, qabzni keyingi kunlarga surish nasiyaga aylanadi.",
+        "Muddatli taklif o‘sha muddat davomida taklif qilgan tomon uchun majburiy.",
+        "Standart masofaviy shartnomani bir joydagi shartnoma bilan teng huquqiy oqibatga ega deydi."
+      ],
+      "ref": "AAOIFI SS 1, 2/8 Valyutalar savdosida zamonaviy aloqa vositalaridan foydalanish, 2/8/2 (va 2/8/1)",
+      "quote": "Taqdim etilgan muddatli taklif (oferta / iyjob) o‘sha muddat mobaynida uni taklif qilgan tomon uchun majburiy bo‘lib qoladi. Shartnoma oferta qabul qilinib, ikki tomonlama haqiqiy yoki hukmiy qabz qilingandagina tuzilgan hisoblanadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Umumiy shartlar (2/1)",
+      "text": "Mijoz bank bilan 5 000 dollarni so‘mga almashtirish shartnomasini tuzdi va valyutalar shu zahoti to‘liq almashildi. Mijozning iltimosiga ko‘ra shartnomaga xiyor ash-shart (shartnomani muayyan muddat ichida bekor qilish huquqi) qo‘shildi: «mijoz 3 kun ichida bitimni bekor qilishi mumkin». Bu bandni qanday baholash kerak?",
+      "options": [
+        "Joiz, chunki qabz to‘liq amalga oshgan, qolgan shartlarni tomonlar erkin belgilaydi",
+        "Joiz, agar bitim bekor qilinsa, bank kurs farqidan ko‘rgan zararni mijoz qoplasa",
+        "Joiz, ammo bekor qilish muddati 1 kundan oshmasligi sharti bilan",
+        "Joiz emas: sarf shartnomasida xiyor ash-shart sharti bo‘lmasligi lozim"
+      ],
+      "correct": "D",
+      "explain": "Sarf shartnomasida xiyor ash-shart ham, valyutalardan biri yoki ikkalasining to‘lovini kechiktirish sharti ham bo‘lmasligi kerak. Bekor qilish huquqi mulkning to‘liq va qat’iy o‘tishini kechiktiradi: qabz shaklan bo‘lsa ham, egalik 3 kun davomida muallaq qoladi va bu sarfdagi qat’iy, darhol almashuv talabiga zid. Qabzning bajarilgani bu nuqsonni tuzatmaydi.",
+      "notes": [
+        "Qabz bajarilgani yetarli emas: standart xiyor ash-shartni alohida taqiqlaydi.",
+        "Zararni qoplash sharti nuqsonni yo‘qotmaydi, aksincha bitimga qo‘shimcha shart qo‘shadi.",
+        "Standart muddat uzunligiga qarab farqlamaydi — xiyor ash-shartning o‘zi taqiqlangan.",
+        ""
+      ],
+      "ref": "AAOIFI SS 1, 2/1 Valyutalar savdosi joiz bo‘lish shartlari, 2/1/3",
+      "quote": "Shartnomada xiyor ash-shart (shartnomani muayyan muddat ichida bekor qilish huquqi) yoki valyutalardan biri yoki har ikkisining to‘lovini kechiktirish sharti bo‘lmasligi kerak."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Forward, fyuchers va hedj (2/2–2/4)",
+      "text": "Import bilan shug‘ullanuvchi islom banki 6 oydan keyin yevroda katta to‘lov qilishi kerak va so‘mning qadrsizlanishidan xavotirda. Risk bo‘limi hedj (xatardan himoyalanish) uchun to‘rtta taklif berdi. Standartga eng mos yechimni baholang.",
+      "options": [
+        "Boshqa bank bilan 6 oylik forward shartnoma tuzib, yevro kursini hozirdan qotirish",
+        "Yetkazib beruvchi bilan majburiy ikki tomonlama va’da asosida kelajakdagi kursni belgilash",
+        "Turli valyutalarda o‘zaro bog‘lanmagan ikki alohida, ustamasiz qarz bitimini tuzish",
+        "Fyuchers birjasida 6 oydan keyin yetkaziladigan yevro sotib olish shartnomasini tuzish"
+      ],
+      "correct": "C",
+      "explain": "Forward valyuta amaliyotlari, ya’ni valyutalarning nasiya savdosi hedj maqsadida bo‘lsa ham taqiqlangan; fyuchers bozorida savdo ham man etilgan. Standart kelajakdagi qadrsizlanishdan himoyalanishning joiz yo‘llarini ko‘rsatadi: turli valyutalarda, bir-biriga bog‘liq bo‘lmagan ikkita alohida shartnoma orqali ustama foizsiz o‘zaro qarz berish yoki o‘sha valyutaning o‘zida tovar xarid qilish va murobaha bitimlarini tuzish. C variant birinchi joiz usulga to‘liq mos.",
+      "notes": [
+        "Forward valyuta amaliyoti hatto hedj uchun bo‘lsa ham taqiqlangan (2/2, 2/3).",
+        "Majburiy ikki tomonlama va’dalashuv qadrsizlanishdan himoyalanish uchun ham taqiqlangan (2/9/1).",
+        "",
+        "Valyutani nasiya asosida, fyuchers bozorida savdo qilish man etilgan (2/1/5)."
+      ],
+      "ref": "AAOIFI SS 1, 2-bo‘lim Valyutalar savdosiga oid shariat hukmi, 2/4 va 2/4/1 (shuningdek 2/2, 2/3)",
+      "quote": "Kelajakda valyuta qadrsizlanishidan himoyalanish maqsadida muassasa quyidagi usullardan foydalanib hedj qilishi mumkin: turli valyutalarda, bir-biriga bog‘liq bo‘lmagan ikkita alohida shartnoma orqali, ustama foizsiz o‘zaro qarz bitimlarini amalga oshirish orqali."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Va’dalashuv va kafolat (2/9)",
+      "text": "Ikki kompaniya dollar asosida mushoraka (sherikchilik) tuzmoqda. Sherik A shartnomaga «Sherik B valyuta kursidan ko‘radigan zararni men qoplayman» degan band kiritishni taklif qildi. Shariat maslahatchisi buning o‘rniga mustaqil uchinchi shaxsning kafolatini taklif qildi. Qaysi baho to‘g‘ri?",
+      "options": [
+        "Sherik A ning kafolati joiz, agar u mushoraka shartnomasida aniq yozib qo‘yilsa",
+        "Sherik kafolat bera olmaydi; uchinchi shaxs bera oladi, ammo shartnomaga yozilmaydi",
+        "Ikki kafolat ham joiz emas, chunki valyuta kursi xatari faqat sheriklarning o‘z zimmasida qoladi",
+        "Uchinchi shaxs kafolati joiz, ammo u mushoraka shartnomasining bandi bo‘lishi kerak"
+      ],
+      "correct": "B",
+      "explain": "Mushoraka yoki muzoraba (kapital va mehnat sherikchiligi)da sheriklardan biri sherigini valyuta savdosi xatarlaridan himoya qilish majburiyatini ola olmaydi: bu sherikchilikdagi foyda va zararni adolatli taqsimlash tamoyilini buzadi va bir sherik kapitalini kafolatlashga aylanadi. Uchinchi shaxs esa bunday kafolatni ixtiyoriy ravishda o‘z zimmasiga olishi mumkin, lekin bu kafillik sherikchilik shartnomasida qayd etilmasligi kerak.",
+      "notes": [
+        "Shartnomaga yozish nuqsonni tuzatmaydi: sherikning sherikka kafolati standartda taqiqlangan.",
+        "",
+        "Standart uchinchi shaxsning ixtiyoriy kafilligiga aniq ruxsat beradi.",
+        "Aksincha: standart uchinchi shaxs kafilligini sherikchilik shartnomasida qayd etishni taqiqlaydi."
+      ],
+      "ref": "AAOIFI SS 1, 2/9 Valyutalar savdosida ikki tomonlama va’dalashuv, 2/9/3",
+      "quote": "Uchinchi shaxs sheriklarni bunday xatarlardan himoya qilish majburiyatini ixtiyoriy ravishda o‘z zimmasiga olishi (ya’ni kafil bo‘lishi) mumkin. Lekin, bu kafillik sherikchilik shartnomasida qayd etilishi mumkin emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Moliya muassasalari amaliyoti (2/12)",
+      "text": "Investitsiya platformasi mijozga hisobidagi 1 000 dollar bilan, bank taqdim etadigan kredit imkoniyati hisobiga 100 000 dollarlik valyuta pozitsiyasini ochishni taklif qilmoqda (1:100 leverej — qarz mablag‘i bilan savdo hajmini oshirish). Islom banki bu mahsulotni o‘z mijozlariga taklif qilishi to‘g‘rimi?",
+      "options": [
+        "Ha, chunki har bir almashuv spot asosida, darhol bajariladi",
+        "Ha, agar bank berilgan kredit uchun foiz emas, qat’iy belgilangan xizmat haqi olsa",
+        "Ha, agar mijoz yo‘qotishlarni o‘z mablag‘idan qoplashga rozi bo‘lsa",
+        "Yo‘q, mijoz o‘z mablag‘idan ortiq summaga valyuta savdosi qilolmaydi"
+      ],
+      "correct": "D",
+      "explain": "Mijozga o‘z egaligidagi mablag‘dan ortiq summaga valyuta savdosi qilishga ruxsat berilmaydi, chunki bunday savdo muassasa bergan moliyaviy imtiyozlar (kredit imkoniyatlari) hisobiga amalga oshadi va mijoz o‘z imkoniyatidan ortiq tranzaksiya qiladi. Spot shakl, haq turi yoki zararni qoplashga rozilik bu asosiy nuqsonni — o‘zida yo‘q mablag‘ bilan savdo qilishni — yo‘qotmaydi.",
+      "notes": [
+        "Spot shakl yetarli emas: savdo mijozning o‘zida yo‘q, qarzga berilgan mablag‘ hisobiga bo‘lyapti.",
+        "Haq nomini o‘zgartirish taqiqning sababini — mablag‘dan ortiq savdoni — yo‘qotmaydi.",
+        "Zararni qoplashga rozilik mijozni o‘z imkoniyatidan ortiq savdodan chiqarmaydi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 1, 2/12 Moliya muassasalari orqali amalga oshiriladigan valyutalar savdosining ko‘rinishlari, 2/12/1",
+      "quote": "Mijoz o‘z egaligidagi mablag‘dan ortiq mablag‘ga valyuta savdosini amalga oshirishiga ruxsat berilmaydi, chunki bu valyuta savdosini amalga oshirayotgan muassasa tomonidan taqdim etilgan moliyaviy imtiyozlar (masalan, kredit imkoniyatlari) hisobiga amalga oshiriladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Moliya muassasalari amaliyoti (2/12)",
+      "text": "Bank mijozga 50 000 dollar qarz bermoqda. Ikki variant ko‘rib chiqilmoqda: (1) qarz shartnomasida «mijoz valyutani faqat shu bankda ayirboshlaydi» degan shart bo‘ladi; (2) bunday shart yo‘q, ammo mijoz o‘z xohishi bilan shu bankda ayirboshlaydi. Qaysi baho to‘g‘ri?",
+      "options": [
+        "(1)-variant joiz emas, (2)-variant esa joiz",
+        "Ikki variant ham joiz, chunki ayirboshlash spot kursda bo‘ladi",
+        "(1)-variant joiz, chunki bank o‘z xizmatini taklif qilmoqda xolos",
+        "Ikki variant ham joiz emas, chunki qarzdan so‘ng ayirboshlash man etilgan"
+      ],
+      "correct": "A",
+      "explain": "Muassasa mijozga valyuta savdosini aynan shu muassasaning o‘zida amalga oshirish sharti bilan qarz berishi mumkin emas: qarz evaziga shartlangan qo‘shimcha manfaat (ayirboshlashdan olinadigan daromad) qarzdan foyda olishga olib keladi. Shart qo‘yilmagan bo‘lsa, mijozning o‘z xohishi bilan shu bankda ayirboshlashiga mone’lik yo‘q.",
+      "notes": [
+        "",
+        "Spot kurs muammoni yechmaydi: (1)-variantda qarz shartlangan manfaatga bog‘langan.",
+        "Xizmat taklif qilish emas, qarzni shu xizmatga shart qilib qo‘yish — taqiqlangan.",
+        "Standart shartsiz holatni aniq joiz deydi; qarzdan keyin ayirboshlashning o‘zi man etilmagan."
+      ],
+      "ref": "AAOIFI SS 1, 2/12 Moliya muassasalari orqali amalga oshiriladigan valyutalar savdosining ko‘rinishlari, 2/12/2",
+      "quote": "Muassasa mijozga valyuta savdosini boshqa moliya muassasasida emas, balki aynan o‘sha muassasaning o‘zida amalga oshirish sharti asosida qarz berishi mumkin emas. Lekin, bunday shart qo‘yilmagan bo‘lsa, unda bunga mone’lik yo‘q."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Umumiy shartlar (2/1)",
+      "text": "Mijoz bankka eskirgan bitta 100 dollarlik banknotani olib kelib, uni yangi 1 dollarlik kupyuralarga almashtirishni so‘radi. Bank «eskirgan banknota uchun» deb 98 dollar berishni taklif qildi. Bu taklifni baholang.",
+      "options": [
+        "Joiz, chunki eskirgan banknotaning bozordagi qiymati yangisidan pastroq",
+        "Joiz emas: bir turdagi valyuta almashganda miqdor teng bo‘lishi shart",
+        "Joiz, agar 2 dollar alohida xizmat haqi sifatida rasmiylashtirilsa",
+        "Joiz emas, chunki eskirgan banknotani almashtirish umuman taqiqlangan"
+      ],
+      "correct": "B",
+      "explain": "Bir turdagi valyutalar (dollarni dollarga) o‘zaro ayirboshlanganda tengma-teng bo‘lishi shart — hatto biri qog‘oz pul, ikkinchisi tanga bo‘lsa ham. Demak, banknotaning shakli yoki holati qiymatini o‘zgartirmaydi. 100 dollarga 98 dollar berish bir xil valyutada ortiqcha olish, ya’ni riba al-fadl (bir jinsli almashuvdagi ortiqcha) hisoblanadi; uni boshqacha nomlash hukmni o‘zgartirmaydi.",
+      "notes": [
+        "Bir xil valyutada shakl yoki holat farqi qiymat farqiga asos bo‘lmaydi.",
+        "",
+        "Ortiqchani «xizmat haqi» deb nomlash tenglik shartini bekor qilmaydi.",
+        "Almashtirishning o‘zi joiz — faqat tengma-teng bo‘lishi kerak."
+      ],
+      "ref": "AAOIFI SS 1, 2/1 Valyutalar savdosi joiz bo‘lish shartlari, 2/1/2",
+      "quote": "Bir turdagi valyutalar (masalan, dollarni dollarga) o‘zaro ayirboshlanganda tengma-teng bo‘lishi shart, hatto ayirboshlanayotgan valyutalardan biri qog‘oz pul, ikkinchisi esa tanga pul shaklida bo‘lsa ham."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Vakillik (2/7)",
+      "text": "Ikki kompaniya rahbarlari 1 000 000 dollarni so‘mga almashtirish shartnomasini tuzdi va qabz uchun har biri o‘z bosh buxgalterini vakil qilib tayinladi. Buxgalterlar pulni topshirish-qabul qilishni boshlashidan oldin rahbarlardan biri boshqa uchrashuvga ketib qoldi. Bu vaziyatni baholang.",
+      "options": [
+        "Bitim durust, chunki vakillar qabzni rahbar ketganidan keyin ham bajara oladi",
+        "Bitim durust, chunki rahbarlar shartnomani imzolab, kursni kelishib bo‘lgan",
+        "Shart buzilgan: vakillar qabz qilguncha vakil qiluvchilar ajralmasligi kerak",
+        "Bitim durust, agar ketgan rahbar telefon orqali aloqada bo‘lib tursa"
+      ],
+      "correct": "C",
+      "explain": "Shartnoma tuzilgandan keyin qabz uchun vakil tayinlash joiz, ammo ikki tomonning vakillari valyutani qabz qilmaguncha ikkala vakil qiluvchi ajralib ketmasligi shart. Sarfdagi «ajralishdan oldin qabz» talabi vakil qiluvchilarga nisbatan qo‘llanadi: rahbar ketgan paytda qabz hali bo‘lmagani uchun bu shart buzilgan.",
+      "notes": [
+        "Standart vakillar qabz qilguncha vakil qiluvchilarning ajralmasligini aniq shart qiladi.",
+        "Imzo va kurs kelishuvi yetarli emas — sarfda qabz ajralishdan oldin bo‘lishi kerak.",
+        "",
+        "Masofaviy aloqa qoidasi (2/8) shartnoma tuzishga oid; bu yerda vakil qiluvchi ajralgan, qabz esa bo‘lmagan."
+      ],
+      "ref": "AAOIFI SS 1, 2/7 Valyutalar savdosida vakillik, 2/7/3",
+      "quote": "Valyuta ayirboshlash shartnomasi tuzilgandan keyin, valyutani qabz qilish uchun vakil tayin qilish joiz. Bunda ikki tomonning vakillari valyutalarni qabz qilib olishlaridan oldin ikkala vakil qiluvchi tomon ajralib ketmasliklari shart."
+    }
+  ]
+}

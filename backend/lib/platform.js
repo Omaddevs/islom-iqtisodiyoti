@@ -117,7 +117,7 @@ export async function loadState(u) {
         if (r.collection === 'articles' && !item.published) continue
         // To'g'ri javoblar va izohlar faqat test topshirilgandan keyin ko'rinadi (izoh javobni ochib qo'yadi)
         if (r.collection === 'tests' && !attempted.has(r.id)) {
-          item = { ...item, questions: (item.questions || []).map(({ correct, explain, ...q }) => q) } // eslint-disable-line no-unused-vars
+          item = { ...item, questions: (item.questions || []).map((q) => Object.fromEntries(Object.entries(q).filter(([k]) => !HIDDEN_Q.includes(k)))) }
         }
       }
       if (['testAttempts', 'submissions', 'vocabProgress'].includes(r.collection) && r.owner_id !== u.id) continue
@@ -396,6 +396,10 @@ async function attachFile(c, orgId, data) {
 
 const scoreOf = (test, answers) => (test.questions || []).reduce((s, q) => s + (answers?.[q.id] === q.correct ? 1 : 0), 0)
 
+const QKINDS = ['scenario', 'calc', 'theory']
+const BLOOMS = ['apply', 'analyze', 'evaluate']
+// Test topshirilmaguncha o'quvchiga yuborilmaydigan maydonlar: javobni yoki manbani ochib qo'yadi
+const HIDDEN_Q = ['correct', 'explain', 'notes', 'quote', 'ref', 'section', 'bloom']
 // Savollar tuzilmasi: to'g'ri javob har doim mavjud variantni ko'rsatishi kerak (aks holda natija buziladi)
 function cleanQuestions(list) {
   if (!Array.isArray(list) || !list.length || list.length > 200) fail(422, 'Testda 1 tadan 200 tagacha savol bo‘lishi kerak')
@@ -408,9 +412,22 @@ function cleanQuestions(list) {
     if (!Array.isArray(q.options) || q.options.length < 2 || q.options.length > 8) fail(422, `${label}: 2 tadan 8 tagacha variant bo‘lishi kerak`)
     const options = q.options.map((o) => text(o, { min: 1, max: 1000, label: `${label} varianti` }))
     if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct >= options.length) fail(422, `${label}: to‘g‘ri javobni belgilang`)
-    // Izoh (tushuntirish) — o'quvchi testni topshirgach ko'radi; savol tuzilmasiga kirmaydi, keyin ham tahrirlanadi
-    const explain = text(q.explain, { max: 3000, label: `${label} izohi` })
-    return { id, text: text(q.text, { min: 1, max: 2000, label }), options, correct: q.correct, ...(explain ? { explain } : {}) }
+    // Izoh va tasnif — o'quvchi testni topshirgach ko'radi; savol tuzilmasiga kirmaydi, keyin ham tahrirlanadi
+    const meta = {
+      explain: text(q.explain, { max: 4000, label: `${label} izohi` }),
+      quote: text(q.quote, { max: 800, label: `${label} iqtibosi` }),
+      ref: text(q.ref, { max: 200, label: `${label} manbasi` }),
+      section: text(q.section, { max: 120, label: `${label} bo‘limi` }),
+      kind: QKINDS.includes(q.kind) ? q.kind : '',
+      bloom: BLOOMS.includes(q.bloom) ? q.bloom : '',
+    }
+    // Har bir variant haqida izoh (nega to'g'ri / noto'g'ri) — variantlar soniga teng
+    const notes = Array.isArray(q.notes) ? options.map((_, k) => text(q.notes[k], { max: 1000, label: `${label} varianti izohi` })) : []
+    return {
+      id, text: text(q.text, { min: 1, max: 2000, label }), options, correct: q.correct,
+      ...Object.fromEntries(Object.entries(meta).filter(([, v]) => v)),
+      ...(notes.some(Boolean) ? { notes } : {}),
+    }
   })
 }
 const sameQuestions = (a, b) => JSON.stringify(cleanStored(a)) === JSON.stringify(cleanStored(b))

@@ -116,9 +116,12 @@ await ok((await ops(t.cookie, [{ col: 'tests', op: 'patch', id: `t${RUN}`, chang
 const withExplain = [{ id: 'q1', text: '2+2?', options: ['3', '4'], correct: 1, explain: '2 ga 2 qo‘shilsa 4' }, { id: 'q2', text: '3+3?', options: ['6', '7'], correct: 0 }]
 await ok((await ops(t.cookie, [{ col: 'tests', op: 'patch', id: `t${RUN}`, changes: { questions: withExplain } }])).status === 200, 'topshirilgan testga izoh qo‘shildi (savollar o‘zgarmadi)')
 await ok((await api('/api/data', { cookie: s.cookie })).data.tests.find((x) => x.id === `t${RUN}`).questions[0].explain === '2 ga 2 qo‘shilsa 4', 'topshirgan o‘quvchi izohni ko‘radi')
-await ops(t.cookie, [{ col: 'tests', op: 'insert', item: { id: `tx${RUN}`, orgId: ORG, groupIds: [G1], title: 'Izohli test', timeLimit: 5, questions: [{ id: 'a', text: 'S?', options: ['1', '2'], correct: 1, explain: 'Javob 2' }] } }])
+await ops(t.cookie, [{ col: 'tests', op: 'insert', item: { id: `tx${RUN}`, orgId: ORG, groupIds: [G1], title: 'Izohli test', timeLimit: 5, questions: [{ id: 'a', text: 'S?', options: ['1', '2'], correct: 1, explain: 'Javob 2', notes: ['1 emas', ''], ref: 'SS 1, 2/6/2', quote: 'Iqtibos', section: 'Qabz', kind: 'calc', bloom: 'apply' }] } }])
 const sx = (await api('/api/data', { cookie: s.cookie })).data.tests.find((x) => x.id === `tx${RUN}`)
-await ok(sx && sx.questions.every((q) => q.explain === undefined && q.correct === undefined), 'topshirmagan o‘quvchiga izoh yuborilmaydi (javobni ochib qo‘yadi)')
+await ok(sx && sx.questions.every((q) => ['explain', 'correct', 'notes', 'ref', 'quote', 'section', 'bloom'].every((k) => q[k] === undefined) && q.kind === 'calc'), 'topshirmagan o‘quvchiga izoh, manba va Bloom yuborilmaydi (savol turi ko‘rinadi)')
+const tq = (await api('/api/data', { cookie: t.cookie })).data.tests.find((x) => x.id === `tx${RUN}`).questions[0]
+await ok(tq.notes.length === 2 && tq.ref === 'SS 1, 2/6/2' && tq.bloom === 'apply', 'ustoz savol tasnifi va variant izohlarini saqladi')
+await ok((await ops(t.cookie, [{ col: 'tests', op: 'insert', item: { id: `ty${RUN}`, orgId: ORG, groupIds: [G1], title: 'X', timeLimit: 5, questions: [{ id: 'a', text: 'S?', options: ['1', '2'], correct: 0, bloom: 'yodlash' }] } }])).data.results[0].item.questions[0].bloom === undefined, 'noma’lum Bloom darajasi saqlanmaydi')
 await ok((await ops(s.cookie, [{ col: 'testAttempts', op: 'patch', id: `ta${RUN}`, changes: { feedback: 'o‘zim' } }])).status === 403, 'o‘quvchi o‘ziga izoh yoza olmaydi')
 const t2 = await login(P.t2, 'parol123')
 await ok((await ops(t2.cookie, [{ col: 'testAttempts', op: 'patch', id: `ta${RUN}`, changes: { feedback: 'begona' } }])).status === 403, 'boshqa guruh ustozi izoh yoza olmaydi')
