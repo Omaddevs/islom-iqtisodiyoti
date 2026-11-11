@@ -8,6 +8,7 @@ import { pool } from './lib/db.js'
 import { createHub } from './realtime/hub.js'
 import { closeDanglingAttendance } from './realtime/store.js'
 import { startLessonReminders } from './lib/lessons.js'
+import { startBot } from './bot/bot.js'
 
 if (process.argv.includes('--prod')) process.env.NODE_ENV = 'production'
 const dev = process.env.NODE_ENV !== 'production'
@@ -37,6 +38,8 @@ const wss = new WebSocketServer({ noServer: true, maxPayload: 256 * 1024 })
 const beat = hub.heartbeat(wss)
 // Dars boshlanishidan 1 soat oldin guruhga eslatma (bitta jarayon — takrorlanmaydi)
 const reminders = startLessonReminders()
+// Telegram bot (BOT_TOKEN bo'lsa). Bitta token bilan faqat bitta nusxa ishlashi mumkin
+const bot = startBot()
 wss.on('connection', (ws, req) => hub.onConnection(ws, req).catch((e) => { console.error('[ws]', e); ws.close(1011) }))
 
 const nextUpgrade = app.getUpgradeHandler()
@@ -57,6 +60,7 @@ server.listen(port, host, () => {
 const shutdown = () => {
   clearInterval(beat)
   clearInterval(reminders)
+  bot?.stop()
   for (const ws of wss.clients) ws.close(1012, 'server restart')
   server.close(() => pool.end().finally(() => process.exit(0)))
   setTimeout(() => process.exit(0), 5000).unref()

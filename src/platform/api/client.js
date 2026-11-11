@@ -37,6 +37,7 @@ export const wsUrl = (path) => {
 
 export const authApi = {
   login: (phone, password) => api('/api/auth/login', { method: 'POST', body: { phone, password } }),
+  telegram: (initData) => api('/api/auth/telegram', { method: 'POST', body: { initData } }),
   logout: () => api('/api/auth/logout', { method: 'POST' }),
   me: () => api('/api/auth/me'),
 }

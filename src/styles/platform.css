@@ -2139,3 +2139,87 @@ button.ptmx__cell:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -8
 /* Ustoz: testni sinab ko'rish rejimi */
 .ptpreview { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 12px 16px; border-radius: 14px; background: #f1edff; border: 1px solid #d9cffb; color: #5b21b6; font-size: 14px; }
 .ptpreview svg { flex-shrink: 0; }
+
+/* =====================================================================
+   Mobil ilova rejimi + Telegram Mini App
+   ≤768px: pastki tab bar, menyu — pastdan chiquvchi panel (bottom sheet),
+   modal oynalar ham pastdan, safe-area (iPhone «chiziq»i) hisobga olinadi.
+   ===================================================================== */
+.ptab { display: none; }
+:root { --ptab-h: 64px; --safe-b: env(safe-area-inset-bottom, 0px); }
+
+@media (max-width: 768px) {
+  .pf { -webkit-tap-highlight-color: transparent; }
+  .pf__shell { padding: 8px 8px calc(var(--ptab-h) + var(--safe-b) + 16px); gap: 12px; }
+  .pf__content { gap: 12px; }
+
+  /* Yuqori panel: ixcham, ekranga yopishgan */
+  .ptop { position: sticky; top: 8px; z-index: 50; height: 56px; padding: 0 6px 0 14px; gap: 8px; border-radius: 18px; background: rgba(255, 255, 255, .9); backdrop-filter: saturate(1.6) blur(14px); -webkit-backdrop-filter: saturate(1.6) blur(14px); }
+  .ptop__burger { display: none; }
+  .ptop__title b { font-size: 17px; }
+  .ptop__ibtn { width: 40px; height: 40px; }
+  .ptop__me { padding: 2px; }
+  .ptop__me .uavatar, .ptop__me img { width: 34px !important; height: 34px !important; }
+
+  /* Pastki tab bar */
+  .ptab {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: calc(var(--ptab-h) + var(--safe-b)); padding: 6px 6px var(--safe-b);
+    background: rgba(255, 255, 255, .94); backdrop-filter: saturate(1.6) blur(16px); -webkit-backdrop-filter: saturate(1.6) blur(16px);
+    border-top: 1px solid var(--pf-line); box-shadow: 0 -10px 30px -18px rgba(20, 33, 58, .25);
+    -webkit-user-select: none; user-select: none;
+  }
+  .ptab__i { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; border: 0; background: none; padding: 0; color: var(--pf-muted); font: inherit; cursor: pointer; text-decoration: none; }
+  .ptab__ic { position: relative; display: grid; place-items: center; width: 52px; height: 30px; border-radius: 99px; transition: background .2s, color .2s, transform .15s; }
+  .ptab__i:active .ptab__ic { transform: scale(.9); }
+  .ptab__l { max-width: 100%; font-size: 11px; font-weight: 600; letter-spacing: -.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ptab__i.is-active { color: var(--pf-primary-2); }
+  .ptab__i.is-active .ptab__ic { background: var(--pf-primary-soft); }
+  .ptab__badge { position: absolute; top: -3px; right: 6px; min-width: 18px; height: 18px; padding: 0 5px; display: grid; place-items: center; border-radius: 99px; background: var(--pf-primary-2); color: #fff; font-size: 10.5px; font-style: normal; font-weight: 700; border: 2px solid #fff; }
+  .ptab__badge.is-live { background: #ff5f57; animation: pfPulse 1.8s infinite; }
+
+  /* To'liq menyu — pastdan chiquvchi panel (tab bar ustida) */
+  .pside {
+    position: fixed; left: 8px; right: 8px; top: auto; width: auto; height: auto; z-index: 80;
+    bottom: calc(var(--ptab-h) + var(--safe-b) + 8px); max-height: calc(100dvh - var(--ptab-h) - var(--safe-b) - 72px);
+    padding: 10px 14px 12px; border-radius: 24px;
+    transform: translateY(calc(100% + var(--ptab-h) + 40px)); visibility: hidden;
+    transition: transform .32s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .32s;
+  }
+  .pside.is-open { transform: none; visibility: visible; transition: transform .32s cubic-bezier(.2, .8, .2, 1); }
+  .pside::before { content: ''; display: block; width: 40px; height: 4px; margin: 0 auto 8px; border-radius: 99px; background: rgba(255, 255, 255, .22); }
+  .pside__brand { padding: 2px 6px 12px; }
+  .pside__brand img { height: 28px; }
+  .pside__close { display: grid; position: absolute; right: 12px; top: 18px; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .08); color: #fff; cursor: pointer; }
+  .pside__org { margin: 10px 0 2px; }
+  /* Bo'limlar ikki ustunli plitka ko'rinishida — barmoq bilan bosish oson */
+  .pside__nav { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: start; overscroll-behavior: contain; }
+  .pside__group { grid-column: 1 / -1; margin-top: 10px; padding-bottom: 0; }
+  .pside__link { height: 46px; margin: 0; padding: 0 10px; gap: 10px; font-size: 13.5px; background: rgba(255, 255, 255, .05); min-width: 0; }
+  .pside__link > svg { flex-shrink: 0; }
+  .pf__scrim { z-index: 75; }
+
+  /* Modal oynalar — pastdan chiquvchi panel */
+  .pmodal { place-items: end center; padding: 0; }
+  .pmodal__box { max-width: none !important; max-height: calc(100dvh - 24px); border-radius: 24px 24px 0 0; padding-bottom: var(--safe-b); animation: pfSheetUp .28s cubic-bezier(.2, .8, .2, 1); }
+  .ptoasts { left: 12px; right: 12px; bottom: calc(var(--ptab-h) + var(--safe-b) + 12px); align-items: center; }
+
+  /* iOS fokusda sahifani kattalashtirmasligi uchun */
+  .pf input, .pf select, .pf textarea { font-size: 16px; }
+  .ptq__bar { top: 72px; }
+  /* Bosh sahifadagi qidiruv — panelning bo'sh joyini to'liq egallaydi */
+  .ptop__gsearch { flex: 1 1 0; }
+  .ptop__gsearch ~ .ptop__spacer { display: none; }
+}
+@keyframes pfSheetUp { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+
+/* Telegram ichida: tizim «Orqaga» tugmasi bor, sahifa "rezina" bo'lib cho'zilmaydi */
+.is-tg, .is-tg body { overscroll-behavior-y: none; }
+.is-tg .pf { min-height: var(--tg-vh, 100dvh); }
+.is-tg .auth__back, .is-tg .auth__logo { pointer-events: none; }
+.is-tg .auth__back { display: none; }
+@media (max-width: 768px) {
+  .is-tg .ptop { top: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .pside, .pmodal__box { transition: none; animation: none; } }

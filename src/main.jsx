@@ -11,6 +11,9 @@ import './styles/auth.css'
 import './styles/platform.css'
 import './styles/meet.css'
 import { AuthProvider } from './platform/store/auth.jsx'
+import { initTelegram } from './tg.js'
+
+initTelegram()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

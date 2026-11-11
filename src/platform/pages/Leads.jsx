@@ -11,6 +11,7 @@ const KIND = {
   partner: { label: 'Hamkorlik', tone: 'violet' },
   contact: { label: 'Aloqa formasi', tone: 'amber' },
   subscribe: { label: 'Obuna', tone: 'gray' },
+  telegram: { label: 'Telegram bot', tone: 'blue' },
 }
 
 export default function Leads() {

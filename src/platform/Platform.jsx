@@ -5,6 +5,7 @@ import { loadDB, onSyncError } from './store/db.js'
 import { ToastProvider, useToast, ErrorBoundary } from './ui/kit.jsx'
 import Sidebar from './layout/Sidebar.jsx'
 import Topbar from './layout/Topbar.jsx'
+import TabBar from './layout/TabBar.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Meetings, { MeetingRedirect } from './pages/Meetings.jsx'
 import { useMeetingsSync } from './api/meetings.js'
@@ -99,6 +100,7 @@ export default function Platform({ path }) {
             </div>
           </div>
         </div>
+        <TabBar route={path} menuOpen={menuOpen} onMenu={() => setMenuOpen((v) => !v)} />
       </div>
     </ToastProvider>
   )

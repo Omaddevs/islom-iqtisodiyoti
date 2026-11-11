@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useDB, loadDB, clearDB, onSyncError, scopeFor, can as canFn } from './db.js'
 import { authApi } from '../api/client.js'
+import { tg } from '../../tg.js'
 
 // Sessiya — serverdagi httpOnly cookie. Brauzerda faqat bosh admin tanlagan tashkilot eslab qolinadi.
 const VIEW_KEY = 'ii_view_org'
@@ -15,7 +16,10 @@ export function AuthProvider({ children }) {
 
   // Sahifa ochilganda: cookie amal qilsa — ma'lumotlar yuklanadi
   useEffect(() => {
-    loadDB().then((me) => setMeId(me.id)).catch(() => setMeId(null)).finally(() => setReady(true))
+    // Telegram Mini App: sessiya bo'lmasa — bot orqali bog'langan akkaunt bilan avtomatik kirish
+    loadDB()
+      .catch(async (e) => { if (!tg?.initData) throw e; await authApi.telegram(tg.initData); return loadDB() })
+      .then((me) => setMeId(me.id)).catch(() => setMeId(null)).finally(() => setReady(true))
   }, [])
 
   // Sessiya muddati tugasa yoki hisob bloklansa — tizimdan chiqariladi
