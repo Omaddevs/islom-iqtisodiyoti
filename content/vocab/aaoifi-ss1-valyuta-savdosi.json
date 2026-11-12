@@ -1,0 +1,249 @@
+{
+  "title": "AAOIFI 1-shariat standarti: Valyutalar savdosi — izohli lug‘at",
+  "lang": "uz · ar · en",
+  "description": "AAOIFI Shariat standarti №1 «Valyutalar savdosi» (Trading in Currencies) ni tushunish uchun zarur bo‘lgan 20 ta asosiy termin: shariat terminlari va zamonaviy moliya terminlari. Har bir terminda arabcha asl shakli, AAOIFI inglizcha ekvivalenti, oddiy tildagi ta’rif, standart bandi va shariat hukmi berilgan. Ta’riflar standart matniga tayanadi; standartda bo‘lmagan izohlar «(qo‘shimcha izoh)» deb belgilangan. Auditoriya: bakalavr va magistratura talabalari, CSAA/CPSS imtihoniga tayyorlanuvchilar.",
+  "orderNote": "Terminlar alifbo bo‘yicha emas, standart bandlari ketma-ketligida joylashtirilgan: qamrov (1-band) → valyuta savdosining joizlik shartlari (2/1/1–2/1/4) → forward, fyuchers va hedjirlash (2/2–2/4) → qarz to‘lovlari va kurs (2/5) → qabz turlari (2/6) → va’dalashuv (2/9) → zimmadagi qarzlar (2/10) → moliya muassasalari amaliyotlari (2/12). Bu tartib standart mantiqini kuzatib borishga, yaqin terminlarni (haqiqiy va hukmiy qabz, forvard va fyuchers, va’d va muvoada) yonma-yon solishtirishga imkon beradi.",
+  "terms": [
+    {
+      "term": "Sarf (valyuta savdosi)",
+      "arabic": "الصَّرْف",
+      "translit": "aṣ-ṣarf",
+      "translation": "Trading in currencies (Sarf)",
+      "definition": "Bir valyutani boshqa valyutaga (yoki bir turdagi valyutani o‘ziga) ayirboshlash bitimi. Standart 1-bandda qamrovni belgilaydi: valyuta savdosi bilan bog‘liq bo‘lmagan masalalar, zargarlikdagi oltin-kumush savdosi, ayirboshlashsiz pul o‘tkazmalari va veksellarni diskont qilish bu standartga kirmaydi. 2/1-bandga ko‘ra sarf shartlar bajarilsagina joiz; jumladan, bir turdagi valyutalar (masalan, dollar dollarga) qog‘oz va tanga bo‘lsa ham tengma-teng ayirboshlanadi (2/1/2).",
+      "clause": "1; 2/1; 2/1/2",
+      "ruling": "shartli joiz",
+      "example": "Bank kassasida 1 000 dollarni o‘sha zahoti so‘mga almashtirish — sarf."
+    },
+    {
+      "term": "Qabz",
+      "arabic": "الْقَبْض",
+      "translit": "al-qabḍ",
+      "translation": "Possession (taking possession, Qabd)",
+      "definition": "Ayirboshlanayotgan ikkala valyutani tomonlar ajralishidan oldin egalikka olish. Sarfning asosiy sharti shu: qabz haqiqiy yoki hukmiy bo‘lishi mumkin. Qabz qisman bo‘lsa, bitim faqat qabz qilingan qism uchun durust bo‘ladi (2/6/2).",
+      "clause": "2/1/1; 2/6",
+      "ruling": "majburiy shart",
+      "example": "10 000 dollar sotilib, faqat 6 000 dollar topshirilsa — bitim faqat 6 000 dollar uchun durust."
+    },
+    {
+      "term": "Haqiqiy qabz",
+      "arabic": "الْقَبْض الْحَقِيقِي",
+      "translit": "al-qabḍ al-ḥaqīqī",
+      "translation": "Actual (physical) possession",
+      "definition": "Valyutani jismonan qo‘lga olish — naqd pulni qo‘ldan-qo‘lga topshirish. Bu qabzning asl va eng aniq shakli.",
+      "clause": "2/6",
+      "ruling": "joiz",
+      "distinction": "Haqiqiy qabzda pul jismonan topshiriladi; hukmiy qabzda pul jismonan berilmaydi, lekin unga egalik huquqi va tasarruf imkoniyati qonuniy (hisobraqam, chek, karta orqali) o‘tadi. Shariat nuqtai nazaridan ikkalasi ham sarf uchun yetarli.",
+      "example": "Valyuta ayirboshlash shoxobchasida naqd dollar evaziga naqd so‘m olish."
+    },
+    {
+      "term": "Hukmiy qabz",
+      "arabic": "الْقَبْض الْحُكْمِي",
+      "translit": "al-qabḍ al-ḥukmī",
+      "translation": "Constructive possession",
+      "definition": "Valyuta jismonan topshirilmasa ham, unga egalik va tasarruf qilish imkoniyati amalda o‘tishi. Standart uning shakllarini sanaydi: mablag‘ni mijoz hisobraqamiga o‘tkazish, hisobda mablag‘ band qilingan chekni qabul qilish, karta chiqaruvchi darhol to‘lay oladigan kredit karta kvitansiyasini qabul qilish.",
+      "clause": "2/6/5 (2/6/5/1–2/6/5/3)",
+      "ruling": "joiz",
+      "distinction": "Haqiqiy qabzdan farqi — pul qo‘lga olinmaydi, lekin huquqan egalikka o‘tadi. Chek orqali qabz faqat chekdagi summa hisobda mavjud va band qilingan bo‘lsagina hukmiy qabz hisoblanadi.",
+      "example": "Mijoz hisobidagi so‘m evaziga dollar sotib oladi va dollar uning valyuta hisobiga darhol o‘tkaziladi."
+    },
+    {
+      "term": "Xiyor ash-shart",
+      "arabic": "خِيَار الشَّرْط",
+      "translit": "khiyār ash-sharṭ",
+      "translation": "Option of stipulation",
+      "definition": "Shartnomani belgilangan muddat ichida bekor qilish huquqini shart qilib qo‘yish. Sarfda bunday shart bo‘lmasligi kerak, chunki u egalikning darhol va qat’iy o‘tishiga to‘sqinlik qiladi.",
+      "clause": "2/1/3",
+      "ruling": "nojoiz",
+      "example": "«Dollarni hozir olaman, lekin 3 kun ichida qaytarish huquqim bo‘lsin» — sarfda nojoiz."
+    },
+    {
+      "term": "Nasiya (to‘lovni kechiktirish)",
+      "arabic": "النَّسِيئَة / الْأَجَل",
+      "translit": "an-nasīʾah / al-ajal",
+      "translation": "Deferment (of one or both counter-values)",
+      "definition": "Ayirboshlanayotgan valyutalardan biri yoki ikkalasining topshirilishini keyinga qoldirish. Standart sarfda bunday shartni taqiqlaydi: ikkala valyuta majlisda (ajralishdan oldin) topshirilishi shart.",
+      "clause": "2/1/3",
+      "ruling": "nojoiz",
+      "example": "So‘m bugun to‘lanib, dollar bir haftadan keyin berilishi shart qilinsa — nasiya, nojoiz."
+    },
+    {
+      "term": "Ehtikor",
+      "arabic": "الِاحْتِكَار",
+      "translit": "al-iḥtikār",
+      "translation": "Monopoly (hoarding)",
+      "definition": "Valyutani narxni sun’iy ko‘tarish, bozorni egallash yoki jamiyatga zarar yetkazish maqsadida to‘plab ushlab turish. Standartga ko‘ra valyuta savdosi ehtikor yoki shaxslar va jamiyatga zarar keltiradigan maqsadda amalga oshirilmasligi kerak.",
+      "clause": "2/1/4",
+      "ruling": "nojoiz",
+      "example": "Taqchillik paytida kursni ko‘tarish uchun dollarni ommaviy sotib olib, sotuvdan ushlab turish."
+    },
+    {
+      "term": "Riba",
+      "arabic": "الرِّبَا",
+      "translit": "ar-ribā",
+      "translation": "Riba (usury / interest)",
+      "definition": "(qo‘shimcha izoh) Ayirboshlash yoki qarzda shariatga zid ravishda olinadigan ortiqcha. Valyutada ikki ko‘rinishi bor: bir turdagi valyutani ortig‘i bilan almashtirish (riba al-fadl) va topshirishni kechiktirish (riba an-nasi’a). Standartdagi tenglik (2/1/2), qabz (2/1/1) va kechiktirmaslik (2/1/3) shartlari aynan ribaning oldini olish uchun belgilangan.",
+      "clause": "2/1 (shartlarning asosi)",
+      "ruling": "nojoiz",
+      "example": "100 dollarni bugun berib, bir oydan keyin 102 dollar qaytarishni shart qilish — riba."
+    },
+    {
+      "term": "Spot bitim",
+      "arabic": "الصَّرْف الْعَاجِل / الْفَوْرِي",
+      "translit": "aṣ-ṣarf al-ʿājil / al-fawrī",
+      "translation": "Spot transaction",
+      "definition": "Valyutalar darhol (bitim majlisida) haqiqiy yoki hukmiy qabz bilan almashtiriladigan bitim. Standart mijoz hisobidagi mablag‘ evaziga boshqa valyutani sotib olishni spot ayirboshlashning joiz shakli sifatida keltiradi. (qo‘shimcha izoh) Xalqaro bozordagi «T+2» hisob-kitob muddati amaldagi texnik muddat sifatida ko‘riladi.",
+      "clause": "2/6/5/1",
+      "ruling": "joiz",
+      "distinction": "Spotda ikkala valyuta darhol topshiriladi; forvardda esa topshirish kelajakdagi sanaga qoldiriladi — shu sababli spot joiz, forvard nojoiz.",
+      "example": "Mijoz ilovada so‘m hisobidan dollar sotib oladi va dollar zudlik bilan valyuta hisobiga tushadi."
+    },
+    {
+      "term": "Valyuta kursi",
+      "arabic": "سِعْر الصَّرْف",
+      "translit": "siʿr aṣ-ṣarf",
+      "translation": "Exchange rate",
+      "definition": "Bir valyutaning boshqa valyutadagi narxi. Turli valyutalarni ayirboshlashda kurs tomonlar kelishuvi bilan belgilanadi. Qarz boshqa valyutada to‘lansa, to‘lov kunidagi kurs qo‘llanadi; avvaldan belgilangan kurs bilan kelajakdagi to‘lovni qat’iylashtirish joiz emas.",
+      "clause": "2/5; 2/10/1",
+      "ruling": "joiz",
+      "example": "Dollardagi qarzning oylik bo‘lagi to‘lov kunidagi kurs bo‘yicha so‘mda to‘lanadi."
+    },
+    {
+      "term": "Forvard shartnoma",
+      "arabic": "الْعَقْد الْآجِل",
+      "translit": "al-ʿaqd al-ājil",
+      "translation": "Forward contract",
+      "definition": "Valyutalarni bugun kelishilgan kurs bo‘yicha kelajakdagi sanada topshirish majburiyati. Unda ikkala valyutaning topshirilishi kechiktiriladi va qabz sharti buziladi, shuning uchun standart valyuta forvardlarini taqiqlaydi.",
+      "clause": "2/2",
+      "ruling": "nojoiz",
+      "distinction": "Forvard — ikki tomon o‘rtasida individual (birjadan tashqari) tuziladigan, odatda yetkazib berish bilan tugaydigan shartnoma. Fyuchers — birjada standartlashtirilgan, kundalik hisob-kitobli va ko‘pincha yetkazib bermasdan yopiladigan shartnoma. Ikkalasi ham qabz kechiktirilgani uchun nojoiz.",
+      "example": "Bugun «3 oydan keyin 1 dollar = 13 000 so‘m kursida 50 000 dollar sotaman» deb kelishish."
+    },
+    {
+      "term": "Fyuchers shartnoma",
+      "arabic": "الْعُقُود الْمُسْتَقْبَلِيَّة",
+      "translit": "al-ʿuqūd al-mustaqbaliyyah",
+      "translation": "Futures contract",
+      "definition": "Birjada savdo qilinadigan, miqdori va muddati standartlashtirilgan kelajakdagi valyuta yetkazib berish shartnomasi. Valyutalar topshirilishi kelajakka qoldirilgani sababli standart uni ham forvard kabi taqiqlaydi.",
+      "clause": "2/3",
+      "ruling": "nojoiz",
+      "distinction": "Forvarddan farqi — birjada, standart lotlar bilan, kliring markazi orqali savdo qilinadi va odatda farqi bo‘yicha (yetkazmasdan) yopiladi.",
+      "example": "Birjada EUR/USD fyuchers kontraktini sotib olish."
+    },
+    {
+      "term": "Hedjirlash",
+      "arabic": "التَّحَوُّط",
+      "translit": "at-taḥawwuṭ",
+      "translation": "Hedging",
+      "definition": "Kelajakda valyuta qadrsizlanishi xatarini kamaytirish. Standart buni forvard yoki fyuchers orqali emas, shariatga mos usullar bilan qilishga ruxsat beradi: turli valyutalarda bir-biriga bog‘liq bo‘lmagan ikkita alohida shartnoma yoki ustama foizsiz o‘zaro qarz bitimlari orqali.",
+      "clause": "2/4; 2/4/1",
+      "ruling": "shartli joiz",
+      "example": "Ikki bank bir-biriga turli valyutalarda foizsiz qarz beradi va muddat oxirida qarzlarni qaytaradi."
+    },
+    {
+      "term": "Svop (valyuta svopi)",
+      "arabic": "الْمُبَادَلَة",
+      "translit": "al-mubādalah",
+      "translation": "Currency swap",
+      "definition": "(qo‘shimcha izoh) An’anaviy svop — valyutani bugun spot kursda almashtirib, kelajakda oldindan belgilangan kursda qayta almashtirish majburiyati. Uning kelajakdagi qismi forvard bo‘lgani va ikki bitim o‘zaro bog‘langani uchun 2/2 va 2/9/2 qoidalariga ko‘ra nojoiz. Shariatga mos muqobili — 2/4/1 dagi foizsiz o‘zaro qarzlar.",
+      "clause": "2/2; 2/4/1; 2/9/2",
+      "ruling": "nojoiz",
+      "example": "Bugun 1 mln dollarni so‘mga almashtirib, 6 oydan keyin belgilangan kursda qaytarib almashtirishni shart qilish."
+    },
+    {
+      "term": "Va’d (bir tomonlama va’da)",
+      "arabic": "الْوَعْد",
+      "translit": "al-waʿd",
+      "translation": "Unilateral promise",
+      "definition": "Faqat bir tomonning kelajakda valyutani sotish yoki sotib olish bo‘yicha va’dasi. Standartga ko‘ra bir tomonlama va’da, bajarilishi majburiy bo‘lsa ham, joiz.",
+      "clause": "2/9/1",
+      "ruling": "joiz",
+      "distinction": "Va’dda majburiyat faqat bir tomonda bo‘ladi, ikkinchi tomon erkin. Muvoadada esa ikkala tomon bir-biriga majburiy va’da beradi — bu amalda forvard shartnomasiga teng bo‘lib qoladi.",
+      "example": "Bank mijozga «bir oy ichida xohlasangiz, dollarni shu kursda sotaman» deb va’da beradi, mijoz esa hech narsaga majbur emas."
+    },
+    {
+      "term": "Muvoada (ikki tomonlama va’dalashuv)",
+      "arabic": "الْمُوَاعَدَة",
+      "translit": "al-muwāʿadah",
+      "translation": "Bilateral promise",
+      "definition": "Ikki tomonning bir-biriga kelajakda valyutani ayirboshlash haqida majburiy va’dasi. Standartga ko‘ra agar va’da ikkala tomon uchun majburiy bo‘lsa, hatto valyuta qadrsizlanishidan himoyalanish uchun qo‘llansa ham, taqiqlanadi. «Valyutalarni parallel sotib olish va sotish» amaliyoti ham shu sababli nojoiz (2/9/2).",
+      "clause": "2/9/1; 2/9/2",
+      "ruling": "nojoiz",
+      "distinction": "Majburiy bo‘lmagan (axloqiy) ikki tomonlama va’dalashuv standartning taqiqi doirasiga kirmaydi; taqiq majburiylik bilan bog‘liq.",
+      "example": "Bank va mijoz «3 oydan keyin ikkalamiz ham shu kursda ayirboshlashga majburmiz» deb kelishadi."
+    },
+    {
+      "term": "Muqassa (o‘zaro hisob-kitob)",
+      "arabic": "الْمُقَاصَّة",
+      "translit": "al-muqāṣṣah",
+      "translation": "Set-off",
+      "definition": "Ikki shaxsning bir-biriga turli valyutalardagi qarzlarini kelishilgan kurs bo‘yicha to‘liq yoki qisman o‘zaro yopishi. Standart zimmadagi qarz sifatidagi valyutalarni shu tarzda ayirboshlashga ruxsat beradi.",
+      "clause": "2/10/1",
+      "ruling": "joiz",
+      "example": "A B ga 1 000 dollar, B esa A ga 13 mln so‘m qarz; ular kelishilgan kursda qarzlarni o‘zaro yopadi."
+    },
+    {
+      "term": "Marja savdosi",
+      "arabic": "الْمُتَاجَرَة بِالْهَامِش",
+      "translit": "al-mutājarah bil-hāmish",
+      "translation": "Margin trading",
+      "definition": "Mijozning o‘z mablag‘idan ortiq hajmda, muassasa bergan kredit (leveraj) hisobiga valyuta savdosi qilishi. Standartga ko‘ra mijozga o‘z egaligidagi mablag‘dan ortiq valyuta savdosi qilishga ruxsat berilmaydi.",
+      "clause": "2/12/1",
+      "ruling": "nojoiz",
+      "example": "1 000 dollar depozit bilan 1:100 leveraj orqali 100 000 dollarlik valyuta pozitsiyasini ochish."
+    },
+    {
+      "term": "Qarz hasana",
+      "arabic": "الْقَرْض الْحَسَن",
+      "translit": "al-qarḍ al-ḥasan",
+      "translation": "Interest-free loan (Qard Hasan)",
+      "definition": "Ustamasiz (foizsiz) beriladigan qarz. Standartda u ikki o‘rinda keladi: hedjirlashda turli valyutalardagi foizsiz o‘zaro qarzlar joiz (2/4/1); lekin muassasa qarzni mijoz valyuta savdosini aynan o‘sha muassasada qilishi sharti bilan bera olmaydi — bunday shart qo‘yilmasa, mone’lik yo‘q (2/12/2).",
+      "clause": "2/4/1; 2/12/2",
+      "ruling": "shartli joiz",
+      "example": "«Qarz beramiz, lekin valyutani faqat bizning bankda almashtirasiz» degan shart — nojoiz."
+    },
+    {
+      "term": "Murobaha (valyutada)",
+      "arabic": "الْمُرَابَحَة",
+      "translit": "al-murābaḥah",
+      "translation": "Murabaha (cost-plus sale)",
+      "definition": "(qo‘shimcha izoh) Tannarx va ma’lum foyda bilan sotish, odatda narx muddatli to‘lanadi. Valyutani valyutaga muddatli murobaha qilish mumkin emas, chunki bu 2/1/1 (qabz) va 2/1/3 (kechiktirmaslik) shartlarini buzadi. Muassasa valyuta savdosini murobaha emas, faqat spot sarf shaklida amalga oshiradi.",
+      "clause": "2/1/1; 2/1/3",
+      "ruling": "nojoiz",
+      "example": "Bank 10 000 dollarni sotib olib, mijozga 6 oy muddatga ustama bilan so‘mda sotishi — nojoiz."
+    }
+  ],
+  "questions": [
+    {
+      "text": "Haqiqiy qabz va hukmiy qabzning farqi nimada? Standart (2/6/5) bo‘yicha hukmiy qabzning uchta shaklini sanang.",
+      "answer": "Haqiqiy qabz — valyutani jismonan qo‘lga olish; hukmiy qabz — jismonan olinmasa ham egalik va tasarruf huquqining o‘tishi. Shakllari: mablag‘ni mijoz hisobraqamiga o‘tkazish (2/6/5/1), hisobda mablag‘ mavjud va band qilingan chekni qabul qilish (2/6/5/2), darhol to‘lanadigan kredit karta kvitansiyasini qabul qilish (2/6/5/3)."
+    },
+    {
+      "text": "Quyidagilardan qaysi biri AAOIFI SS 1 ga ko‘ra joiz?",
+      "options": [
+        "Valyuta forvard shartnomasi",
+        "Ikki tomon uchun majburiy muvoada",
+        "Bir tomonlama majburiy va’d",
+        "Valyuta fyuchersi"
+      ],
+      "answer": "C — bir tomonlama va’da, bajarilishi majburiy bo‘lsa ham, joiz (2/9/1). Qolganlari nojoiz (2/2, 2/3, 2/9/1)."
+    },
+    {
+      "text": "Forvard va fyuchers shartnomalari qanday farqlanadi va nega ikkalasi ham valyuta savdosida taqiqlangan?",
+      "answer": "Forvard — ikki tomon o‘rtasida individual tuziladigan, odatda yetkazib berish bilan tugaydigan shartnoma; fyuchers — birjada standartlashtirilgan, kliring orqali va ko‘pincha yetkazmasdan yopiladigan shartnoma. Ikkalasida ham valyutalar topshirilishi kelajakka qoldiriladi, bu qabz (2/1/1) va kechiktirmaslik (2/1/3) shartlarini buzadi (2/2, 2/3)."
+    },
+    {
+      "text": "Muassasa valyuta qadrsizlanishidan himoyalanish (hedjirlash) uchun qaysi usuldan foydalanishi mumkin?",
+      "options": [
+        "Valyuta forvard shartnomasi",
+        "Turli valyutalarda ustama foizsiz o‘zaro qarzlar",
+        "Valyuta opsionini sotib olish",
+        "Parallel sotib olish va sotish (ikki bog‘liq bitim)"
+      ],
+      "answer": "B — 2/4/1 ga ko‘ra turli valyutalardagi foizsiz o‘zaro qarzlar yoki bir-biriga bog‘liq bo‘lmagan ikki alohida shartnoma joiz. Parallel sotib olish-sotish 2/9/2 ga ko‘ra nojoiz."
+    },
+    {
+      "text": "Mijozning dollardagi qarzi bo‘yicha oylik to‘lovni so‘mda qilishga kelishildi. Qaysi kurs qo‘llanadi va nima uchun shartnoma kunidagi kursni qat’iylashtirib bo‘lmaydi?",
+      "answer": "To‘lov amalga oshiriladigan kundagi kurs qo‘llanadi (2/5). Oldindan belgilangan kurs bilan kelajakdagi to‘lov — kechiktirilgan sarf bo‘lib qoladi va 2/1/3 dagi kechiktirmaslik shartiga zid."
+    }
+  ]
+}

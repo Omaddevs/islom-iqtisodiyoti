@@ -2223,3 +2223,42 @@ button.ptmx__cell:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -8
   .is-tg .ptop { top: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .pside, .pmodal__box { transition: none; animation: none; } }
+
+/* ---------- Izohli lug'at (glossariy) ---------- */
+.pvintro p { font-size: 14.5px; line-height: 1.65; color: var(--pf-text-2); }
+.pvintro__note { display: flex; gap: 10px; margin-top: 12px !important; padding: 12px 14px; border-radius: 14px; background: var(--pf-primary-soft); font-size: 13.5px !important; }
+.pvintro__note svg { flex-shrink: 0; margin-top: 3px; color: var(--pf-primary-2); }
+.pgloss { display: flex; flex-direction: column; gap: 12px; }
+.pgloss__head { display: flex; align-items: flex-start; gap: 14px; }
+.pgloss__n { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; background: var(--pf-teal-soft); color: #0d9488; font-weight: 700; font-size: 14px; }
+.pgloss__names { flex: 1; min-width: 0; }
+.pgloss__names h3 { font-family: var(--f-head); font-size: 18px; font-weight: 700; letter-spacing: -.2px; }
+.pgloss__alt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 4px; font-size: 13.5px; color: var(--pf-muted); }
+.pgloss__ar { font-family: 'Amiri', 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif; font-size: 21px; line-height: 1.3; color: var(--pf-text); }
+.pgloss__en { color: var(--pf-primary-2); font-weight: 600; }
+.pgloss__tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; flex-shrink: 0; max-width: 40%; }
+.pgloss__def { margin-top: 12px !important; font-size: 14.5px; line-height: 1.65; color: var(--pf-text-2); }
+.pgloss__diff, .pgloss__ex, .pgloss__ans { margin-top: 10px !important; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.6; }
+.pgloss__diff { background: var(--pf-amber-soft); color: #7c4a03; }
+.pgloss__ex { background: var(--c-surface, #f4f6fa); color: var(--pf-text-2); }
+.pgloss__ans { background: var(--pf-green-soft); color: #065f46; }
+.pgloss__q { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.pgloss__opts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.pgloss__opts li { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border: 1px solid var(--pf-line); border-radius: 12px; font-size: 14px; }
+.pgloss__opts i { font-style: normal; font-weight: 700; color: var(--pf-primary-2); }
+.pgtab { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pgtab table { width: 100%; min-width: 1100px; border-collapse: collapse; font-size: 13.5px; }
+.pgtab th { position: sticky; top: 0; background: #f8fafc; padding: 12px 14px; text-align: left; font-weight: 600; color: var(--pf-text-2); border-bottom: 1px solid var(--pf-line); white-space: nowrap; }
+.pgtab td { padding: 12px 14px; border-bottom: 1px solid var(--pf-line); vertical-align: top; line-height: 1.55; }
+.pgtab td small { display: block; color: var(--pf-muted); font-style: italic; }
+.pgtab td .pgloss__ar { font-size: 18px; white-space: nowrap; }
+.pgtab__def { min-width: 340px; color: var(--pf-text-2); }
+.pgtab tr:last-child td { border-bottom: 0; }
+.pflash__ar { margin-top: 6px; font-family: 'Amiri', 'Traditional Arabic', serif; font-size: 24px; color: rgba(255, 255, 255, .85); }
+.pvq-extra { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; }
+@media (max-width: 640px) {
+  .pgloss__head { flex-wrap: wrap; }
+  .pgloss__tags { max-width: none; width: 100%; justify-content: flex-start; padding-left: 48px; }
+  .pvq-extra { grid-template-columns: 1fr 1fr; }
+  .pvq-extra > :first-child { grid-column: 1 / -1; }
+}

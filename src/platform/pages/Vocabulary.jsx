@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search, useFormInit } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search, useFormInit, Select } from '../ui/kit.jsx'
 import { pct } from '../ui/format.js'
 import { uid } from '../store/ids.js'
 
@@ -55,7 +55,32 @@ function VocabList() {
   )
 }
 
-const emptyTerm = () => ({ id: uid('w'), term: '', translation: '', definition: '', example: '' })
+// Shariat hukmi belgisi (izohli lug'atlar uchun)
+const RULING = { joiz: 'green', 'shartli joiz': 'amber', nojoiz: 'red', 'majburiy shart': 'blue' }
+const rulingTone = (r) => RULING[String(r || '').toLowerCase()] || 'gray'
+const TERM_KEYS = ['term', 'translation', 'definition', 'example', 'arabic', 'translit', 'clause', 'ruling', 'distinction']
+const str = (v, max = 2000) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
+
+// JSON fayldan lug'at: { title, lang, description, orderNote, terms: [{ term, translation, definition, example, arabic, translit, clause, ruling, distinction }], questions: [{ text, options?, answer }] }
+function parseVocabFile(raw) {
+  let d
+  try { d = JSON.parse(raw.replace(/^\uFEFF/, '')) } catch { throw new Error('Fayl JSON formatida emas') }
+  const list = Array.isArray(d) ? d : d?.terms
+  if (!Array.isArray(list) || !list.length) throw new Error('Faylda «terms» ro‘yxati topilmadi')
+  if (list.length > 500) throw new Error('To‘plamda 500 tadan ortiq so‘z bo‘lishi mumkin emas')
+  const terms = list.map((t, n) => {
+    if (!str(t?.term) || !str(t?.translation)) throw new Error(`${n + 1}-so‘z: «term» va «translation» majburiy`)
+    const out = { id: uid('w') }
+    for (const k of TERM_KEYS) out[k] = str(t[k])
+    return out
+  })
+  const questions = (Array.isArray(d?.questions) ? d.questions : []).slice(0, 50).filter((q) => str(q?.text)).map((q) => ({
+    id: uid('vq'), text: str(q.text), answer: str(q.answer), options: Array.isArray(q.options) ? q.options.map((o) => str(o, 300)).filter(Boolean).slice(0, 8) : [],
+  }))
+  return { terms, questions, title: str(d?.title, 200), lang: str(d?.lang, 40), description: str(d?.description), orderNote: str(d?.orderNote) }
+}
+
+const emptyTerm = () => ({ id: uid('w'), term: '', translation: '', definition: '', example: '', arabic: '', clause: '', ruling: '' })
 export function VocabForm({ open, set: vs, onClose }) {
   const { user, scope } = useAuth()
   const toast = useToast()
@@ -69,7 +94,7 @@ export function VocabForm({ open, set: vs, onClose }) {
     if (!f.title?.trim()) return setErr('Nomini kiriting')
     const terms = f.terms.filter((t) => t.term.trim() && t.translation.trim())
     if (!terms.length) return setErr('Kamida bitta so‘z va tarjimasini kiriting')
-    const data = { title: f.title.trim(), lang: f.lang?.trim() || '—', groupIds: f.groupIds || [], terms }
+    const data = { title: f.title.trim(), lang: f.lang?.trim() || '—', groupIds: f.groupIds || [], terms, description: f.description?.trim() || '', orderNote: f.orderNote?.trim() || '', questions: f.questions || [] }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       add('vocabSets', { ...data, orgId: scope.orgId, authorId: user.id })
@@ -78,6 +103,21 @@ export function VocabForm({ open, set: vs, onClose }) {
       toast('To‘plam yaratildi')
     } else { patch('vocabSets', vs.id, data); toast('Saqlandi') }
     onClose()
+  }
+  // JSON fayldan import: so'zlar (va nazorat savollari) almashtiriladi, bo'sh maydonlar fayldan to'ldiriladi
+  const fileRef = useRef(null)
+  const onFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) return setErr('Fayl juda katta (2 MB dan oshmasin)')
+    try {
+      const r = parseVocabFile(await file.text())
+      setF((x) => ({ ...x, terms: r.terms, questions: r.questions, title: x.title?.trim() ? x.title : r.title, lang: r.lang || x.lang,
+        description: x.description?.trim() ? x.description : r.description, orderNote: x.orderNote?.trim() ? x.orderNote : r.orderNote }))
+      setErr('')
+      toast(`${r.terms.length} ta so‘z${r.questions.length ? ` va ${r.questions.length} ta savol` : ''} yuklandi — tekshirib, saqlang`)
+    } catch (x) { setErr(x.message) }
   }
   return (
     <Modal open={open} onClose={onClose} width={760} title={isNew ? 'Lug‘at to‘plami' : 'To‘plamni tahrirlash'}
@@ -88,7 +128,12 @@ export function VocabForm({ open, set: vs, onClose }) {
           <FField label="Til juftligi"><Input value={f.lang || ''} onChange={(e) => set('lang', e.target.value)} placeholder="ar → uz" /></FField>
         </div>
         <FField label="Guruhlar"><ChipSelect allLabel="Barcha guruhlar" value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>
-        <div className="pfield__label">So‘zlar ({f.terms?.length || 0})</div>
+        <FField label="Tavsif (ixtiyoriy)"><Textarea value={f.description || ''} onChange={(e) => set('description', e.target.value)} rows={2} placeholder="To‘plam nima haqida, kimlar uchun" /></FField>
+        <div className="prow prow--between">
+          <div className="pfield__label" style={{ margin: 0 }}>So‘zlar ({f.terms?.length || 0}){f.questions?.length ? ` · ${f.questions.length} ta nazorat savoli` : ''}</div>
+          <Btn size="sm" icon="upload" onClick={() => fileRef.current?.click()}>Fayldan yuklash</Btn>
+          <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={onFile} />
+        </div>
         {(f.terms || []).map((t, i) => (
           <div key={t.id} className="pqb">
             <div className="pform__row">
@@ -98,6 +143,11 @@ export function VocabForm({ open, set: vs, onClose }) {
             <div className="pform__row" style={{ marginTop: 8 }}>
               <Input value={t.definition} onChange={(e) => setT(i, 'definition', e.target.value)} placeholder="Ta’rif (ixtiyoriy)" style={{ height: 40 }} />
               <Input value={t.example} onChange={(e) => setT(i, 'example', e.target.value)} placeholder="Misol jumla (ixtiyoriy)" style={{ height: 40 }} />
+            </div>
+            <div className="pvq-extra" style={{ marginTop: 8 }}>
+              <Input value={t.arabic || ''} onChange={(e) => setT(i, 'arabic', e.target.value)} placeholder="Arabcha shakli" dir="auto" style={{ height: 40 }} />
+              <Input value={t.clause || ''} onChange={(e) => setT(i, 'clause', e.target.value)} placeholder="Band (2/1/1)" style={{ height: 40 }} />
+              <Select value={t.ruling || ''} onChange={(v) => setT(i, 'ruling', v)} placeholder="Hukm —" options={Object.keys(RULING).map((r) => ({ value: r, label: r }))} />
             </div>
           </div>
         ))}
@@ -128,13 +178,69 @@ function VocabSet({ id }) {
     })
   }
   const isStaff = user.role !== 'student'
+  const rich = v.terms.some((t) => t.arabic || t.clause || t.ruling)
+  const qs = v.questions || []
+  const tabs = [{ value: 'list', label: 'Ro‘yxat', icon: 'list' }, ...(rich ? [{ value: 'table', label: 'Jadval', icon: 'layoutGrid' }] : []), { value: 'cards', label: 'Kartochkalar', icon: 'cards' }, { value: 'quiz', label: 'Viktorina', icon: 'zap' }, ...(qs.length ? [{ value: 'check', label: 'Nazorat savollari', icon: 'clipboard' }] : [])]
   return (
     <>
       <PageHead crumbs={[{ label: 'Lug‘at', href: '#/platform/vocabulary' }, { label: v.title }]} title={v.title} sub={`${v.terms.length} ta so‘z · ${v.lang}${user.role === 'student' ? ` · ${learned.size} ta o‘rganildi` : ''}`}
         actions={isStaff && (v.authorId === user.id || user.role !== 'teacher') && <Btn icon="edit" onClick={() => setEditing(true)}>Tahrirlash</Btn>} />
-      <Tabs value={mode} onChange={setMode} items={[{ value: 'list', label: 'Ro‘yxat', icon: 'list' }, { value: 'cards', label: 'Kartochkalar', icon: 'cards' }, { value: 'quiz', label: 'Viktorina', icon: 'zap' }]} />
+      {(v.description || v.orderNote) && (
+        <Card className="pvintro">
+          {v.description && <p>{v.description}</p>}
+          {v.orderNote && <p className="pvintro__note"><Icon name="info" size={16} /><span><b>Tartib:</b> {v.orderNote}</span></p>}
+        </Card>
+      )}
+      <Tabs value={mode} onChange={setMode} items={tabs} />
       {user.role === 'student' && <Progress value={pct(learned.size, v.terms.length)} tone="teal" />}
-      {mode === 'list' && (
+      {mode === 'list' && rich && (
+        <div className="pgloss">
+          {v.terms.map((t, n) => (
+            <Card key={t.id} className="pgloss__item">
+              <div className="pgloss__head">
+                <span className="pgloss__n">{n + 1}</span>
+                <div className="pgloss__names">
+                  <h3>{t.term}</h3>
+                  <div className="pgloss__alt">
+                    {t.arabic && <span className="pgloss__ar" dir="rtl" lang="ar">{t.arabic}</span>}
+                    {t.translit && <i>{t.translit}</i>}
+                    <span className="pgloss__en">{t.translation}</span>
+                  </div>
+                </div>
+                <div className="pgloss__tags">
+                  {t.clause && <Badge tone="violet">Band {t.clause}</Badge>}
+                  {t.ruling && <Badge tone={rulingTone(t.ruling)} dot>{t.ruling}</Badge>}
+                </div>
+              </div>
+              {t.definition && <p className="pgloss__def">{t.definition}</p>}
+              {t.distinction && <p className="pgloss__diff"><b>Farqi:</b> {t.distinction}</p>}
+              {t.example && <p className="pgloss__ex"><b>Misol:</b> {t.example}</p>}
+              {user.role === 'student' && <div style={{ marginTop: 12 }}><Btn size="sm" variant={learned.has(t.id) ? 'success' : 'default'} icon={learned.has(t.id) ? 'check' : 'plus'} onClick={() => toggleLearned(t.id)}>{learned.has(t.id) ? 'O‘rganildi' : 'O‘rgandim deb belgilash'}</Btn></div>}
+            </Card>
+          ))}
+        </div>
+      )}
+      {mode === 'table' && (
+        <Card className="pcard--flush">
+          <div className="pgtab">
+            <table>
+              <thead><tr><th>№</th><th>Termin (o‘zbekcha)</th><th>Arabcha asl shakli</th><th>Inglizcha ekvivalenti</th><th>Ta’rif</th><th>Bandi</th><th>Shariat hukmi</th></tr></thead>
+              <tbody>
+                {v.terms.map((t, n) => (
+                  <tr key={t.id}>
+                    <td>{n + 1}</td><td><b>{t.term}</b></td>
+                    <td><span className="pgloss__ar" dir="rtl" lang="ar">{t.arabic}</span>{t.translit && <small>{t.translit}</small>}</td>
+                    <td>{t.translation}</td><td className="pgtab__def">{t.definition}</td>
+                    <td className="mono">{t.clause}</td><td>{t.ruling && <Badge tone={rulingTone(t.ruling)}>{t.ruling}</Badge>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+      {mode === 'check' && <CheckQuestions qs={qs} />}
+      {mode === 'list' && !rich && (
         <Card>
           {v.terms.map((t) => (
             <div key={t.id} className="pterm">
@@ -173,7 +279,7 @@ function Flashcards({ terms, learned, onLearn, isStudent }) {
       <div className={cx('pflash', flip && 'is-flipped')} onClick={() => setFlip((f) => !f)}>
         <div className="pflash__in">
           <div className="pflash__face"><span className="pflash__hint">So‘z</span><div className="pflash__term" dir="auto">{t.term}</div><span className="pflash__hint">Ag‘darish uchun bosing</span></div>
-          <div className="pflash__face pflash__face--back"><span className="pflash__hint" style={{ color: 'rgba(255,255,255,.5)' }}>Tarjima</span><div className="pflash__term">{t.translation}</div>{t.definition && <div className="pflash__def">{t.definition}</div>}{t.example && <div className="pflash__ex" dir="auto">“{t.example}”</div>}</div>
+          <div className="pflash__face pflash__face--back"><span className="pflash__hint" style={{ color: 'rgba(255,255,255,.5)' }}>Tarjima</span><div className="pflash__term">{t.translation}</div>{t.arabic && <div className="pflash__ar" dir="rtl" lang="ar">{t.arabic}</div>}{t.definition && <div className="pflash__def">{t.definition}</div>}{t.example && <div className="pflash__ex" dir="auto">“{t.example}”</div>}</div>
         </div>
       </div>
       <div className="prow" style={{ justifyContent: 'center', marginTop: 18, gap: 10 }}>
@@ -224,6 +330,25 @@ function Quiz({ terms, onDone }) {
           <div key={oi} className={cx('pquiz__opt', picked !== null && oi === q.correct && 'is-right', picked === oi && oi !== q.correct && 'is-wrong')} onClick={() => pick(oi)}><i>{String.fromCharCode(65 + oi)}</i>{o}</div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// Nazorat savollari: test (variantli) yoki ochiq savol; javob bosilganda ochiladi
+function CheckQuestions({ qs }) {
+  const [open, setOpen] = useState({})
+  return (
+    <div className="pgloss">
+      {qs.map((q, n) => (
+        <Card key={q.id || n} className="pgloss__item">
+          <div className="prow" style={{ gap: 8, marginBottom: 8 }}><Badge tone={q.options?.length ? 'blue' : 'teal'}>{q.options?.length ? 'Test' : 'Ochiq savol'}</Badge><span className="pmuted">{n + 1}-savol</span></div>
+          <h3 className="pgloss__q">{q.text}</h3>
+          {q.options?.length > 0 && <ol className="pgloss__opts">{q.options.map((o, k) => <li key={k}><i>{String.fromCharCode(65 + k)}</i>{o}</li>)}</ol>}
+          {q.answer && (open[n]
+            ? <p className="pgloss__ans"><b>Javob:</b> {q.answer}</p>
+            : <Btn size="sm" variant="soft" icon="eye" onClick={() => setOpen((x) => ({ ...x, [n]: true }))} style={{ marginTop: 12 }}>Javobni ko‘rsatish</Btn>)}
+        </Card>
+      ))}
     </div>
   )
 }
