@@ -1354,7 +1354,7 @@ button.pev { width: 100%; text-align: left; font: inherit; cursor: pointer; }
 /* =====================================================================
    Kutubxona
    ===================================================================== */
-.plibstats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.plibstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .plibstat { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 0; border-radius: 20px; background: var(--pf-card); box-shadow: var(--pf-shadow); text-align: left; color: inherit; font: inherit; min-width: 0; transition: transform .18s, box-shadow .18s; }
 button.plibstat { cursor: pointer; }
 button.plibstat:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(20, 33, 58, .04), 0 14px 30px -14px rgba(20, 33, 58, .2); }
@@ -1524,8 +1524,8 @@ button.plibstat:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(
   .plibnav__right { margin-left: 0; width: 100%; justify-content: space-between; }
 }
 @media (max-width: 640px) {
-  .plibstats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .plibstats > :first-child { grid-column: span 2; }
+  .plibstats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .plibstats > :first-child { grid-column: span 3; }
   .plibstat { padding: 14px; }
   .plibstat__icon { width: 42px; height: 42px; }
   .plibstat__body b { font-size: 21px; }

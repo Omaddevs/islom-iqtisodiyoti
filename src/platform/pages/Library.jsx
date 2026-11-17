@@ -16,20 +16,22 @@ const TYPES = {
   video: { label: 'Video', tab: 'Video', icon: 'play', tone: 'red' },
   research: { label: 'Tadqiqot', tab: 'Tadqiqot hisobotlari', icon: 'clipboard', tone: 'blue' },
   standard: { label: 'Standart', tab: 'Standartlar', icon: 'scale', tone: 'teal' },
-  textbook: { label: 'Darslik', tab: 'Darsliklar', icon: 'book', tone: 'blue' },
+  textbook: { label: 'Dars', tab: 'Darslar', icon: 'book', tone: 'blue' },
   pdf: { label: 'PDF', icon: 'fileText', tone: 'violet' },
   document: { label: 'Hujjat', icon: 'fileText', tone: 'blue' },
-  slides: { label: 'Taqdimot', icon: 'layers', tone: 'amber' },
+  slides: { label: 'PPTX', icon: 'layers', tone: 'amber' },
   sheet: { label: 'Jadval', icon: 'grid', tone: 'green' },
   link: { label: 'Havola', icon: 'globe', tone: 'teal' },
 }
-// "Boshqa" tabi — alohida tabga ega bo'lmagan turlar
-const OTHER = ['pdf', 'document', 'slides', 'sheet', 'link']
+// Kutubxona uchta bo'limdan iborat. Eski turlar (kitob, PDF, audio…) yo'qolmasligi uchun mos bo'limga tushadi:
+// hujjat/PDF ko'rinishidagilar — Standartlar, o'quv materiallari — Darslar, taqdimotlar — PPTX
 const TABS = [
-  { value: 'all', label: 'Barchasi', icon: 'bookOpen' },
-  ...['book', 'article', 'audio', 'video', 'research', 'standard', 'textbook'].map((k) => ({ value: k, label: TYPES[k].tab, icon: TYPES[k].icon })),
-  { value: 'other', label: 'Boshqa', icon: 'layers' },
+  { value: 'standard', label: 'Standartlar', icon: 'scale', types: ['standard', 'pdf', 'document', 'sheet', 'link'] },
+  { value: 'textbook', label: 'Darslar', icon: 'book', types: ['textbook', 'book', 'article', 'research', 'audio', 'video'] },
+  { value: 'slides', label: 'PPTX', icon: 'layers', types: ['slides'] },
 ]
+// Material qo'shishda tanlanadigan turlar
+const FORM_TYPES = { standard: 'Standart', textbook: 'Dars', slides: 'PPTX' }
 const ACTION = {
   audio: { label: 'Tinglash', icon: 'play' },
   video: { label: 'Tomosha qilish', icon: 'play' },
@@ -64,7 +66,8 @@ const sortFn = {
   popular: (a, b) => (b.downloads || 0) - (a.downloads || 0),
   title: (a, b) => a.title.localeCompare(b.title),
 }
-const inTab = (l, tab) => tab === 'all' || (tab === 'other' ? OTHER.includes(l.type) || !TYPES[l.type] : l.type === tab)
+const tabOf = (l) => (TABS.find((t) => t.types.includes(l.type)) || TABS[0]).value
+const inTab = (l, tab) => tabOf(l) === tab
 const MONTH = 30 * 864e5
 
 // "320 bet", "45 daqiqa", "1:25:30"
@@ -93,7 +96,7 @@ function useSaved(uid) {
 export default function Library() {
   const { user, db, scope, can } = useAuth()
   const toast = useToast()
-  const [tab, setTab] = useState('all')
+  const [tab, setTab] = useState('standard')
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('')
   const [fmt, setFmt] = useState('')
@@ -134,8 +137,8 @@ export default function Library() {
   }, [all, tab, q, cat, fmt, lang, year, onlySaved, saved, sort])
 
   const activeFilters = [cat, fmt, lang, year].filter(Boolean).length
-  const filtered = q || tab !== 'all' || activeFilters || onlySaved
-  const clear = () => { setQ(''); setTab('all'); setCat(''); setFmt(''); setLang(''); setYear(''); setOnlySaved(false) }
+  const filtered = q || activeFilters || onlySaved
+  const clear = () => { setQ(''); setCat(''); setFmt(''); setLang(''); setYear(''); setOnlySaved(false) }
 
   // Asosiy amal: yuklangan fayl platforma ichida, havola yangi oynada ochiladi
   const run = (l, e) => {
@@ -160,7 +163,7 @@ export default function Library() {
       ...(canEdit && mine ? ['sep', { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(l) }, { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(l) }] : []),
     ]
   }
-  const pickTag = (t) => { setQ(t); setTab('all'); setOpen(null) }
+  const pickTag = (t) => { setQ(t); setOpen(null) }
 
   return (
     <>
@@ -170,10 +173,9 @@ export default function Library() {
       {/* Statistika */}
       <div className="plibstats">
         <LibStat icon="bookOpen" tone="violet" value={all.length} label="Jami materiallar" trend={fresh ? `+${fresh} bu oy` : null} />
-        <LibStat icon="fileText" tone="blue" value={count((l) => ['book', 'textbook'].includes(l.type))} label="Kitoblar" onClick={() => setTab('book')} />
-        <LibStat icon="fileText" tone="violet" value={count((l) => ['article', 'research'].includes(l.type))} label="Ilmiy maqolalar" onClick={() => setTab('article')} />
-        <LibStat icon="headphones" tone="green" value={count((l) => l.type === 'audio')} label="Audio materiallar" onClick={() => setTab('audio')} />
-        <LibStat icon="play" tone="red" value={count((l) => l.type === 'video')} label="Video materiallar" onClick={() => setTab('video')} />
+        <LibStat icon="scale" tone="green" value={count((l) => inTab(l, 'standard'))} label="Standartlar" onClick={() => setTab('standard')} />
+        <LibStat icon="book" tone="blue" value={count((l) => inTab(l, 'textbook'))} label="Darslar" onClick={() => setTab('textbook')} />
+        <LibStat icon="layers" tone="amber" value={count((l) => inTab(l, 'slides'))} label="PPTX taqdimotlar" onClick={() => setTab('slides')} />
       </div>
 
       {/* Qidiruv va filtrlar */}
@@ -437,7 +439,7 @@ function LibForm({ open, item, onClose, categories }) {
     setSource(isNew || item?.fileId || !item?.url ? 'file' : 'link')
     setUp(item?.fileId ? { file: { id: item.fileId, name: item.fileName, size: item.fileSize, ext: item.fileExt } } : null)
     setF(isNew
-      ? { title: '', author: '', type: 'document', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
+      ? { title: '', author: '', type: 'standard', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
       : { ...item, minutes: item.duration ? Math.round(item.duration / 60) : '', tags: (item.tags || []).join(', ') })
   })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
@@ -548,8 +550,8 @@ function LibForm({ open, item, onClose, categories }) {
         )}
         <FField label="Turi">
           <div className="plibtypes">
-            {Object.entries(TYPES).map(([k, t]) => (
-              <button key={k} type="button" className={cx('plibtypes__opt', f.type === k && 'is-on')} onClick={() => setType(k)}><Icon name={t.icon} size={15} /> {t.label}</button>
+            {Object.entries(FORM_TYPES).map(([k, label]) => (
+              <button key={k} type="button" className={cx('plibtypes__opt', tabOf(f) === k && 'is-on')} onClick={() => setType(k)}><Icon name={TYPES[k].icon} size={15} /> {label}</button>
             ))}
           </div>
         </FField>
