@@ -1,0 +1,447 @@
+{
+  "title": "AAOIFI 3-shariat standarti: Qarz to‘lovini kechiktiruvchi qarzdor — 20 ta murakkab test",
+  "description": "Qo‘llash, tahlil va baholash darajasidagi vaziyatli va hisob-kitobli savollar: jarima taqiqi, undirish xarajatlari, garov, muddatidan oldin to‘lash sharti, kafil, pudratchi, nomoddiy choralar. Topshirgach har bir savol bo‘yicha izoh, variantlar tahlili va standart bandi ko‘rsatiladi.",
+  "timeLimit": 40,
+  "questions": [
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Undirish xarajatlari va garov (2/1/4–2/1/5)",
+      "text": "«Barakat» islom banki mijoz Sardorga murobaha (tannarx va ustamani oshkor qilib sotish) asosida uskuna sotgan; Sardorning qarzi 120 000 000 so‘m. Sardor to‘lovga qodir bo‘lsa-da, to‘lovni qasddan kechiktirdi. Bank qarzni undirish uchun 1 800 000 so‘m sud boji va 3 200 000 so‘m advokat xizmati haqini to‘ladi. Shartnomada esa kechikkan har kun uchun 0,1% penya yozilgan (30 kun uchun 3 600 000 so‘m). Standartga ko‘ra bank Sardordan jami qancha summani talab qilishi mumkin?",
+      "options": [
+        "128 600 000 so‘m — qarz, sud va advokat xarajatlari hamda penya",
+        "125 000 000 so‘m — qarz hamda uni undirish uchun qilingan xarajatlar",
+        "123 600 000 so‘m — qarz va shartnomada kelishilgan penya",
+        "120 000 000 so‘m — faqat qarzning asosiy summasi"
+      ],
+      "correct": "B",
+      "explain": "Qasddan kechiktirayotgan qarzdor sud xarajatlarini va qarz beruvchi qarzni undirish uchun qilgan boshqa tegishli xarajatlarni qoplashga majbur. Bu qarzdan olinadigan foyda emas, balki qarzdorning kechiktirishi tufayli haqiqatda qilingan sarfni qoplash. Penya esa qarz ustiga vaqtga bog‘liq qo‘shimcha — mohiyatan riba (foiz), shuning uchun avvaldan kelishilgan bo‘lsa ham undirilmaydi.\n\nHisob-kitob:\n1) Undirish xarajatlari: 1 800 000 + 3 200 000 = 5 000 000 so‘m.\n2) Jami talab: 120 000 000 + 5 000 000 = 125 000 000 so‘m.\n3) Penya (3 600 000 so‘m) qo‘shilmaydi.\nA variant penyani ham qo‘shgan (125 000 000 + 3 600 000), C variant xarajatlarni chiqarib, penyani qo‘shgan (120 000 000 + 3 600 000), D variant esa 2/1/4 bandini e’tiborsiz qoldirgan.",
+      "notes": [
+        "Penya qo‘shilgan: kechiktirish uchun moliyaviy jarima, hatto avvaldan kelishilgan bo‘lsa ham, taqiqlanadi (2/1/2).",
+        "",
+        "Bu yerda ikki narsa almashib ketgan: penya avvaldan kelishilgani uni joiz qilmaydi, undirish xarajatlari esa aksincha — haqli talab.",
+        "Qasddan kechiktiruvchi qarzdor sud va undirish xarajatlarini qoplashga majbur — bank bu sarflarni o‘zi ko‘tarishi shart emas."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/4 (shuningdek 2/1/2)",
+      "quote": "Qarz to‘lovini (qasddan) kechiktirayotgan qarzdor sud xarajatlarini, shuningdek, qarz beruvchi tomon qarzini undirib olish uchun qilgan boshqa (tegishli) sarf-xarajatlarni qoplab berishga majbur."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Undirish xarajatlari va garov (2/1/4–2/1/5)",
+      "text": "Komil bankdan murobaha asosida 90 000 000 so‘mlik avtomobil sotib oldi va qarzi uchun shu avtomobilni garovga qo‘ydi. Shartnomada «qarzdor to‘lovni kechiktirsa, bank garovni sotishga vakil qilinadi» degan band bor va Komil uni imzolagan. Komil to‘lovga qodir bo‘lsa-da, to‘lovlarni kechiktirib kelmoqda. Bank qanday yo‘l tutishi mumkin?",
+      "options": [
+        "Sudga murojaat qilmasdan garovni sotib, qarzni uning pulidan yopishi mumkin",
+        "Garovni faqat sud qarori bilan sotishi mumkin, oldindan berilgan vakolat kuchsiz",
+        "Garovni sotmasdan, qarz miqdorida o‘z mulkiga o‘tkazib olishi mumkin",
+        "Garovni faqat Komil bankrot deb e’lon qilingandan keyin sotishi mumkin"
+      ],
+      "correct": "A",
+      "explain": "Qarz beruvchi qarzni undirish uchun garovni sotishni talab qilishga haqli. Bundan tashqari, sudga bormasdan garov pulidan qarzni yopish maqsadida qarzdordan garovni sotishga vakolat berishini shart qilish ham joiz. Komil bu bandni imzolagan — demak bank vakil sifatida avtomobilni sotib, tushgan puldan qarzni yopadi. Garovning maqsadi aynan shu: to‘lanmagan qarzni uning qiymatidan undirish.",
+      "notes": [
+        "",
+        "Standart garovni sotishga oldindan vakolat berishni shart qilishga aniq ruxsat beradi — sudsiz sotish aynan shu bandning maqsadi.",
+        "Standart garovni sotib, qarzni uning pulidan yopishga ruxsat beradi; garovni sotmasdan bank mulkiga o‘tkazib olish bu bandda nazarda tutilmagan.",
+        "Garovni sotish huquqi bankrotlikka bog‘lanmagan — qarzning kechiktirilishi yetarli asos."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/5",
+      "quote": "Qarz beruvchi tomon (qarzni undirish uchun) garovni pulga aylantirish maqsadida uni sotishni talab qilish huquqiga ega. Shuningdek, sudga murojaat qilmasdan garovning pulidan qarzni yopish maqsadida, qarz beruvchi qarzdordan garovni sotishga vakolat berishini shart qilish huquqiga ham ega."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Umumiy qoidalar (2/5)",
+      "text": "«Nur» MChJning murobaha bo‘yicha 25 200 000 so‘mlik to‘lovi kechikdi. Shartnomada bank kechikkan qarzni mijozning bankdagi istalgan hisobraqamidan undirishi shart qilingan. Mijozning bankdagi yagona hisobraqami AQSH dollarida, unda 5 000 dollar bor. Shartnoma imzolangan kuni kurs 1 dollar = 12 000 so‘m edi, undirish kuni bozor kursi 1 dollar = 12 600 so‘m. Bank hisobraqamdan necha dollar yechishi kerak?",
+      "options": [
+        "2 100 dollar — shartnoma imzolangan kundagi kurs bo‘yicha",
+        "Yechib bo‘lmaydi — hisobraqam boshqa valyutada, faqat sud orqali",
+        "2 000 dollar — undirish kunidagi bozor kursi bo‘yicha",
+        "2 200 dollar — 2 000 dollar va kechikish uchun 10% ustama"
+      ],
+      "correct": "C",
+      "explain": "Qarzdorlik hosil bo‘ladigan bitimda muassasa kechikkan qarzni mijozning shu muassasadagi istalgan hisobraqamidan (joriy yoki investitsiya) undirishni shart qilishi joiz. Hisobraqam qarz valyutasidan boshqa valyutada bo‘lsa, kurs undirish paytidagi bozor kursi bo‘yicha olinadi: bu aslida zimmadagi so‘m qarzini dollar bilan to‘lash, ya’ni o‘sha kungi qiymatda bajariladigan ayirboshlash — qarzdan ortiq ham, kam ham olinmaydi.\n\nHisob-kitob:\n1) To‘g‘ri: 25 200 000 / 12 600 = 2 000 dollar.\n2) A variant: 25 200 000 / 12 000 = 2 100 dollar — eskirgan kurs, mijozdan 100 dollar ortiqcha olinadi.\n3) D variant: 2 000 + 2 000 × 10% = 2 200 dollar — kechikish uchun jarima qo‘shilgan.\n4) Hisobraqamda 5 000 dollar bor, demak 2 000 dollar to‘liq undiriladi.",
+      "notes": [
+        "Shartnoma kunidagi kurs qo‘llansa, qarzdan ortiq olinadi; standart o‘sha paytdagi bozor kursini talab qiladi.",
+        "Standart istalgan hisobraqamdan undirishni shart qilishga ruxsat beradi va boshqa valyuta uchun bozor kursini belgilaydi — sud shart emas.",
+        "",
+        "Kechikish uchun foizli ustama moliyaviy jarima bo‘lib, 2/1/2 bandiga ko‘ra taqiqlangan."
+      ],
+      "ref": "AAOIFI SS 3, 2/5 Umumiy qoidalar, 2/5/3",
+      "quote": "Qarzdorlik hosil bo‘ladigan bitimda, agar qarzdor to‘lovni kechiktirsa, muassasa mijozning muassasadagi har qanday hisobraqamlaridan, u xoh joriy, xoh investitsiya hisobraqami bo‘lsin, qarzni undirish huquqini shart qilishi joiz. Agar hisobraqamdagi pullar qarz valyutasidan boshqa valyutada bo‘lsa, valyuta kursi o‘sha paytdagi bozor kursi asosida belgilanishi kerak."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Kafil (2/2)",
+      "text": "Botir do‘sti Alisherning bankdan olgan murobaha qarziga kafil bo‘ldi. Kafillik shartnomasida «qarz avval qarzdordan talab qilinadi» degan shart yo‘q. Alisher to‘lovni kechiktirgach, bank Alisherga murojaat qilmasdan, to‘g‘ridan-to‘g‘ri Botirdan to‘lovni talab qildi. Bankning harakati standartga mosmi?",
+      "options": [
+        "Mos emas: bank avval qarzdordan undirishning barcha yo‘llarini tugatishi shart",
+        "Mos emas: kafil faqat qarzdor bankrot deb topilgandan keyin javobgar bo‘ladi",
+        "Mos, lekin faqat Botir ham qarz uchun alohida garov qo‘ygan bo‘lsa",
+        "Mos: bunday shart qo‘yilmagani uchun bank istaganidan talab qila oladi"
+      ],
+      "correct": "D",
+      "explain": "Qarz beruvchi qarzni kafildan ham, qarzdordan ham talab qilishga haqli: kafillik qarzdorning zimmasiga kafilning zimmasini qo‘shadi. Faqat kafil «avval qarzdordan talab qilinsin» degan shartni qo‘ygan bo‘lsa, navbat tartibi saqlanadi. Botirning shartnomasida bunday shart yo‘q, shuning uchun bank to‘g‘ridan-to‘g‘ri unga murojaat qila oladi.",
+      "notes": [
+        "Navbat tartibi faqat kafil buni shart qilgan bo‘lsa amal qiladi; bu shartnomada bunday shart yo‘q.",
+        "Kafilning javobgarligi qarzdorning bankrotligiga bog‘lanmagan — bu talqin kafillik mohiyatiga zid.",
+        "Kafillik (shaxsiy kafolat) va garov — alohida ta’minot turlari; kafildan talab qilish uchun garov shart emas.",
+        ""
+      ],
+      "ref": "AAOIFI SS 3, 2/2 Kafil, 2/2/1",
+      "quote": "Qarz beruvchi tomon qarzni kafildan ham, qarzdordan ham talab qilishga haqli, agar kafil qarzni yopishni birinchi navbatda qarzdordan talab qilish shartini qo‘ymagan bo‘lsa."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Pudratchi (2/3)",
+      "text": "Bank «Qurilish-Invest» pudratchisi bilan istisno (buyurtma asosida yasash) shartnomasini tuzdi: bino 1-iyunda topshirilishi, har bir kechikkan kun uchun 1 000 000 so‘m jarima to‘lanishi shart qilindi. Pudratchi binoni 20 kun kechiktirib topshirdi va jarimani to‘lashdan bosh tortdi. Bank pudratchiga hali 150 000 000 so‘m qoldiq to‘lovni to‘lashi kerak. Standartga ko‘ra bank pudratchiga qancha to‘laydi?",
+      "options": [
+        "130 000 000 so‘m — jarima qoldiq to‘lovdan ushlab qolinadi",
+        "150 000 000 so‘m — jarima faqat sud orqali alohida undiriladi",
+        "126 000 000 so‘m — jarima va uni kechiktirgani uchun 4 000 000 penya",
+        "110 000 000 so‘m — jarima va bankning boy bergan 20 000 000 foydasi"
+      ],
+      "correct": "A",
+      "explain": "Qurilish, istisno va ta’minot shartnomalariga jarima shartini kiritish joiz — bu pul qarzining emas, ish bajarish majburiyatining kechikishiga oid. Pudratchi jarimani to‘lashni kechiktirsa, unga qarz to‘lovini kechiktiruvchi qarzdor qoidalari qo‘llanadi, bank esa jarimani pudratchiga to‘lanadigan mablag‘lardan ushlab qolishi mumkin.\n\nHisob-kitob:\n1) Jarima: 20 kun × 1 000 000 = 20 000 000 so‘m.\n2) To‘lov: 150 000 000 − 20 000 000 = 130 000 000 so‘m.\nC variantda jarima qarzi ustiga yana penya qo‘shilgan (endi u qarz — 2/1/2 taqiqi amal qiladi), D variantda boy berilgan foyda qo‘shilgan, B variant esa ushlab qolish huquqini e’tiborsiz qoldirgan.",
+      "notes": [
+        "",
+        "Standart jarimani pudratchiga to‘lanadigan mablag‘dan ushlab qolishga aniq ruxsat beradi — sud shart emas.",
+        "To‘lanmagan jarima pudratchining qarziga aylanadi; qarzni kechiktirgani uchun ustiga penya qo‘yish taqiqlangan.",
+        "Boy berilgan foyda uchun tovon kechiktiruvchi qarzdor qoidalariga ko‘ra taqiqlangan moliyaviy jarima hisoblanadi."
+      ],
+      "ref": "AAOIFI SS 3, 2/3 Pudratchi",
+      "quote": "Qurilish, istisno va ta’minot shartnomalariga jarima (to‘lash) shartini kiritish joiz. Jarima to‘lovlarini kechiktirgan pudratchi yoki ta’minotchiga nisbatan qarz to‘lovlarini kechiktiruvchi qarzdorga nisbatan qo‘llanadigan qoidalar tatbiq etiladi. Pudratchiga to‘lanishi kerak bo‘lgan pul mablag‘laridan jarima mablag‘larini ushlab qolish mumkin."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Kechiktirishni qayd etish (2/6)",
+      "text": "Jamshidning murobaha bo‘yicha navbatdagi to‘lovi 1-mart kuni edi, u to‘lamadi. Bank 5-mart kuni unga odatiy talabnoma yuborib, 15-martgacha to‘lashni so‘radi. Jamshid 15-martgacha ham to‘lamadi va to‘lovga qodir emasligini ko‘rsatuvchi hech qanday dalil taqdim etmadi. Standartga ko‘ra Jamshidning holati qanday?",
+      "options": [
+        "U 1-martdanoq kechiktiruvchi hisoblanadi, talabnoma shart emas",
+        "U faqat sud kechiktiruvchi deb topgandan keyingina shunday hisoblanadi",
+        "Talabnoma muddati o‘tib, qodir emasligini isbotlamagani uchun kechiktiruvchi",
+        "Kechiktiruvchi emas, chunki bank uning to‘lovga qodirligini isbotlamagan"
+      ],
+      "correct": "C",
+      "explain": "Qarzdor odatiy talabnomadan keyin belgilangan muddatda to‘lamasa va to‘lovga qodir emasligini isbotlamasa, qarz to‘lovi kechiktirilgan hisoblanadi. Ikki shart ham bajarilgan: talabnomadagi muddat o‘tdi va Jamshid uzrini isbotlamadi. E’tibor bering: isbot yuki qarzdorda — qodir emasligini u ko‘rsatishi kerak, bank uning qodirligini isbotlashi shart emas.",
+      "notes": [
+        "Muddatning o‘tishi yetarli emas: standart odatiy talabnoma va unda belgilangan muddatni ham talab qiladi.",
+        "Standart kechiktirishni sud qaroriga emas, talabnoma muddati va isbotlanmagan qodirsizlikka bog‘laydi.",
+        "",
+        "Isbot yuki teskari: to‘lovga qodir emasligini qarzdorning o‘zi isbotlashi kerak."
+      ],
+      "ref": "AAOIFI SS 3, 2/6 Qarz to‘lovi kechiktirilganligini qayd etish",
+      "quote": "Qarzdor odatiy talabnomadan keyin belgilangan muddatda to‘lovni amalga oshirmasa hamda to‘lovga qodir emasligini isbotlamasa, qarz to‘lovi kechiktirilgan hisoblanadi."
+    },
+    {
+      "kind": "theory",
+      "bloom": "analyze",
+      "section": "Qamrov (1-band)",
+      "text": "Quyidagi to‘rt holatdan qaysi biri AAOIFI 3-standarti («Qarz to‘lovini kechiktiruvchi qarzdor») qamroviga kiradi?",
+      "options": [
+        "Do‘koni yonib, to‘lovga qobiliyatsiz (bankrot) bo‘lib qolgan tadbirkorning kechikishi",
+        "Ishni kechiktirib jarima qarziga aylangan, to‘lashga qodir pudratchining kechikishi",
+        "Shar’iy uzr sababli to‘lovni vaqtincha kechiktirgan qarzdorning kechikishi",
+        "Daromadi keskin kamayib, moliyaviy qiyin ahvolga tushgan xodimning kechikishi"
+      ],
+      "correct": "B",
+      "explain": "Standart to‘lovga qodir qarzdor yoki kafilning kechiktirishini, shuningdek majburiyatini o‘z vaqtida bajarmay, shartnomadagi jarima tufayli qarzdorga aylangan pudratchi va yetkazib beruvchilarni qamraydi. Asosiy mezon — qodirlik: kechiktirish faqat to‘lay olib turib to‘lamaslik bo‘lsagina standartdagi choralar qo‘llanadi. Bankrot, moliyaviy qiyin ahvoldagi va shar’iy uzrli qarzdorlar qamrovdan aniq chiqarilgan.",
+      "notes": [
+        "To‘lovga qobiliyatsiz (bankrot) qarzdor standart qamrovidan aniq chiqarilgan.",
+        "",
+        "Shar’iy uzr sababli kechiktirayotgan qarzdor ham qamrovga kirmaydi.",
+        "Moliyaviy qiyin ahvoldagi qarzdor qamrovdan chiqarilgan: unda to‘lashga qodirlik yo‘q."
+      ],
+      "ref": "AAOIFI SS 3, 1. Me’yorning qamrovi (amal qilish doirasi)",
+      "quote": "Ushbu me’yor to‘lovga qodir qarzdor yoki kafil tomonidan to‘lovni kechiktirish holatlarini, shuningdek, shartnomada ko‘zda tutilgan jarima tufayli qarzdorga aylangan pudratchi yoki yetkazib beruvchilarni qamrab oladi. Me’yor moliyaviy tomondan qiyin ahvolda qolgan yoki to‘lovga qobiliyatsiz (bankrot) bo‘lib qolgan qarzdor hamda shar’iy uzr sababli qarzini to‘lashni kechiktirayotgan qarzdorlarni o‘z ichiga olmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Jarima taqiqi (2/1/1–2/1/3)",
+      "text": "Bank yangi murobaha shartnomasi loyihasiga shunday band qo‘shmoqchi: «Mijoz to‘lovni kechiktirsa, bank shu davrda mablag‘ni investitsiyaga yo‘naltirib olishi mumkin bo‘lgan o‘rtacha daromadni (oyiga 1,5%) zararni qoplash — ta’vid sifatida undiradi». Mijoz bu bandga oldindan rozi bo‘ladi. Bandni tahlil qiling.",
+      "options": [
+        "Joiz, chunki mijoz unga shartnoma tuzishda oldindan rozilik bergan",
+        "Joiz, agar bank haqiqatda shunday daromad ko‘rishi mumkinligini isbotlasa",
+        "Joiz, chunki bu jarima emas, balki haqiqiy zararni qoplash (ta’vid)",
+        "Joiz emas: boy berilgan daromad uchun to‘lov ham taqiqlangan jarima"
+      ],
+      "correct": "D",
+      "explain": "Standart kechikkan qarzdorga moliyaviy jarima shart qilishni — pul yoki mol ko‘rinishida, avvaldan kelishilgan yoki kelishilmagan bo‘lishidan qat’i nazar — taqiqlaydi va bu taqiq boy berilgan daromad (yo‘qotilgan imkoniyat) uchun ko‘zda tutilgan to‘lovga ham tegishli ekanini alohida ta’kidlaydi. Sababi: qarz ustiga vaqt evaziga qo‘shimcha olish, «ta’vid» deb atalsa ham, mohiyatan riba (foiz) bo‘ladi. Hal qiluvchi narsa bandning nomi emas, mazmuni.",
+      "notes": [
+        "Taqiq kelishuvga bog‘liq emas: standart «avvaldan kelishilgan bo‘lsin, kelishilmagan bo‘lsin» deb aniq aytadi.",
+        "Daromadni isbotlash masalani o‘zgartirmaydi — boy berilgan daromad uchun to‘lovning o‘zi taqiqlangan.",
+        "Nom o‘zgargani bilan mohiyat o‘zgarmaydi: boy berilgan foyda uchun to‘lov standartda jarima turi sifatida taqiqlangan.",
+        ""
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/2",
+      "quote": "Qarzini o‘z vaqtida to‘lamagan qarzdorga nisbatan «jarima» (penya) deb nomlanuvchi moliyaviy jarimani shart qilish, u xoh pul ko‘rinishida bo‘lsin, xoh moddiy ko‘rinishda, xoh avvaldan kelishilgan bo‘lsin, xoh kelishilmagan bo‘lsin, taqiqlanadi. Ushbu qoida boy berilgan daromad (yo‘qotilgan imkoniyat) sababli ko‘rilgan zarar uchun ko‘zda tutilgan jarimaga ham tegishli."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Muddatidan oldin to‘lash sharti (2/1/6)",
+      "text": "Murobaha shartnomasida «mijoz biror oylik to‘lovni kechiktirsa, qolgan barcha to‘lovlar darhol to‘lanadi» degan band bor. Mijoz Feruza hech qanday favqulodda holatsiz 3-oylik to‘lovni kechiktirdi. Bank ertasi kuniyoq, Feruzani ogohlantirmasdan, qolgan barcha qarzni darhol to‘lashni talab qildi. Vaziyatni tahlil qiling.",
+      "options": [
+        "Band o‘zi joiz emas: qarzni muddatidan oldin talab qilish ribaga olib keladi",
+        "Band joiz, lekin uni ogohlantirib, munosib muddat bergach qo‘llash ma’qul",
+        "Band joiz va bank qolgan qarz ustiga kechikish uchun penya ham qo‘sha oladi",
+        "Band faqat mijoz qolgan barcha to‘lovlarni ham o‘tkazib yuborsa amal qiladi"
+      ],
+      "correct": "B",
+      "explain": "Qarzdor davriy to‘lovlardan birini kechiktirsa, qolgan qarzning barchasi darhol to‘lanishini shart qilish joiz — bu qarz miqdorini oshirmaydi, faqat muddat imtiyozini bekor qiladi. Biroq standart bu shartni, fors-major bo‘lmagan holatda, qarzdor xabardor qilingandan va unga munosib muddat berilgandan keyin tatbiq etishni ma’qul deb hisoblaydi. Bank shartni ishlatishga haqli edi, ammo ogohlantirmasdan ertasi kuniyoq qo‘llash standart tavsiya etgan tartibga mos emas.",
+      "notes": [
+        "Muddatni tezlashtirish qarz summasini oshirmaydi, shuning uchun riba emas — standart bu shartni aniq joiz deydi.",
+        "",
+        "Tezlashtirilgan qarz ustiga penya qo‘shish 2/1/2 bandiga ko‘ra taqiqlangan moliyaviy jarima.",
+        "Standart bitta davriy to‘lovning kechiktirilishini yetarli asos deb belgilaydi."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/6",
+      "quote": "Qarzdor davriy to‘lovlardan birortasini kechiktirgan taqdirda, u qolgan qarzning barchasini darhol (ya’ni muddatidan oldin) to‘lashini shart qilish joiz. Mazkur shart, hech qanday favqulodda holat (fors-major) bo‘lmagan holatda, qarzdor xabardor qilingandan keyin va unga muayyan munosib muddat berilgandan keyin tatbiq etilgani ma’qul."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Muddatidan oldin to‘lash sharti (2/1/6)",
+      "text": "Bank Otabekka uskunani murobaha asosida 36 000 000 so‘mga sotdi; narx 12 oy davomida har oy 3 000 000 so‘mdan to‘lanadi. Shartnomada tezlashtirish sharti bor: bitta to‘lov kechiksa, qolgan qarz darhol to‘lanadi. Otabek 4 ta to‘lovni vaqtida qildi, 5-to‘lovni kechiktirdi. Fors-major yo‘q; bank uni ogohlantirib, 15 kun muddat berdi, Otabek baribir to‘lamadi. Bank endi qancha summani talab qila oladi?",
+      "options": [
+        "24 000 000 so‘m — to‘lanmagan 8 ta to‘lovning barchasi",
+        "21 000 000 so‘m — faqat hali muddati kelmagan 7 ta to‘lov",
+        "26 400 000 so‘m — qolgan qarz va 10% kechikish ustamasi",
+        "36 000 000 so‘m — murobahaning to‘liq narxi qaytadan"
+      ],
+      "correct": "A",
+      "explain": "Tezlashtirish sharti to‘lanmagan qoldiqning muddatini bekor qiladi, uning miqdorini emas. Bank ogohlantirish va munosib muddat berish tartibiga amal qilgan, shuning uchun qolgan butun qarzni talab qila oladi — lekin undan bir so‘m ham ortiq emas.\n\nHisob-kitob:\n1) To‘langan: 4 × 3 000 000 = 12 000 000 so‘m.\n2) Qoldiq: 36 000 000 − 12 000 000 = 24 000 000 so‘m (kechikkan 5-to‘lov + muddati kelmagan 7 ta to‘lov = 8 × 3 000 000).\n3) B variant kechikkan 5-to‘lovni hisobdan chiqarib qo‘ygan (7 × 3 000 000), C variant 10% ustama qo‘shgan (24 000 000 × 1,1), D variant to‘langan 12 000 000 so‘mni hisobga olmagan.",
+      "notes": [
+        "",
+        "Kechikkan 5-to‘lov ham to‘lanmagan qoldiqning bir qismi — u ham talab qilinadi.",
+        "Kechikish uchun ustama taqiqlangan moliyaviy jarima (2/1/2); tezlashtirish faqat qoldiqning muddatini o‘zgartiradi.",
+        "Otabek to‘lagan 12 000 000 so‘m hisobdan chiqarilmagan — bu qarzni ikki marta undirish bo‘ladi."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/6",
+      "quote": "Qarzdor davriy to‘lovlardan birortasini kechiktirgan taqdirda, u qolgan qarzning barchasini darhol (ya’ni muddatidan oldin) to‘lashini shart qilish joiz."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Murobahada molni qaytarib olish (2/1/7)",
+      "text": "Bank «Tekstil-Lux» korxonasiga murobaha asosida ikkita tikuv mashinasini sotdi. Birinchisi hali ochilmagan qadoqda, sotilgan holatida turibdi; ikkinchisi o‘rnatilib, korxona liniyasiga moslab qayta jihozlangan. Korxona to‘lovlarni kechiktirib, so‘ng to‘lovga layoqatsiz (bankrot) bo‘lib qoldi; boshqa kreditorlar ham bor. Bankning huquqini tahlil qiling.",
+      "options": [
+        "Ikkala mashinani qaytarib oladi, chunki ikkalasi ham bank sotgan mol",
+        "Hech birini ololmaydi: bankrotlikda barcha kreditorlar teng ulush oladi",
+        "Ikkalasini faqat bankrotlik boshqaruvchisining ruxsati bilan oladi",
+        "Faqat qadoqdagi mashinani bankrotlik tartibisiz qaytarib oladi"
+      ],
+      "correct": "D",
+      "explain": "Murobahada sotilgan mol dastlabki sotilgan holatida bo‘lsa va mijoz to‘lovni kechiktirib, keyin bankrot bo‘lsa, sotuvchi bankrotlik amaliyotlariga kirishmasdan molni qaytarib olishga haqli. Kalit shart — molning asl holatida saqlanishi. Qadoqdagi mashina shu shartga javob beradi; qayta jihozlangan mashina esa asl holatini yo‘qotgan, shuning uchun bu huquq unga tatbiq etilmaydi.",
+      "notes": [
+        "Qaytarib olish huquqi molning dastlabki sotilgan holatida bo‘lishiga bog‘langan — qayta jihozlangan mashina bu shartga javob bermaydi.",
+        "Standart asl holatdagi mol uchun sotuvchiga bankrotlik tartibidan tashqari qaytarib olish huquqini beradi.",
+        "Standart bu huquqni bankrotlik amaliyotlariga kirishmasdan amalga oshirish mumkinligini aytadi; ikkinchi mashinaga esa u umuman tatbiq etilmaydi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/7",
+      "quote": "Murobaha savdosi doirasida sotilgan mol (tovar) dastlabki sotilgan holatida bo‘lsa, mijoz esa to‘lovni kechiktirib, keyinroq to‘lovga layoqatsiz (bankrot) bo‘lib qolsa, sotuvchi (muassasa) bankrotlik holatida qilinadigan tegishli amaliyotlarga kirishib o‘tirmasdan, sotilgan molni qaytarib olish huquqiga ega."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Sadaqa majburiyati (2/1/8)",
+      "text": "Murobaha shartnomasida mijoz kechiktirgan har oy uchun kechikkan summaning 1 foizini sadaqa qilish majburiyatini olgan. Mijoz 2 oy kechiktirdi va shu majburiyat bo‘yicha 400 000 so‘m to‘ladi. Bank bu mablag‘ bilan qanday ishlashi kerak?",
+      "options": [
+        "Bank daromadiga kiritib, kechikishdan ko‘rilgan zararni qoplaydi",
+        "Mijoz qarzni to‘liq yopgach, mablag‘ unga qaytarib beriladi",
+        "Shariat kengashi nazoratida bank orqali xayriyaga yo‘naltiriladi",
+        "Bankning zaxira fondiga o‘tkazilib, yil oxirida taqsimlanadi"
+      ],
+      "correct": "C",
+      "explain": "Kechiktiruvchi qarzdor muayyan mablag‘ni yoki qarzning ma’lum foizini sadaqa qilish majburiyatini olishi joiz, ammo bu mablag‘ bank foydasiga emas — muassasa orqali, Shariat kengashi nazoratida xayriya maqsadlariga yo‘naltirilishi shart. Mexanizmning ma’nosi: qarzdorni intizomga undash, lekin kreditor kechikishdan foyda ko‘rmasligi. Mablag‘ bank daromadiga o‘tkazilsa, u taqiqlangan jarimaning o‘ziga aylanadi.",
+      "notes": [
+        "Mablag‘ bank daromadiga o‘tkazilsa, u taqiqlangan moliyaviy jarimaga aylanadi (2/1/2).",
+        "Sadaqa majburiyati qaytariladigan depozit emas — mablag‘ xayriya maqsadlariga yo‘naltirilishi shart.",
+        "",
+        "Bankning o‘z fondiga o‘tkazish mablag‘ni bank manfaatiga xizmat qildiradi; standart esa uni xayriyaga yo‘naltirishni talab qiladi."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/8",
+      "quote": "Murobaha kabi qarzdorlik hosil bo‘luvchi shartnomalarda qarz to‘lovini kechiktirgan qarzdor muayyan mablag‘ni yoki qarz miqdorining ma’lum foizini (uchinchi tomonga) sadaqa (xayriya) qilish majburiyatini zimmasiga olishi joiz. Bunday mablag‘lar muassasaning Shariat kengashi nazorati ostida muassasa orqali xayriya maqsadlariga yo‘naltirilishi shart."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Kafil (2/2)",
+      "text": "Rustam ukasining bankdagi 60 000 000 so‘mlik qarziga kafil bo‘lgan; kafillikda «avval qarzdordan talab qilinsin» degan shart yo‘q. Bank qarzni Rustamdan talab qildi. Rustam to‘lashga to‘liq qodir bo‘lsa-da, olti oy davomida to‘lovni qasddan kechiktirdi. Bank sudga murojaat qilib, 2 000 000 so‘m sud xarajati qildi. Bank Rustamdan nimalarni talab qila oladi?",
+      "options": [
+        "Qarz va 2 000 000 so‘m sud xarajatini — kechikish jarimasisiz",
+        "Faqat qarzni: kafilga hech qanday xarajat yuklab bo‘lmaydi",
+        "Qarz, sud xarajati va olti oylik kechikish uchun penyani",
+        "Hech narsani: qarz avval ukasining o‘zidan undirilishi kerak"
+      ],
+      "correct": "A",
+      "explain": "Qarz to‘lovini kechiktirayotgan qarzdorga tegishli barcha qoidalar to‘lovni kechiktirayotgan kafilga ham tatbiq etiladi. Demak, qasddan kechiktirayotgan qarzdor kabi Rustam ham sud va undirish xarajatlarini qoplaydi (2/1/4), lekin unga ham moliyaviy jarima qo‘yish taqiqlangan (2/1/2). Kafil maqomi uni na og‘irroq, na yengilroq qiladi — u kechiktiruvchi qarzdor bilan bir xil hukmda.",
+      "notes": [
+        "",
+        "Kafilga ham kechiktiruvchi qarzdor qoidalari, jumladan sud xarajatlarini qoplash majburiyati tatbiq etiladi.",
+        "Penya kafilga nisbatan ham taqiqlangan — u qarzdor bilan bir xil hukmda.",
+        "Kafil navbat shartini qo‘ymagan, shuning uchun bank undan to‘g‘ridan-to‘g‘ri talab qila oladi (2/2/1)."
+      ],
+      "ref": "AAOIFI SS 3, 2/2 Kafil, 2/2/2",
+      "quote": "Qarz to‘lovini kechiktirayotgan qarzdorga tegishli barcha qonun-qoidalar to‘lovni kechiktirayotgan kafilga nisbatan ham tatbiq etiladi."
+    },
+    {
+      "kind": "theory",
+      "bloom": "analyze",
+      "section": "Nomoddiy choralar (2/4)",
+      "text": "Bank qasddan kechiktirib kelayotgan, to‘lovga qodir qarzdorga nisbatan quyidagi choralarni ko‘rib chiqmoqda. Ulardan qaysi biri standartdagi nomoddiy (moliyaviy bo‘lmagan) jazo turiga mos keladi?",
+      "options": [
+        "«Qora ro‘yxat»dan chiqarish uchun qarzdordan alohida to‘lov olish",
+        "Uni «qora ro‘yxat»ga kiritib, boshqa muassasalarni ogohlantirish",
+        "Qarzdorning boshqa bankdagi hisobidan qarzni o‘zi yechib olish",
+        "Kechikkan har kun uchun «ma’muriy xizmat haqi» belgilash"
+      ],
+      "correct": "B",
+      "explain": "Standart moliya muassasasiga qarzdorni majburiyatlarini bajarmagan mijozlarning «qora» ro‘yxatiga kiritish va boshqa muassasalarga ogohlantiruvchi xat yuborish huquqini beradi; bu boshqa muassasalar qarzdor haqida so‘raganda yoki «qora ro‘yxat»lar almashilganda amalga oshadi. Bu chora qarz miqdorini oshirmaydi, ammo qarzdorning ishonchliligiga ta’sir qilib, uni to‘lashga undaydi — shuning uchun ribaga olib kelmaydi.",
+      "notes": [
+        "Ro‘yxatdan chiqarish uchun to‘lov — kechikish evaziga olinadigan pul, ya’ni yashirin moliyaviy jarima.",
+        "",
+        "Standart faqat mijozning shu muassasadagi hisobraqamlaridan undirishni shart qilishga ruxsat beradi (2/5/3); boshqa bankdagi hisob bunga kirmaydi.",
+        "Nomi «xizmat haqi» bo‘lsa ham, kechikkan kunlarga bog‘liq to‘lov taqiqlangan moliyaviy jarimadir (2/1/2)."
+      ],
+      "ref": "AAOIFI SS 3, 2/4 Qarz to‘lovini kechiktirganlik uchun nomoddiy jazo turlari",
+      "quote": "Moliya muassasasi qarzdorning nomini qarz majburiyatlarini bajarmagan mijozlarning «qora» ro‘yxatiga kiritish va boshqa muassasalarga qarzdor o‘z majburiyatlarini bajarmaganligi haqida ogohlantiruvchi xat yuborish huquqiga ega."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Umumiy qoidalar (2/5)",
+      "text": "Dilnoza murobaha to‘lovini 2 oy kechiktirdi, so‘ng qarzni to‘liq yopayotganda o‘z xohishi bilan 500 000 so‘m qo‘shib to‘ladi va «noqulaylik uchun uzr» dedi. Shartnomada ham, og‘zaki ham bunday ustama haqida gap bo‘lmagan, bankda bunday odat yo‘q va oldindan hech qanday kelishuv bo‘lmagan. Bankning ustamani qabul qilish qarorini baholang.",
+      "options": [
+        "Qabul qilish mumkin emas: kechikkan qarz ustidagi har qanday qo‘shimcha riba",
+        "Qabul qilish mumkin, lekin faqat xayriyaga yo‘naltirish sharti bilan",
+        "Qabul qilish mumkin, faqat ustama qarzning 5 foizidan oshmasa",
+        "Qabul qilish mumkin: ustama shart qilinmagan, urf va til biriktirish yo‘q"
+      ],
+      "correct": "D",
+      "explain": "Kechiktiruvchi qarzdor to‘lov paytida o‘z ixtiyori bilan qo‘shimcha to‘lasa, uni qabul qilishga monelik yo‘q — agar u yozma, og‘zaki yoki ishora orqali shart qilinmagan, urfga aylanmagan va maxfiy til biriktirish natijasi bo‘lmasa. Taqiqlangan riba — shart qilingan yoki odat tusiga kirgan ziyodalik. Bu yerda uchala to‘siq ham yo‘q, shuning uchun ustama qarzdorning ixtiyoriy hadyasi hisoblanadi.",
+      "notes": [
+        "Riba — shart qilingan (yoki urf, til biriktirish orqali kelishilgan) ziyodalik; ixtiyoriy, shartsiz ustama emas.",
+        "Xayriyaga yo‘naltirish talabi 2/1/8 dagi sadaqa majburiyatiga oid; ixtiyoriy ustamaga bunday shart qo‘yilmagan.",
+        "Standart ustamaga foiz chegarasi qo‘ymaydi — mezon miqdor emas, balki shart, urf va til biriktirishning yo‘qligi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 3, 2/5 Umumiy qoidalar, 2/5/2",
+      "quote": "Qarz to‘lovini kechiktiruvchi qarzdor qarzini to‘lash vaqtida qarzga qo‘shimcha ustama to‘lasa, bu ustama yozma, og‘zaki va/yoki turli imo-ishoralar orqali shart qilinmaganligi, urfda bo‘lmaganligi yoki maxfiy til biriktirilishi natijasida hosil bo‘lmaganligi sharti bilan qabul qilinishiga monelik yo‘q."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Umumiy qoidalar (2/5)",
+      "text": "«Ishonch» bankida kechikkan mijozlar qarzni yopayotganda kassir har safar «odatda mijozlarimiz kechikkani uchun minnatdorchilik sifatida 2% qo‘shib to‘laydi» deb eslatadi va deyarli barcha kechikkan mijozlar shunday qiladi. Shartnomada bu haqda hech narsa yozilmagan. Bankning Shariat kengashi bu amaliyotni ko‘rib chiqmoqda. Eng to‘g‘ri baho qaysi?",
+      "options": [
+        "Joiz: shartnomada yozilmagan ekan, ustama ixtiyoriy hadya hisoblanadi",
+        "Joiz, agar bank yig‘ilgan mablag‘ni yil oxirida xayriyaga bersa",
+        "Joiz emas: ustama og‘zaki ishora va urf orqali shart qilingan",
+        "Joiz emas: kechikkan qarzdordan umuman hech qanday ustama olinmaydi"
+      ],
+      "correct": "C",
+      "explain": "Ixtiyoriy ustamani qabul qilish uchun u yozma, og‘zaki yoki ishora orqali shart qilinmagan, urfda bo‘lmagan va maxfiy til biriktirish natijasi bo‘lmasligi kerak. Bu yerda kassirning muntazam eslatmasi — og‘zaki ishora, deyarli barcha mijozlarning shunday qilishi esa urfga aylangan amaliyot. Urfda ma’lum bo‘lgan narsa shart qilingan kabidir, shuning uchun bu ustama yashirin kechikish jarimasiga (ribaga) aylanadi. Shartnomada yozilmagani hukmni o‘zgartirmaydi.",
+      "notes": [
+        "Standart faqat yozma shartni emas, og‘zaki shart, ishora va urfni ham to‘siq deb hisoblaydi.",
+        "Keyinroq xayriyaga berish shart qilingan ustamani joiz qilmaydi; muammo undirish usulining o‘zida.",
+        "",
+        "Standart shartsiz va urfsiz ixtiyoriy ustamani qabul qilishga ruxsat beradi; bu yerda taqiq sababi — ishora va urf."
+      ],
+      "ref": "AAOIFI SS 3, 2/5 Umumiy qoidalar, 2/5/2",
+      "quote": "…bu ustama yozma, og‘zaki va/yoki turli imo-ishoralar orqali shart qilinmaganligi, urfda bo‘lmaganligi yoki maxfiy til biriktirilishi natijasida hosil bo‘lmaganligi sharti bilan qabul qilinishiga monelik yo‘q."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Jarima taqiqi (2/1/1–2/1/3)",
+      "text": "Bank qasddan to‘lamayotgan qarzdor ustidan sudga da’vo arizasi tayyorladi. Arizada uchta talab bor: (1) 80 000 000 so‘m asosiy qarz; (2) 1 500 000 so‘m sud xarajati; (3) ekspert hisoblagan, kechikish davrida bank boy bergan 6 000 000 so‘m foyda. Bank yuristlari «sud qarori bilan undirilsa, bu jarima emas» deyishmoqda. Da’voni baholang.",
+      "options": [
+        "Uchala talab ham joiz, chunki undirish sud qarori bilan amalga oshadi",
+        "1- va 2-talablar joiz, 3-talab sud orqali bo‘lsa ham joiz emas",
+        "Faqat 1-talab joiz, sud xarajatlarini bank o‘zi ko‘taradi",
+        "1- va 3-talablar joiz, sud xarajati esa davlat zimmasida qoladi"
+      ],
+      "correct": "B",
+      "explain": "Qasddan to‘lamayotgan qarzdordan kechiktirgani uchun pul yoki mol ko‘rinishidagi moliyaviy jarimani sud orqali talab qilish ham joiz emas — sud yo‘li taqiqlangan narsani halol qilmaydi. Boy berilgan foyda uchun to‘lov ham shu taqiq ostida (2/1/2). Shu bilan birga, sud va undirish xarajatlari haqiqatda qilingan sarf bo‘lib, qarzdor ularni qoplashga majbur (2/1/4). Shuning uchun asosiy qarz va sud xarajati — haqli talab, 6 000 000 so‘mlik «boy berilgan foyda» esa yo‘q.",
+      "notes": [
+        "Sud qarori moliyaviy jarimani joiz qilmaydi — standart aynan sud orqali talab qilishni ham taqiqlaydi.",
+        "",
+        "Qasddan kechiktiruvchi qarzdor sud xarajatlarini qoplashga majbur (2/1/4).",
+        "Ikkala qism ham teskari: boy berilgan foyda taqiqlangan, sud xarajati esa qarzdor zimmasida."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/3 (shuningdek 2/1/2 va 2/1/4)",
+      "quote": "Qarzini (qasddan) to‘lamayotgan qarzdordan qarz to‘lovini kechiktirgani uchun pul yoki moddiy ko‘rinishdagi moliyaviy jarimani sud orqali talab qilish joiz emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Umumiy qoidalar (2/5)",
+      "text": "Bank Shariat kengashiga taklif kiritildi: qasddan kechiktirayotgan yirik qarzdor korxonaning moliyaviy holatini kuzatish uchun uning ochiq moliyaviy hisobotlarini va davlat reyestridagi ma’lumotlarini muntazam tahlil qilish hamda qonun doirasida qo‘shimcha ma’lumot so‘rash. Kengash a’zolaridan biri «bu mijozning ishiga aralashish» deb e’tiroz bildirdi. Qaysi xulosa standartga mos?",
+      "options": [
+        "Taklif joiz: muassasa barcha shar’iy va qonuniy vositalar bilan kuzata oladi",
+        "Taklif joiz emas: qarzdorning moliyaviy faoliyati uning shaxsiy sirri",
+        "Taklif faqat qarzdor bankrot deb e’lon qilingandan keyin joiz bo‘ladi",
+        "Taklif faqat sud alohida ruxsat bergan taqdirdagina joiz bo‘ladi"
+      ],
+      "correct": "A",
+      "explain": "Muassasa qarz to‘lovini kechiktiruvchi qarzdorning holati va moliyaviy faoliyatini barcha shar’iy va qonuniy vositalar yordamida kuzatib borish (monitoring qilish) huquqiga ega. Taklifdagi vositalar — ochiq hisobotlar, davlat reyestri, qonuniy so‘rovlar — aynan shunday vositalar. Qasddan kechiktirish zulm bo‘lgani uchun kreditorning o‘z haqqini himoya qilish maqsadidagi kuzatuvi asosli; chegara — vositaning shar’iy va qonuniy bo‘lishi.",
+      "notes": [
+        "",
+        "Standart kechiktiruvchi qarzdorning moliyaviy faoliyatini kuzatishga aniq ruxsat beradi; faqat vositalar shar’iy va qonuniy bo‘lishi kerak.",
+        "Kuzatuv huquqi bankrotlikka bog‘lanmagan — u aynan qodir, lekin kechiktirayotgan qarzdorga nisbatan beriladi.",
+        "Standart sud ruxsatini shart qilmaydi; vositalarning qonuniy bo‘lishi yetarli."
+      ],
+      "ref": "AAOIFI SS 3, 2/5 Umumiy qoidalar, 2/5/1",
+      "quote": "Muassasa qarz to‘lovini kechiktiruvchi qarzdorning holatini va moliyaviy faoliyatini barcha shar’iy va qonuniy vositalar yordamida kuzatib borish [monitoring qilish] huquqiga ega."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Qamrov (1-band)",
+      "text": "Sel toshqini Alisherning ustaxonasini vayron qildi; u daromadsiz qolib, ikki oylik murobaha to‘lovini kechiktirdi va bankka zarar haqidagi rasmiy hujjatlarni taqdim etdi. Bank boshqaruvi uni kechiktiruvchi qarzdor sifatida «qora ro‘yxat»ga kiritish va boshqa muassasalarni ogohlantirishga qaror qildi. Qarorni baholang.",
+      "options": [
+        "To‘g‘ri: to‘lovi kechikkan har qanday qarzdor «qora ro‘yxat»ga kiritiladi",
+        "To‘g‘ri, chunki bu nomoddiy chora bo‘lib, hech qanday riba hosil qilmaydi",
+        "To‘g‘ri, lekin faqat Alisherning kafili ham to‘lovni kechiktirgan bo‘lsa",
+        "Noto‘g‘ri: uzrli va qiyin ahvoldagi qarzdor standart qamroviga kirmaydi"
+      ],
+      "correct": "D",
+      "explain": "Standartdagi choralar faqat to‘lovga qodir bo‘la turib kechiktirayotgan qarzdorga qaratilgan. Moliyaviy qiyin ahvolga tushgan yoki shar’iy uzr sababli kechiktirayotgan qarzdor qamrovdan aniq chiqarilgan. Alisher favqulodda ofat sababli daromadsiz qolgan va buni hujjat bilan ko‘rsatgan (2/6 ga ko‘ra qodir emasligini isbotlagan), shuning uchun u «kechiktiruvchi qarzdor» emas va unga «qora ro‘yxat» chorasi qo‘llanmaydi. B variant chora turini to‘g‘ri baholagan, lekin uni kimga qo‘llash mumkinligini e’tiborsiz qoldirgan.",
+      "notes": [
+        "Kechikishning o‘zi yetarli emas: to‘lovga qodirlik va uzrsizlik shart (1-band, 2/6).",
+        "Chora nomoddiy bo‘lsa ham, u faqat qamrovdagi — qodir bo‘la turib kechiktirayotgan qarzdorga qo‘llanadi.",
+        "Kafilning holati Alisherning maqomini o‘zgartirmaydi: u baribir uzrli qarzdor bo‘lib qoladi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 3, 1. Me’yorning qamrovi (shuningdek 2/4 va 2/6)",
+      "quote": "Me’yor moliyaviy tomondan qiyin ahvolda qolgan yoki to‘lovga qobiliyatsiz (bankrot) bo‘lib qolgan qarzdor hamda shar’iy uzr sababli qarzini to‘lashni kechiktirayotgan qarzdorlarni o‘z ichiga olmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Jarima taqiqi (2/1/1–2/1/3)",
+      "text": "Mijoz Shohruh to‘lovga to‘liq qodir, lekin «islom bankida baribir jarima yo‘q» deb murobaha to‘lovlarini qasddan kechiktirmoqda. Uning qarzi avtomobil garovi bilan ta’minlangan, shartnomada garovni sotishga vakolat bandi bor. Bank uchta harakat rejasini va Shohruhning o‘z pozitsiyasini ko‘rib chiqmoqda. Qaysi yondashuv standartga to‘liq mos?",
+      "options": [
+        "Sud orqali qarz bilan birga kechikish penyasi va boy berilgan foydani undirish",
+        "Pul jarimasi o‘rniga Shohruhdan bug‘doy shaklida tovon (mol jarima) undirish",
+        "Qarz va undirish xarajatlarini talab qilish, garovni sotish, «qora ro‘yxat»",
+        "Hech narsa qilmaslik: jarima taqiqlangani uchun bank faqat kutishi kerak"
+      ],
+      "correct": "C",
+      "explain": "To‘lovga qodir qarzdorning kechiktirishi haromdir — demak Shohruh gunohkor va bank qonuniy choralar ko‘rishga haqli. Standart moliyaviy jarimani yopadi, lekin boshqa vositalarni ochiq qoldiradi: sud va undirish xarajatlarini qarzdorga yuklash (2/1/4), garovni sotish (2/1/5) va «qora ro‘yxat»ga kiritish (2/4). C yondashuvdagi barcha choralar shular. Shohruhning «jarima yo‘q, demak kechiktirsam bo‘ladi» degan xulosasi esa xato: jarima yo‘qligi kechiktirishni halol qilmaydi.",
+      "notes": [
+        "Penya va boy berilgan foyda sud orqali ham undirilmaydi (2/1/2, 2/1/3).",
+        "Taqiq pul va mol ko‘rinishidagi jarimaga birdek tegishli — bug‘doy shaklidagi tovon ham taqiqlangan.",
+        "",
+        "Jarima taqiqi bankni himoyasiz qoldirmaydi: xarajatlarni undirish, garovni sotish va nomoddiy choralar joiz."
+      ],
+      "ref": "AAOIFI SS 3, 2/1 Qarz to‘lovini kechiktiruvchi qarzdor, 2/1/1 (shuningdek 2/1/4, 2/1/5, 2/4)",
+      "quote": "To‘lovga qodir qarzdorning qarzni to‘lashni kechiktirishi haromdir."
+    }
+  ]
+}

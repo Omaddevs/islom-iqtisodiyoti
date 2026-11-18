@@ -1,0 +1,447 @@
+{
+  "title": "AAOIFI 5-shariat standarti: Kafolatlar — 20 ta murakkab test",
+  "description": "Qo‘llash, tahlil va baholash darajasidagi vaziyatli va hisob-kitobli savollar: kafillik va uning turlari, omonatga asoslangan shartnomalarda kafolat, ijara, kafolat xati, hamish jiddiyya, urbun, tender kafolati, hisobraqamni muzlatish, uchinchi tomon kafolati, bankrotlikda ustunlik. Topshirgach har bir savol bo‘yicha izoh, variantlar tahlili va standart bandi ko‘rsatiladi.",
+  "timeLimit": 40,
+  "questions": [
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Hamish jiddiyya, urbun va tender kafolati (6/8)",
+      "text": "Mijoz Bahrom bankka avtomobilni murobaha asosida sotib olish bo‘yicha majburiy va’d (bir tomonlama va’da) berdi va hamish jiddiyya (jiddiylik puli) sifatida 30 000 000 so‘m to‘ladi. Bank avtomobilni 200 000 000 so‘mga sotib oldi va unga 20 000 000 so‘m ustama qo‘yishni rejalashtirgan edi. Bahrom va’dasidan qaytdi, bank avtomobilni boshqa xaridorga 185 000 000 so‘mga sotdi. Standartga ko‘ra hamish jiddiyya qanday hal qilinadi?",
+      "options": [
+        "Bank 30 000 000 so‘mni to‘liq oladi — bu urbun (bay’ona) hisoblanadi",
+        "Bank hech narsa ushlamaydi — 30 000 000 so‘m to‘liq qaytariladi",
+        "Bank 15 000 000 so‘mni ushlab, 15 000 000 so‘mni Bahromga qaytaradi",
+        "Bank 30 000 000 so‘mni ushlaydi va yana 5 000 000 so‘m talab qiladi"
+      ],
+      "correct": "C",
+      "explain": "Va’da mijoz uchun majburiy bo‘lsa, uning bajarilishini ta’minlash uchun hamish jiddiyya olish joiz. Shartnoma hali imzolanmagani uchun bu pul urbun emas, balki omonat. Mijoz va’dasini buzsa, undan faqat haqiqiy zarar ushlab qolinadi; haqiqiy zarar — mol tannarxi bilan uni boshqa shaxsga sotish narxi o‘rtasidagi farq. Boy berilgan (rejalashtirilgan) foyda haqiqiy zarar hisoblanmaydi.\n\nHisob-kitob:\n1) Haqiqiy zarar: 200 000 000 − 185 000 000 = 15 000 000 so‘m.\n2) Qaytariladi: 30 000 000 − 15 000 000 = 15 000 000 so‘m.\nD variant zararga rejalashtirilgan 20 000 000 so‘m foydani qo‘shgan: 15 000 000 + 20 000 000 = 35 000 000, ya’ni 30 000 000 dan 5 000 000 ortiq — bu boy berilgan foydani undirish bo‘lib, standartga zid.",
+      "notes": [
+        "Shartnoma imzolanmagan bosqichda olingan pul urbun emas, omonat; undan faqat haqiqiy zarar ushlanadi.",
+        "Va’da majburiy bo‘lgani va buzilgani uchun bank haqiqiy zararni hamish jiddiyya hisobidan ushlab qolishga haqli.",
+        "",
+        "Rejalashtirilgan foyda haqiqiy zarar emas: zarar faqat tannarx va boshqaga sotish narxi farqi bilan o‘lchanadi."
+      ],
+      "ref": "AAOIFI SS 5, 6/8 Aukcion, tender kafolati, hamish jiddiyya va urbun, 6/8/2",
+      "quote": "Agar va’dani bajarish mijoz uchun majburiy bo‘lsa, sotib olish va’dasini bergan mijozdan va’daning bajarilishini ta’minlash maqsadida muayyan mablag‘ olish joiz. Bunday mablag‘ «hamish jiddiyya» deb ataladi. Bu mablag‘ hali shartnoma imzolanmagan paytda olingani uchun urbun emas, balki omonat hisoblanadi. Mijoz va’dasini buzgan taqdirda, ushbu omonat mablag‘ hisobidan haqiqiy zarar miqdori ushlab qolinishi mumkin. Haqiqiy zarar mahsulot tannarxi va uni boshqa shaxsga sotish narxi o‘rtasidagi farqdir."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Kafolat maqsadlarini amalga oshirish (5)",
+      "text": "Bank Laylo xonimga oshxona jihozlarini nasiya (muddatli to‘lov) asosida sotdi. Shartnomada «xaridor narxni 60 kun ichida to‘lamasa, sotuvchi sudga murojaat qilmasdan shartnomani bekor qilib, molni qaytarib olish huquqiga ega» degan shart bor. 60 kun o‘tdi, Laylo to‘lamadi. Bank qanday yo‘l tuta oladi?",
+      "options": [
+        "Shartnomadagi shartga ko‘ra uni sudsiz bekor qilib, molni qaytarib oladi",
+        "Shartnomani faqat sud qarori bilan bekor qilib, molni qaytara oladi",
+        "Shartnomani bekor qila olmaydi, faqat narxni sud orqali undira oladi",
+        "Shartnomani bekor qilib, molni qaytarib oladi va 5% jarima ham undiradi"
+      ],
+      "correct": "A",
+      "explain": "Sotuvchi nasiya savdo shartnomasiga «xaridor belgilangan muddatda to‘lamasa, sudga murojaat qilmasdan shartnomani bekor qilish (va molni qaytarib olish) huquqi»ni kiritishi mumkin. Bu shart narxni oshirmaydi, faqat bitimni bekor qilish yo‘lini soddalashtiradi; shuning uchun riba yoki jarima mohiyatiga ega emas. Laylo muddatni o‘tkazib yubordi — bank shart asosida shartnomani bekor qilib, jihozlarni qaytarib oladi.",
+      "notes": [
+        "",
+        "Standart aynan sudga murojaat qilmasdan bekor qilish shartini kiritishga ruxsat beradi.",
+        "Bekor qilish sharti shartnomaga kiritilgan; bank faqat narx talab qilish bilan cheklanmaydi.",
+        "Bekor qilish va molni qaytarib olish yetarli; kechikish uchun foizli jarima qarz ustiga ziyodalik bo‘lib, joiz emas."
+      ],
+      "ref": "AAOIFI SS 5, 5/2 Puli to‘lanmaganligi sababli nasiya savdoni buzish",
+      "quote": "Sotuvchi nasiya (kechiktirilgan to‘lov) asosidagi oldi-sotdi shartnomasiga xaridor belgilangan muddat ichida to‘lovni amalga oshirmasa, sudga murojaat qilmasdan turib shartnomani bekor qilish (va sotilgan mol-mulkni qaytarib olish) huquqiga ega ekanligi haqidagi shartni kiritib ketishi mumkin."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Kafolat taqozo qiladigan narsalar (3/3)",
+      "text": "Sarvar o‘z iltimosiga ko‘ra do‘sti Akmalni bankdagi 50 000 000 so‘mlik qarziga kafil qilib berdi (qarzdorga murojaat qilish huquqi bor kafillik). Sarvar to‘lovni kechiktirgach, Akmal bank bilan kelishib, qarzni 42 000 000 so‘m to‘lash orqali yopdi va bank qolgan qismidan voz kechdi. Akmal Sarvardan qancha summani talab qila oladi?",
+      "options": [
+        "50 000 000 so‘m — kafillik olingan qarzning to‘liq miqdori",
+        "52 500 000 so‘m — qarz va kafillik xizmati uchun 5% haq",
+        "Hech narsa — kafil to‘lovni ixtiyoriy (tabarru’) qilgan",
+        "42 000 000 so‘m — kafil kreditorga haqiqatda to‘lagan summa"
+      ],
+      "correct": "D",
+      "explain": "Kafil qarz beruvchi bilan qarz miqdoridan kamroq summa to‘lashga kelishsa, riba paydo bo‘lmasligi uchun qarzdordan qarz miqdorini emas, balki kafil sifatida kreditorga haqiqatda to‘lagan summani qaytarib oladi. Aks holda kafil 42 000 000 berib, 50 000 000 oladi — bu pulni ko‘proq pulga almashtirish, ya’ni riba bo‘ladi.\n\nHisob-kitob:\n1) Akmal to‘lagan: 42 000 000 so‘m → talab qiladi: 42 000 000 so‘m.\n2) A variant: 50 000 000 − 42 000 000 = 8 000 000 so‘m ortiqcha — riba.\n3) B variant: 50 000 000 × 1,05 = 52 500 000 — kafillik uchun haq olish mutlaqo joiz emas (3/1/5).\n4) C variant noto‘g‘ri, chunki kafillik qarzdorning iltimosi bilan berilgan — murojaat huquqi bor.",
+      "notes": [
+        "Kafil 42 000 000 to‘lab 50 000 000 olsa, 8 000 000 farq ribaga aylanadi; standart haqiqatda to‘langan summani belgilaydi.",
+        "Kafillik evaziga haq olish yoki berish mutlaqo joiz emas (3/1/5); bundan tashqari, qarz miqdori ham noto‘g‘ri olingan.",
+        "Kafillik qarzdorning iltimosi bilan berilgan, demak bu qarzdorga murojaat qilish huquqi bor kafillik.",
+        ""
+      ],
+      "ref": "AAOIFI SS 5, 3/3 Kafolat taqozo qiladigan narsalar, 3/3/2",
+      "quote": "Agar kafil qarz beruvchi tomon bilan qarz miqdoridan kamroq mablag‘ to‘lashga kelishadigan bo‘lsa, ribo paydo bo‘lib qolmasligi uchun, qarzdordan qarz miqdoriga teng pul mablag‘ini emas, balki kafil sifatida kreditorga haqiqatda to‘lagan pul mablag‘ini qaytarib oladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Ijara mulkining javobgarligi (2/3)",
+      "text": "Bank «Agro-Servis» MChJga traktorni ijaraga berdi va shartnomada «traktorga har qanday sabab bilan yetgan zararni qoplash uchun ijarachi 40 000 000 so‘m garov qo‘yadi» deb yozdi. Ijarachi traktordan to‘g‘ri foydalanayotgan paytda chaqmoq urib, traktor yonib ketdi; ijarachining aybi yoki beparvoligi yo‘q. Zarar kimning zimmasida?",
+      "options": [
+        "Ijarachining zimmasida — bank aynan shu maqsadda undan garov olgan",
+        "Bankning zimmasida — ijarachi aybsiz, ijara mulki unda omonat",
+        "Ikkala tomonning zimmasida — zarar teng yarmiga bo‘linadi",
+        "Ijarachining zimmasida — u traktorni sug‘urta qilmagani uchun"
+      ],
+      "correct": "B",
+      "explain": "Ijaraga berilgan mulkning javobgarligi mulk egasi zimmasida, ijarachi uchun esa u omonat hisoblanadi. Shuning uchun mulkka talofat yetganda uni qoplash maqsadida ijarachidan kafillik yoki garov talab qilish joiz emas; kafolat faqat ta’addiy (tajovuz), beparvolik yoki shartlarni qasddan buzish holatlari uchun joiz. Talofat ijarachining aybi bilan bo‘lmagani uchun zarar bank (ijaraga beruvchi) zimmasida; shartnomadagi «har qanday sabab» bandi bu hukmni o‘zgartirmaydi.",
+      "notes": [
+        "Aybsiz talofatni qoplash uchun ijarachidan garov talab qilishning o‘zi joiz emas — bunday band zararni ijarachiga o‘tkazmaydi.",
+        "",
+        "Talofat ijarachining aybi bilan bo‘lmasa, zarar to‘liq ijaraga beruvchining zimmasida — taqsimlanmaydi.",
+        "Sug‘urta xarajatlarini ijaraga beruvchi o‘z zimmasiga oladi; ijarachining sug‘urtalamagani unga javobgarlik yuklamaydi."
+      ],
+      "ref": "AAOIFI SS 5, 2/3 Ijara berilgan mulklarning javobgarligi",
+      "quote": "Ijaraga berilgan mulkning javobgarligi mulk egasi zimmasida bo‘ladi, ijaraga oluvchi uchun esa bu mulk omonat hisoblanadi. Ijaraga berilgan mulkka talofat yetganda uni qoplash uchun ijaraga oluvchidan kafillik, garov yoki shunga o‘xshash kafolatlarni talab qilish joiz emas. Agar kafolat ta’addiy (tajovuz qilish), loqaydlik yoki bitim shartlarini qasddan buzish holatlari uchun bo‘lsa, unda joiz."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Kafolat xati (6/1)",
+      "text": "«Qurilish-Stroy» MChJ tenderda qatnashish uchun bankdan 1 000 000 000 so‘mlik, 1 yil muddatli kafolat xatini so‘radi (qoplanmagan). Bank quyidagi to‘lovlarni taklif qildi: kafolat summasining 1 foizi miqdorida yillik komissiya; hujjatlarni tayyorlash uchun 1 200 000 so‘m va yuridik tekshiruv uchun 800 000 so‘m. Oxirgi ikki xarajat haqiqiy va o‘rtacha bozor narxidan oshmaydi. Bank mijozdan jami qancha undira oladi?",
+      "options": [
+        "2 000 000 so‘m — faqat haqiqiy ma’muriy xarajatlar",
+        "12 000 000 so‘m — komissiya va ma’muriy xarajatlar",
+        "10 000 000 so‘m — faqat 1 foizlik yillik komissiya",
+        "Hech narsa — kafolat xati to‘liq bepul berilishi shart"
+      ],
+      "correct": "A",
+      "explain": "Kafolat xati taqdim etilgani uchun haq olish joiz emas — kafolatning o‘zi pul evaziga sotilmaydi, chunki kafil to‘lagan summani qaytarib oladi va ustiga olingan haq qarz bo‘yicha ziyodalikka aylanadi. Odatda bunday komissiya aynan kafolat summasi va muddatiga qarab hisoblanadi — bu belgining o‘zi uning kafolat narxi ekanini ko‘rsatadi. Biroq kafolat xatini rasmiylashtirish bilan bog‘liq ma’muriy xarajatlar va xizmatlar haqini, o‘rtacha bozor narxidan (ujrat al-misl) oshmagan holda, so‘ragan tomonga yuklash joiz.\n\nHisob-kitob:\n1) Komissiya: 1 000 000 000 × 1% = 10 000 000 so‘m — joiz emas.\n2) Ma’muriy xarajatlar: 1 200 000 + 800 000 = 2 000 000 so‘m — joiz.\n3) Jami: 2 000 000 so‘m. B variant ikkalasini qo‘shgan (10 000 000 + 2 000 000), C faqat taqiqlangan qismini olgan.",
+      "notes": [
+        "",
+        "Summa va muddatga bog‘langan 1 foizlik komissiya — kafolat uchun haq, u joiz emas.",
+        "Bu aynan taqiqlangan qism: kafolat summasi va muddatiga qarab hisoblangan haq.",
+        "Ma’muriy xarajat va xizmatlar haqini, o‘rtacha bozor narxidan oshmasa, mijozga yuklash joiz."
+      ],
+      "ref": "AAOIFI SS 5, 6/1 Kafolat xati, 6/1/1–6/1/2",
+      "quote": "Kafolat xati taqdim etilganligi uchun haq olish joiz emas. Ikki turdagi (boshlang‘ich va yakuniy) kafolat xati taqdim etish bilan bog‘liq ma’muriy xarajatlar va xizmatlar uchun to‘lovlarni kafolat xati so‘ragan tomonga yuklash shar’an joiz, faqat bunday to‘lovlar «ujrat al-misl», ya’ni o‘rtacha bozor bahosidan ziyoda bo‘lmasligiga rioya qilish kerak."
+    },
+    {
+      "kind": "theory",
+      "bloom": "apply",
+      "section": "Qamrov (1-band)",
+      "text": "Bank yuristi AAOIFI 5-standarti («Kafolatlar») bo‘yicha ichki yo‘riqnoma tayyorlamoqda. Quyidagi to‘rt holatdan qaysi biri aynan shu standart qamroviga kiradi?",
+      "options": [
+        "Ijarachi avtomobil bilan yo‘l-transport hodisasida boshqa mashinaga yetkazgan zarar uchun tovon",
+        "O‘zganing mulkini kuch bilan tortib olgan (g‘asb qilgan) shaxsning yetkazgan zarari uchun javobgarligi",
+        "Jinoyat natijasida yetkazilgan moddiy zarar uchun aybdor shaxsdan olinadigan kafolat",
+        "Murobaha qarzining to‘lanmasligini oldini olish uchun mijozdan olinadigan kafil va veksel"
+      ],
+      "correct": "D",
+      "explain": "Standart majburiyatlarni kafolatlash (rasmiylashtirish, hujjatlashtirish) hamda qarzlarning to‘lanmasligi yoki kechiktirilishining oldini olish uchun qo‘llanadigan kafolatlarni qamraydi: yozma hujjat, guvohlik, kafillik, garov (rahn), chek va veksellar. Shu bilan birga standart talofat yetkazish, jinoyatlar va g‘asb bilan bog‘liq kafolatlarni o‘z ichiga olmaydi. Murobaha qarzi uchun kafil va veksel — aynan shartnomaviy majburiyatni ta’minlash vositalari.",
+      "notes": [
+        "Talofat yetkazish (zarar qilish) bilan bog‘liq javobgarlik standart qamrovidan aniq chiqarilgan.",
+        "G‘asb (o‘zganing mulkini kuch bilan tortib olish) bilan bog‘liq kafolatlar standartga kirmaydi.",
+        "Jinoyatlar bilan bog‘liq kafolatlar standart qamrovidan chiqarilgan.",
+        ""
+      ],
+      "ref": "AAOIFI SS 5, 1. Me’yorning qamrovi (amal qilish doirasi)",
+      "quote": "Ushbu me’yor majburiyatlarni kafolatlash (rasmiylashtirish, hujjatlashtirish) hamda qarzlarning to‘lanmasligini yoki to‘lovlar kechiktirilishini oldini olish maqsadida qo‘llanadigan kafolatlarni qamrab oladi. Bunday kafolatlar yozma hujjat, guvohlik, kafillik, garov (rahn), chek yoki veksellar ko‘rinishida bo‘lishi mumkin. Mazkur me’yor talofat yetkazish, jinoyatlar va g‘asb bilan bog‘liq kafolatlarni o‘z ichiga olmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Omonatga asoslangan shartnomalarda kafolat (2/2)",
+      "text": "Islom banki mudaraba (biri sarmoya, ikkinchisi mehnat bilan qatnashadigan sheriklik) asosida investitsiya hisobvarag‘ini ochib, uni «Sarmoyangiz bank tomonidan 100% kafolatlangan, foyda esa bozorga bog‘liq» degan shior bilan reklama qilmoqda. Bank mudarib sifatida ish yuritadi. Bu mahsulotni tahlil qiling.",
+      "options": [
+        "Joiz, chunki faqat sarmoya kafolatlanadi, foyda esa kafolatlanmaydi",
+        "Joiz, agar investorlar shartnomada bu kafolatga yozma rozilik bersa",
+        "Joiz emas: mudarib sarmoyani ham, foydani ham kafolatlay olmaydi",
+        "Joiz, agar kafolat reklamada emas, faqat shartnoma matnida yozilsa"
+      ],
+      "correct": "C",
+      "explain": "Vakillik, vadi’a, mudaraba, musharaka kabi omonatga asoslangan shartnomalarda kafolat talab qilish ularning mohiyatiga zid. Odatiy holatda mudaribdan, investitsion vakildan yoki sheriklardan kafolat talab qilib bo‘lmaydi — sarmoyani kafolatlash uchunmi yoki foydanimi, ahamiyati yo‘q. Bunday shartnomalarni kafolatlangan investitsiya sifatida targ‘ib qilish ham joiz emas. Mudarib faqat ta’addiy (tajovuz), taqsir (loqaydlik) yoki shartlarni qasddan buzganda javobgar bo‘ladi. Sarmoya kafolatlansa, mudaraba amalda foizli qarzga aylanadi.",
+      "notes": [
+        "Standart aniq aytadi: sarmoyani kafolatlash uchunmi yoki foydani kafolatlash uchunmi — ahamiyati yo‘q, ikkalasi ham joiz emas.",
+        "Investorlarning roziligi omonat shartnomasi mohiyatini o‘zgartirmaydi — mudarib kafolati baribir joiz emas.",
+        "",
+        "Kafolat shartnomada yozilsa ham joiz emas; reklama esa alohida taqiqlangan — ikki xato bir-birini oqlamaydi."
+      ],
+      "ref": "AAOIFI SS 5, 2/2 Ishonchga asoslangan shartnomalarda kafolat qo‘llash masalasi, 2/2/1",
+      "quote": "Biroq (oddiy holatda) muzoribdan, sarmoyadorning boshqaruvchi vakili (investitsion vakil)dan yoki sheriklardan biridan kafolat talab qilish mumkin emas. Bu sarmoyani (tanini) kafolatlash uchun bo‘ladimi yoki foydani kafolatlash uchun bo‘ladimi, buni ahamiyati yo‘q. Shuningdek, bunday shartnomalarni kafolatlangan investitsiya sifatida targ‘ibot qilish ham (ya’ni marketing maqsadida) joiz emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Kafolatlarning joizligi (2/1)",
+      "text": "Bank Jasurga uyni murobaha asosida sotmoqda va aynan sotuv shartnomasining o‘ziga uchta talab kiritdi: ishonchli kafil taqdim etish, uyni garovga qo‘yish va har oylik to‘lov uchun veksel berish. Jasur e’tiroz bildirdi: «Bitta shartnomada bir nechta kafolat olinmaydi, kafolat esa asosiy shartnomaga qo‘shilsa, sotuvni buzadi». E’tirozni tahlil qiling.",
+      "options": [
+        "E’tiroz to‘g‘ri: bir bitimda faqat bitta kafolat turini olish mumkin",
+        "E’tiroz noto‘g‘ri: sotuvda bir nechta kafolat asosiy shartnomada olinadi",
+        "E’tiroz qisman to‘g‘ri: kafolatlar alohida shartnomada bo‘lishi shart",
+        "E’tiroz to‘g‘ri: sotuvga qo‘shilgan kafolat sharti shartnomani fasid qiladi"
+      ],
+      "correct": "B",
+      "explain": "Savdo kabi evazli bitimlarda kafolat talab qilish shar’an joiz va bunday shart shartnomani buzmaydi. Kafolat shartnomasini asosiy shartnoma bilan birlashtirishga ham monelik yo‘q, chunki kafolatni hujjatlashtirish kafolat talab qilinayotgan shartnomalarga xos tabiiy jarayon. Bundan tashqari, bir bitim doirasida bir nechta kafolat — masalan, kafillik va garov — birgalikda olinishi joiz. Demak, Jasurning ikkala dalili ham standartga zid.",
+      "notes": [
+        "Standart bir bitimda bir nechta kafolatni, masalan, kafillik va garovni birga olishga aniq ruxsat beradi (2/1/2).",
+        "",
+        "Kafolat shartnomasini asosiy shartnoma bilan birlashtirishga monelik yo‘q — alohida shartnoma shart emas.",
+        "Evazli bitimda kafolat talab qilish shartnomani buzmaydi — bu standartda aniq aytilgan."
+      ],
+      "ref": "AAOIFI SS 5, 2/1 Kafolatlarning joizligi va ularning shartnomalarga muvofiqligi, 2/1/1–2/1/2",
+      "quote": "Savdo kabi evazli bitimlarda kafolat talab qilish shar’an joiz hisoblanadi. Bunday talab (shart) shartnomani buzmaydi. Shuningdek, kafolat shartnomasi va asosiy shartnomani birlashtirishga hech qanday monelik yo‘q. Bir bitim doirasida bir necha kafolatlar, masalan, kafillik va garov birgalikda olinishi joiz."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Kafillik va uning turlari (3/1)",
+      "text": "Bankning yirik mijozi «Textil Group» bankdan o‘z yetkazib beruvchisining boshqa bankdagi qarziga kafil bo‘lishni so‘radi va shunday shart qo‘ydi: bank to‘lasa ham, yetkazib beruvchidan pulni qaytarib talab qilmasin (murojaat huquqisiz kafillik). Bank ustavi va aksiyadorlar qarori bankka xayriya qilish vakolatini bermagan. Vaziyatni tahlil qiling.",
+      "options": [
+        "Bank bunday kafillik bera oladi, chunki har qanday kafillik tabarru’ (xayriya) hisoblanadi",
+        "Bank bunday kafillik bera oladi, agar buning evaziga mijozdan xizmat haqi olsa",
+        "Bank bunday kafillik bera oladi, agar yetkazib beruvchi keyinchalik rozilik bersa",
+        "Bank bunday kafillik bera olmaydi, chunki unda xayriya qilish huquqi yo‘q"
+      ],
+      "correct": "D",
+      "explain": "Kafillik ikki turga bo‘linadi: qarzdorning iltimosi yoki roziligi bilan beriladigan, unga murojaat qilish huquqi bor kafillik; va qarzdorning ruxsatisiz, tabarru’ (ixtiyoriy) asosida beriladigan, murojaat huquqisiz kafillik. Ikkinchi turi amalda xayriya bo‘lgani uchun muassasa murojaat huquqi bo‘lmagan kafillik taqdim eta olmaydi — faqat xayriya qilish huquqiga ega bo‘lgan holat bundan mustasno. Bu bankda bunday vakolat yo‘q, shuning uchun u bu kafillikni bera olmaydi.",
+      "notes": [
+        "Har qanday kafillik tabarru’ emas: qarzdorning iltimosi bilan berilganida kafilning unga murojaat qilish huquqi bor.",
+        "Kafillik evaziga haq olish mutlaqo joiz emas (3/1/5) — haq olish bu muammoni hal qilmaydi, aksincha yangi taqiq qo‘shadi.",
+        "Talab qilinayotgan kafillik «pulni qaytarib talab qilmaslik» sharti bilan berilmoqda; muammo bankning xayriya vakolatida.",
+        ""
+      ],
+      "ref": "AAOIFI SS 5, 3/1 Kafillikning joizligi va uning turlari, 3/1/2–3/1/3",
+      "quote": "Muassasa kafillik berilgan tomonga (kafillik hisobidan yopilgan qarzni undirib olish uchun) murojaat qilish huquqi mavjud bo‘lmagan kafillik taqdim etish huquqiga ega emas, lekin muassasa xayriya qilish huquqiga ega bo‘lgan holat bundan mustasno."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Omonatga asoslangan shartnomalarda kafolat (2/2)",
+      "text": "Ikki holatni solishtiring. 1-holat: vakala bil-istismar (investitsiyani boshqarish bo‘yicha vakillik) shartnomasining o‘zida «vakil kompaniya sarmoyani qaytarishni kafolatlaydi» deb yozilgan. 2-holat: vakillik shartnomasida kafillik shart qilinmagan; bir necha oydan keyin vakil kompaniya o‘z tashabbusi bilan alohida kafillik shartnomasini imzoladi, keyinroq vakillik shartnomasi bekor qilindi. Standartga ko‘ra to‘g‘ri tahlil qaysi?",
+      "options": [
+        "1-holat joiz emas; 2-holatda kafillik mustaqil va vakillik bekor bo‘lsa ham saqlanadi",
+        "Ikkala holat ham joiz, chunki kafillik vakil tomonidan ixtiyoriy berilgan",
+        "Ikkala holat ham joiz emas, chunki vakil hech qachon kafil bo‘la olmaydi",
+        "1-holat joiz; 2-holatda kafillik vakillik bekor bo‘lishi bilan o‘z-o‘zidan tushadi"
+      ],
+      "correct": "A",
+      "explain": "Vakillik va kafillikning mohiyati bir-biriga zid bo‘lgani uchun ularni bitta shartnomada birlashtirish — bir tomon ham vakil, ham kafil bo‘lishi — joiz emas: investitsion vakildan kafolat talab qilish investitsiyani va undan daromadni kafolatlashga, ya’ni amalni ribali qarzga aylantiradi. Ammo vakillik shartnomasida kafillik shart qilinmagan bo‘lsa va vakil keyinroq alohida shartnoma asosida kafillik bersa, bu majburiyat vakillikdan ajralgan (mustaqil) hisoblanadi va hatto vakillik bekor qilinganda ham saqlanib qoladi.",
+      "notes": [
+        "",
+        "1-holatda kafillik vakillik shartnomasining o‘ziga kiritilgan — bu ixtiyoriylik emas, vakillik va kafillikni birlashtirish; u joiz emas.",
+        "Standart 2-holatdagi kabi keyinroq, alohida shartnoma bilan berilgan kafillikni mustaqil majburiyat deb tan oladi.",
+        "Ikkala qism ham teskari: 1-holat joiz emas, 2-holatdagi kafillik esa vakillik bekor bo‘lsa ham saqlanadi."
+      ],
+      "ref": "AAOIFI SS 5, 2/2 Ishonchga asoslangan shartnomalarda kafolat qo‘llash masalasi, 2/2/2",
+      "quote": "Vakillik va kafillik mohiyati bir-biriga zid bo‘lgani uchun ularni bitta shartnomada birlashtirish joiz emas. Ammo vakillik shartnomasida kafillik shart qilinmagan bo‘lsa, keyinroq vakil alohida shartnoma asosida kafillik taqdim etsa, bunda kafillik majburiyati vakillikdan ajralgan (ya’ni mustaqil) bo‘ladi. Hatto vakillik shartnomasi bekor qilingan taqdirda ham kafillik majburiyati saqlanib qoladi."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Kafolat taqozo qiladigan narsalar (3/3)",
+      "text": "Dilshod Rustamning bankdagi 60 000 000 so‘mlik qarziga Rustamning iltimosi bilan kafil bo‘ldi. Rustam to‘lamagach, Dilshod bank bilan kelishib, qarzni pul o‘rniga o‘zining bozor qiymati 66 000 000 so‘m bo‘lgan avtomobilini berish orqali yopdi. Dilshod Rustamdan qancha summani talab qila oladi?",
+      "options": [
+        "66 000 000 so‘m — bankka berilgan avtomobilning qiymati",
+        "60 000 000 so‘m — qarz va aktiv qiymatining kamrog‘i",
+        "63 000 000 so‘m — qarz va aktiv qiymatining o‘rtachasi",
+        "Hech narsa — qarz pul bilan emas, mol bilan yopilgan"
+      ],
+      "correct": "B",
+      "explain": "Kafil qarzni boshqa biror mol yoki aktiv bilan yopishga kelishsa, qarzdordan qarzning o‘zini (tanini) yoki to‘lov qilingan aktivning qiymatini — qaysi biri kamroq bo‘lsa — talab qilishi mumkin. Mantiq: kafil qarzdorga nisbatan qarzdan ortiq olsa, ziyodalik paydo bo‘ladi; aktiv arzon bo‘lsa, u haqiqatda shuncha sarflagan bo‘ladi.\n\nHisob-kitob:\n1) Qarz: 60 000 000 so‘m; aktiv qiymati: 66 000 000 so‘m.\n2) Kamrog‘i: min(60 000 000; 66 000 000) = 60 000 000 so‘m.\n3) A variant kattarog‘ini olgan (qarzdan 6 000 000 ortiq), C variant o‘rtachani olgan ((60 000 000 + 66 000 000) / 2 = 63 000 000) — standartda o‘rtacha yo‘q.\nAgar avtomobil 54 000 000 so‘m tursa, javob 54 000 000 bo‘lardi.",
+      "notes": [
+        "Aktiv qarzdan qimmat bo‘lsa, uning qiymatini olish qarzdan ortiq undirish bo‘ladi; standart kamrog‘ini belgilaydi.",
+        "",
+        "Standartda o‘rtacha qiymat qoidasi yo‘q — qarz va aktiv qiymatining kamrog‘i olinadi.",
+        "Mol bilan yopish kafilning murojaat huquqini yo‘qotmaydi — standart aynan shu holat uchun qoida belgilagan."
+      ],
+      "ref": "AAOIFI SS 5, 3/3 Kafolat taqozo qiladigan narsalar, 3/3/2",
+      "quote": "Agar kafil qarz beruvchi tomon bilan qarzni boshqa biror mol/aktiv bilan yopishga kelishadigan bo‘lsa, qarzning o‘zini (tanini) yoki to‘lov qilingan aktivning qiymatini (qaysi biri kamroq bo‘lsa) qarzdordan talab qilishi mumkin."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Hisobraqamdagi pullarni muzlatish (6/5)",
+      "text": "Murobaha shartnomasiga bank ikkita shart kiritdi: (1) kelgusi davriy to‘lovlar uchun mijozning investitsiya hisobvarag‘idagi mablag‘lardan qarz miqdoriga teng qismini muzlatib qo‘yish; (2) mijozning joriy hisobraqamini ham muzlatib qo‘yish. Mijoz joriy hisobraqamni muzlatishga alohida rozilik bermagan, shunchaki shartnomani imzolagan. Shartlarni tahlil qiling.",
+      "options": [
+        "Ikkala shart ham joiz, chunki ikkalasi ham qarzni ta’minlash vositasi",
+        "Ikkala shart ham joiz emas, chunki mijoz pulidan foydalanishi cheklanadi",
+        "1-shart joiz; 2-shart joiz emas, agar mijoz o‘z xohishi bilan rozi bo‘lmasa",
+        "1-shart joiz emas; 2-shart joiz, chunki joriy hisob foyda keltirmaydi"
+      ],
+      "correct": "C",
+      "explain": "Kelgusi davriy to‘lovlar yoki muddatli qarz majburiyatlarini ta’minlash uchun mijozning investitsiya hisobvarag‘idagi mablag‘larni muzlatish yoki ulardan foydalanishni butunlay yoki qarz miqdorida (bu afzal) to‘xtatish shartini kiritish joiz; bunda muzlatilgan hisobvaraq foydasi, mudarib ulushidan keyin, mijozga tegishli bo‘lib qoladi. Ammo mudoyana (qarzga bog‘liq) amaliyotlarda mijozning joriy hisobraqamini muzlatishni shart qilish joiz emas — faqat mijoz bunga o‘z xohishi bilan rozi bo‘lsa, monelik yo‘q. Bu yerda bunday ixtiyoriy rozilik yo‘q.",
+      "notes": [
+        "Joriy hisobraqamni muzlatishni shart qilish standartda alohida taqiqlangan — faqat mijozning ixtiyoriy roziligi bilan joiz.",
+        "Investitsiya hisobvarag‘ini qarz miqdorida muzlatish shartini standart aniq joiz deydi.",
+        "",
+        "Hukm teskari olingan: investitsiya hisobvarag‘ini muzlatish joiz, joriy hisobraqamni shart qilib muzlatish esa joiz emas."
+      ],
+      "ref": "AAOIFI SS 5, 6/5 Hisobraqamdagi pullarni muzlatish, 6/5/1–6/5/2",
+      "quote": "Mudoyana (qarzga bog‘liq) amaliyotlarda muassasa tomonidan mijozning joriy hisobraqamini muzlatib qo‘yishni shart qilish joiz emas. Biroq, mijoz joriy hisobraqamini muzlatib qo‘yishga o‘z xohishi bilan rozi bo‘lsa, bunday shartga hech qanday monelik yo‘q."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Hamish jiddiyya, urbun va tender kafolati (6/8)",
+      "text": "Bank uskunalar yetkazib berish tenderini o‘tkazdi. «Mexanika» MChJ boshlang‘ich kafolat puli sifatida 40 000 000 so‘m to‘ladi; bank bu pulni o‘z mablag‘lariga aralashtirib yubordi. «Mexanika» g‘olib bo‘ldi, ammo shartnomani imzolashdan bosh tortdi. Qayta tender va narx farqi tufayli bankning haqiqiy moliyaviy zarari 25 000 000 so‘m bo‘ldi. Pul qanday hal qilinadi?",
+      "options": [
+        "40 000 000 so‘m to‘liq bankda qoladi — bu urbun (bay’ona)",
+        "25 000 000 so‘m ushlanadi, 15 000 000 so‘m qaytariladi",
+        "Hech narsa ushlanmaydi — omonatga tegib bo‘lmaydi",
+        "25 000 000 ushlanadi, qolgan 15 000 000 aralashgani uchun qaytmaydi"
+      ],
+      "correct": "B",
+      "explain": "Aukcion va tenderlarda kafolat puli olish joiz; bu mablag‘ tender o‘tkazayotgan tomon qo‘lida omonat hisoblanadi, urbun emas. Mablag‘ boshqa pullarga aralashtirilgach, u bankning javobgarligiga (zimmasiga) o‘tadi — ya’ni bank uni to‘liq qaytarishga kafil bo‘ladi. Haqiqiy moliyaviy zarar miqdoridan ortiq summani musodara qilish joiz emas.\n\nHisob-kitob:\n1) Ushlanadi: haqiqiy zarar = 25 000 000 so‘m.\n2) Qaytariladi: 40 000 000 − 25 000 000 = 15 000 000 so‘m.\nD variant aralashtirishni javobgarlikdan qutulish deb tushungan — aslida aksincha: aralashtirish bankni qaytarishga majburlaydi.",
+      "notes": [
+        "Tender kafolat puli omonat, urbun emas; haqiqiy zarardan ortiq musodara qilish joiz emas.",
+        "",
+        "Omonat bo‘lsa ham, g‘olib shartnomadan bosh tortsa, undan haqiqiy zarar ushlanishi mumkin.",
+        "Aralashtirish pulni bankning javobgarligiga o‘tkazadi — bank 15 000 000 so‘mni albatta qaytaradi."
+      ],
+      "ref": "AAOIFI SS 5, 6/8 Aukcion, tender kafolati, hamish jiddiyya va urbun, 6/8/1",
+      "quote": "Bunday mablag‘lar aukcion yoki tender o‘tkazayotgan tomonning qo‘lida omonat hisoblanadi, urbun emas. Bu mablag‘lar boshqa mablag‘larga aralashtirilishi bilan birga ularning javobgarligiga o‘tadi. Haqiqiy moliyaviy zarar miqdoridan ortiq mablag‘ musodara qilinishi joiz emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Noma’lum va hali yuzaga kelmagan qarzga kafillik (3/2)",
+      "text": "Bank Ravshanga kvartira sotmoqda. Xaridorning talabi bilan bankning hamkori — «Ishonch» kompaniyasi kafolat berdi: «Agar kvartira sotuvchiga emas, boshqa shaxsga tegishli ekani aniqlansa, xaridorga to‘langan narx qaytariladi». Kafolat berilgan paytda hech qanday qarz yo‘q, uning miqdori ham noma’lum. Bu kafolatni tahlil qiling.",
+      "options": [
+        "Joiz emas: kafolatlanayotgan qarz miqdori noma’lum — bu g‘ararga olib keladi",
+        "Joiz emas: kafolat faqat zimmada mavjud bo‘lgan qarz uchun berilishi mumkin",
+        "Joiz, lekin faqat qaytariladigan summa oldindan aniq belgilansa",
+        "Joiz: bu «daman al-darak», hali yuzaga kelmagan qarzga kafillikdir"
+      ],
+      "correct": "D",
+      "explain": "Miqdori aniq bo‘lmagan qarz majburiyati uchun ham, hali yuzaga kelmagan (zimmada bo‘lmagan) qarz uchun ham kafillik berish mumkin. Bunday kafillik «bozor kafolati» yoki «shartnomaviy kafillik» deb ataladi. Sotilgan mahsulot sotuvchidan boshqa shaxsga tegishli ekanligi ma’lum bo‘lsa, to‘langan pul xaridorga qaytarilishi kafolati — aynan uning misoli, «daman al-darak» deb ataladi. Faqat qarz yuzaga kelishidan oldin kafil, tomonni ogohlantirgan holda, kafillikni qaytarib olishi mumkin.",
+      "notes": [
+        "Standart miqdori aniq bo‘lmagan qarzga kafillik berishga aniq ruxsat beradi.",
+        "Hali yuzaga kelmagan qarzga ham kafillik berish mumkin — standart buni «shartnomaviy kafillik» deb ataydi.",
+        "Summani oldindan belgilash shart emas: miqdori noma’lum qarzga kafillik joiz.",
+        ""
+      ],
+      "ref": "AAOIFI SS 5, 3/2 Hali noma’lum bo‘lgan va zimmada vojib bo‘lmagan qarzlar uchun kafillik berish",
+      "quote": "Miqdori aniq bo‘lmagan qarz majburiyati uchun kafillik berish mumkin, shuningdek, hali yuzaga kelmagan (zimmada bo‘lmagan) qarz uchun ham kafillik berilishi mumkin. Bunga, sotilgan mahsulot sotuvchidan boshqa shaxsga tegishli ekanligi ma’lum bo‘lsa, to‘langan pul xaridorga qaytarilishi kafolati misol bo‘la oladi. Bunday kafolat «daman al-darak» deb ataladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Uchinchi tomon kafolati (6/6)",
+      "text": "Bank mudarib sifatida boshqarayotgan qishloq xo‘jaligi investitsiya fondi uchun davlat agentligi — fond bilan hech qanday shartnomaviy aloqasi bo‘lmagan, uning mudaribi ham, vakili ham, sheriki ham emas — fond zarar ko‘rsa, investorlarga zararni qoplash majburiyatini ixtiyoriy ravishda o‘z zimmasiga oldi. Bu majburiyat mudaraba shartnomasiga shart qilib kiritilmagan. Ushbu kafolatni baholang.",
+      "options": [
+        "Joiz: kafil mudarib, vakil yoki sherik emas, kafolat mudarabaga bog‘lanmagan",
+        "Joiz emas: mudaraba zararini hech kim, hech qanday shaklda kafolatlay olmaydi",
+        "Joiz, agar agentlik buning evaziga fond foydasidan ma’lum ulush olsa",
+        "Joiz, agar bu majburiyat mudaraba shartnomasiga shart qilib kiritilsa"
+      ],
+      "correct": "A",
+      "explain": "Mudarib bo‘lmagan, shuningdek investitsiyalarni boshqaruvchi vakil yoki musharakadagi sheriklardan biri bo‘lmagan uchinchi tomon zararni qoplash majburiyatini ixtiyoriy ravishda o‘z zimmasiga olishi joiz. Shart — bu majburiyat bilan mudaraba yoki vakala bil-istismar shartnomalari o‘rtasida hech qanday bog‘liqlik bo‘lmasligi. Agentlik mustaqil, aloqasiz va kafolat shartnomaga kiritilmagan — shuning uchun joiz. Sarmoyani mudarib kafolatlashi taqiqlanadi, chunki u mudarabani qarzga aylantiradi; mustaqil uchinchi tomonning ixtiyoriy kafolati bunday natija bermaydi.",
+      "notes": [
+        "",
+        "Taqiq mudarib, vakil va sherikka tegishli; mustaqil uchinchi tomonning ixtiyoriy kafolati joiz.",
+        "Foyda ulushi evaziga berilgan kafolat ixtiyoriy bo‘lmay qoladi va mudaraba bilan bog‘lanib qoladi.",
+        "Standart aynan majburiyat mudaraba shartnomasiga bog‘lanmasligini talab qiladi."
+      ],
+      "ref": "AAOIFI SS 5, 6/6 Investitsiyalar bo‘yicha yo‘qotishlarni qoplash bo‘yicha ixtiyoriy majburiyat («Uchinchi tomon kafolati»)",
+      "quote": "Muzorib bo‘lmagan, shuningdek investitsiyalarni boshqaruvchi vakil yoki Musharakadagi sheriklardan biri bo‘lmagan uchinchi tomon zararni qoplash majburiyatini ixtiyoriy ravishda o‘z zimmasiga olishi joiz, biroq mazkur majburiyat bilan Muzoraba yoki Vakala bil Istismar shartnomalari orasida hech qanday bog‘liqlik bo‘lmasligi lozim."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Aksiyalarga obuna bo‘lish kafolati (6/7)",
+      "text": "«Navoiy Invest» aksiyalarini 10 000 so‘mdan ommaviy taklif qilmoqda. Islom banki obuna muddati tugagach, sotilmay qolgan aksiyalarni taklif narxida sotib olish majburiyatini (underwriting) olmoqchi. Buning evaziga bank ikki to‘lov so‘ramoqda: (1) «kafolat uchun» emissiya hajmining 1 foizi; (2) bank o‘tkazgan bozor tadqiqoti va marketing ishlari uchun haq. Taklifni baholang.",
+      "options": [
+        "Barchasi joiz: bank risk oladi, shuning uchun ikkala to‘lov ham asosli",
+        "Barchasi joiz emas: aksiyalarga obuna kafolatining o‘zi taqiqlangan",
+        "Obuna majburiyati va marketing haqi joiz, kafolat uchun 1 foiz joiz emas",
+        "Majburiyat faqat aksiyalar taklif narxidan arzonroq olinsa joiz bo‘ladi"
+      ],
+      "correct": "C",
+      "explain": "Muassasa boshqa muassasaning obunadan ortib qolgan aksiyalariga obuna muddati tugaganidan keyin obuna bo‘lish majburiyatini olishi joiz. Bunda obuna taklif qilingan qiymatda bo‘lishi va kafolat evaziga hech qanday qo‘shimcha to‘lov ko‘zda tutilmasligi kerak. Biroq majburiyat olgan tomon kafolatdan boshqa bajargan ishlari — masalan, tadqiqot yoki marketing — uchun haq olishi joiz. Demak, 1 foizlik «kafolat haqi» olib tashlanadi, qolgani joiz.",
+      "notes": [
+        "Kafolat evaziga qo‘shimcha to‘lov ko‘zda tutilmasligi standartning aniq sharti.",
+        "Obuna majburiyatining o‘zi joiz — standart unga aniq ruxsat beradi.",
+        "",
+        "Standart obuna taklif qilingan qiymatda bo‘lishini talab qiladi; arzon narx yashirin kafolat haqi bo‘lib qoladi."
+      ],
+      "ref": "AAOIFI SS 5, 6/7 Aksiyalarga obuna bo‘lish kafolati, 6/7/1–6/7/2",
+      "quote": "Bunda mazkur obuna taklif qilingan qiymatda bo‘lishi va kafolat evaziga qo‘shimcha hech qanday to‘lov ko‘zda tutilmasligi kerak. Obuna bo‘lish majburiyatini olgan tomon kafolatdan boshqa bajargan ishlari uchun, masalan, tadqiqot o‘tkazgani yoki marketing uchun haq olishi joiz."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Chek va veksellardan foydalanish (6/3)",
+      "text": "Bank murobaha bo‘yicha 12 oylik to‘lovlar uchun mijozdan oldindan sanalangan 12 ta chek oldi. Mijoz bankdan «cheklar faqat muddati kelgan qarzga, hech qanday ustamasiz ishlatiladi» degan yozma majburiyat so‘radi. Bank yuristi esa rad etib, cheklarga kechikish uchun 2% qo‘shib yozishni va ularni xohlagan paytda naqdlashtirish huquqini taklif qildi. Vaziyatni baholang.",
+      "options": [
+        "Cheklarni olish joiz; mijozning talabi asosli, yuristning taklifi esa joiz emas",
+        "Cheklarni olish joiz emas, chunki bu qarzdorni majburlash vositasi bo‘ladi",
+        "Yurist haq: chek garov bo‘lgani uchun bank uni xohlagancha ishlata oladi",
+        "Cheklarni olish joiz, ammo mijoz bankdan hech qanday majburiyat so‘ray olmaydi"
+      ],
+      "correct": "A",
+      "explain": "Qarzdorni davriy to‘lovlarni o‘z vaqtida amalga oshirishga majburlash vositasi sifatida undan chek (qonun taqiqlamagan bo‘lsa) yoki veksel olishga e’tiroz yo‘q. Qarzdor to‘lasa, qog‘ozlar unga qaytariladi; to‘lov kechiksa, mavjud qarzni undirishga yo‘naltiriladi. Chek va vekselni garov sifatida taqdim etuvchi tomon muassasadan ularni faqat muddati kelgan qarzni, hech qanday ustama hisoblamasdan yopish uchun ishlatish majburiyatini talab qilishga haqli. 2% ustama — qarz ustiga ziyodalik, ya’ni riba.",
+      "notes": [
+        "",
+        "Standart chek va vekselni aynan to‘lovga majburlash vositasi sifatida olishga ruxsat beradi.",
+        "Chek garov bo‘lsa ham, faqat muddati kelgan qarzga va ustamasiz ishlatiladi; 2% qo‘shish riba.",
+        "Standart mijozga aynan shunday majburiyatni talab qilish huquqini beradi."
+      ],
+      "ref": "AAOIFI SS 5, 6/3 Chek yoki veksellardan foydalanish",
+      "quote": "Qarzdorni davriy to‘lovlarni o‘z vaqtida amalga oshirishga majburlash vositasi sifatida, qarzdordan cheklar (agar bunga qonun hujjatlarida taqiq qo‘yilmagan bo‘lsa) yoki veksellarni olishga hech qanday e’tiroz yo‘q. Bunday cheklar va veksellarni garov sifatida taqdim etuvchi tomon muassasadan ularni faqat muddati kelgan qarzdorlikni hech qanday ustama hisoblamasdan yopish uchun ishlatish haqida majburiyat talab qilish huquqiga ega."
+    },
+    {
+      "kind": "calc",
+      "bloom": "evaluate",
+      "section": "Hamish jiddiyya, urbun va tender kafolati (6/8)",
+      "text": "Bank «Savdo-Trans» bilan omborni ijaraga berish shartnomasini imzoladi va 10 000 000 so‘m urbun (bay’ona) oldi; shartnomada 30 kunlik bekor qilish tanlovi (xiyor al-fasx) bor. Ijarachi 20-kuni shartnomani bekor qildi. Ombor bo‘sh turgani sababli bankning haqiqiy zarari 4 000 000 so‘m bo‘ldi. Standartga ko‘ra eng afzal yondashuv qaysi?",
+      "options": [
+        "Bank 10 000 000 so‘mni to‘liq qaytaradi, chunki urbun omonat hisoblanadi",
+        "Bank 10 000 000 so‘mni ushlaydi va yana 4 000 000 so‘m zarar talab qiladi",
+        "Bank 4 000 000 so‘mni ushlab, qolgan 6 000 000 so‘mdan voz kechadi",
+        "Bank 10 000 000 so‘mni ijara haqining bir qismi sifatida hisobga oladi"
+      ],
+      "correct": "C",
+      "explain": "Oldi-sotdi yoki ijara shartnomasini imzolash vaqtida urbun olish mumkin: shartnoma tanlov muddatida bekor qilinmasa, urbun narxning bir qismi bo‘ladi; bekor qilinsa, pul sotuvchi yoki ijaraga beruvchida qoladi. Ya’ni bankning 10 000 000 so‘mni ushlab qolishi joiz. Ammo standart eng afzal yo‘lni ham ko‘rsatadi: muassasa urbun hisobidan haqiqiy zarar miqdorini ushlab qolib, qolgan qismidan voz kechadi. Savol «eng afzal» yondashuvni so‘ragani uchun to‘g‘ri javob — C.\n\nHisob-kitob:\n1) Haqiqiy zarar: 4 000 000 so‘m — ushlanadi.\n2) Voz kechiladi: 10 000 000 − 4 000 000 = 6 000 000 so‘m.\nB variant: 10 000 000 + 4 000 000 = 14 000 000 — urbunning o‘zi zarar o‘rnini bosadi, ustiga qo‘shimcha talab qilinmaydi.",
+      "notes": [
+        "Urbun hamish jiddiyya emas: u shartnoma imzolangach olinadi, va bekor qilinsa, ijaraga beruvchida qoladi.",
+        "Urbundan tashqari yana zarar talab qilish standartda nazarda tutilmagan — urbun aynan bekor qilish evazidir.",
+        "",
+        "Shartnoma tanlov muddatida bekor qilingan; urbun faqat bekor qilinmaganda narxning (ijara haqining) qismi bo‘ladi."
+      ],
+      "ref": "AAOIFI SS 5, 6/8 Aukcion, tender kafolati, hamish jiddiyya va urbun, 6/8/3",
+      "quote": "Oldi-sotdi yoki ijara bo‘yicha shartnoma imzolash vaqtida xaridor yoki ijaraga oluvchidan urbunni quyidagi shart asosida olish mumkin: agar shartnoma muayyan muddat ichida bekor qilish tanlovi (xiyor al-fasx) sababli bekor bo‘lmasa, urbun narxning bir qismi bo‘ladi, lekin bu muddat ichida shartnoma buziladigan bo‘lsa, pul mablag‘i sotuvchi yoki ijaraga beruvchiga qoladi. Eng afzali, muassasa urbun hisobidan haqiqiy zarar miqdorini chegirib qolib, qolgan qismidan voz kechishidir."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Yozma hujjat va guvohlik (2/4)",
+      "text": "Bank xodimi Kamol ikki holatda ishtirok etdi. 1) Tanishlari o‘rtasidagi foizli qarz shartnomasiga «men faqat guvohman, tomon emasman» deb guvoh sifatida imzo chekdi. 2) U guvoh bo‘lgan sahih murobaha bitimi bo‘yicha nizo sudga chiqqanda, «guvohlik baribir mustahab, majburiy emas» deb sudga borishdan bosh tortdi. Kamolning harakatlarini baholang.",
+      "options": [
+        "Ikkala harakat ham to‘g‘ri: guvohlik ixtiyoriy va guvoh bitim tomoni emas",
+        "1-harakat noto‘g‘ri, 2-harakat to‘g‘ri — chunki guvoh bo‘lish mustahab",
+        "1-harakat to‘g‘ri, chunki guvoh bitim tomoni emas; 2-harakat noto‘g‘ri",
+        "Ikkalasi ham noto‘g‘ri: ribo bitimiga guvohlik va vojib guvohlikdan qochish"
+      ],
+      "correct": "D",
+      "explain": "Shariatda moliyaviy munosabatlarni guvohlar ishtirokida hujjatlashtirish tavsiya etiladi: guvoh bo‘lish mustahab, ammo ehtiyoj tug‘ilganda guvohlik majburiyatini ado etish vojib; yolg‘on guvohlik harom va katta gunoh. Shu bilan birga foizli qarz kabi shariatda taqiqlangan amaliyotlarni yozma hujjatlashtirish yoki ularni guvohlik berish orqali tasdiqlash joiz emas. Kamol ikkala holatda ham standartga zid ish qildi: «faqat guvohman» bahonasi taqiqni bekor qilmaydi, «mustahab» qoidasi esa guvoh bo‘lishga, guvohlikni ado etish esa vojibga tegishli.",
+      "notes": [
+        "Taqiqlangan bitimni guvohlik bilan tasdiqlash joiz emas; ehtiyoj tug‘ilganda guvohlikni ado etish esa vojib.",
+        "Guvoh bo‘lish mustahab, ammo zarurat tug‘ilganda guvohlikni ado etish vojib — 2-harakat ham noto‘g‘ri.",
+        "Guvohning bitim tomoni emasligi taqiqni olib tashlamaydi: ribo bitimini guvohlik bilan tasdiqlash joiz emas.",
+        ""
+      ],
+      "ref": "AAOIFI SS 5, 2/4 Yozma hujjat va guvohlik, 2/4/2–2/4/3",
+      "quote": "Guvoh bo‘lish mustahab, ya’ni targ‘ib qilingandir, ehtiyoj tug‘ilganda guvohlik majburiyatini ado etish esa vojib hisoblanadi, yolg‘on guvohlik berish harom bo‘lib, u gunohi kabiralardan sanaladi. Foizli qarz bitimi kabi shariatda taqiqlangan amaliyotlarni yozma ravishda hujjatlashtirish yoki bunday amaliyotlarni guvohlik berish orqali tasdiqlash joiz emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Ustunlik va kuzatib turish huquqi (6/9)",
+      "text": "«Mebel-Pro» korxonasi bankrot bo‘ldi. Bank unga murobaha asosida sotgan ikkita stanok hali ishlatilmagan, o‘zgarmagan holatda turibdi; bundan tashqari, bankning boshqa qarzi korxona omborining garovi bilan ta’minlangan. Garovsiz oddiy kreditorlar «barcha mol-mulk barcha kreditorlar o‘rtasida teng taqsimlansin» deb talab qilmoqda. Bankning pozitsiyasini baholang.",
+      "options": [
+        "Kreditorlar haq: bankrotlikda barcha kreditorlar teng ulush oladi",
+        "Bank stanoklarni qaytarib oladi va ombor bo‘yicha ustunlikka ega",
+        "Bank stanoklarni qaytaradi, lekin ombor bo‘yicha boshqalar bilan teng",
+        "Bank ombor bo‘yicha ustun, ammo stanoklar mijoz mulki bo‘lib qoladi"
+      ],
+      "correct": "B",
+      "explain": "Bankrot bo‘lgan mijozning mulkida bo‘lgan, unga sotilgan yoki u uchun ishlab chiqarilgan moddiy aktivlar o‘zgarmagan bo‘lsa, muassasa ularni qaytarib olish huquqiga ega — stanoklar shu shartga javob beradi. Bundan tashqari, garov olgan kreditorlarning oddiy kreditorlardan ustun bo‘lish huquqiga rioya qilinadi — bank ombor bo‘yicha birinchi navbatda qondiriladi. Demak, oddiy kreditorlarning «teng taqsimlash» talabi bu ikki aktivga tatbiq etilmaydi.",
+      "notes": [
+        "Standart o‘zgarmagan sotilgan aktivni qaytarib olish va garovli kreditor ustunligini aniq tan oladi.",
+        "",
+        "Garov olgan kreditorlarning ustunlik huquqiga rioya qilinadi (6/9/3) — teng taqsimlash noto‘g‘ri.",
+        "O‘zgarmagan holatdagi sotilgan aktivni muassasa qaytarib olishga haqli (6/9/1)."
+      ],
+      "ref": "AAOIFI SS 5, 6/9 Qarzni undirishda ustunlik huquqi hamda kuzatib turish huquqi, 6/9/1 va 6/9/3",
+      "quote": "Bankrot bo‘lgan mijozning mulkida bo‘lgan, unga sotilgan yoki u uchun ishlab chiqarilgan moddiy ko‘rinishdagi aktivlar o‘zgarmagan bo‘lsa, muassasa mazkur aktivlarni qaytarib olish huquqiga ega. Garov olgan kreditorlar boshqa oddiy kreditorlardan ustun bo‘lish huquqiga rioya qilinadi."
+    }
+  ]
+}
