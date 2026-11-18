@@ -15,6 +15,11 @@ export const MeetingCreate = z.object({
   allowGuests: z.boolean().optional(),
   waitingRoom: z.boolean().optional(),
   muteOnEntry: z.boolean().optional(),
+  // Tashqi xizmat (Zoom va h.k.): havola, ID va kod. 'platform' — o'z video xonamiz
+  provider: z.enum(['platform', 'zoom', 'meet', 'teams', 'link']).optional(),
+  joinUrl: z.string().trim().max(500, 'Havola juda uzun').optional().nullable(),
+  extMeetingId: z.string().trim().max(40, 'ID juda uzun').optional().nullable(),
+  extPasscode: z.string().trim().max(40, 'Kod juda uzun').optional().nullable(),
 })
 
 export const MeetingPatch = MeetingCreate.partial().extend({ locked: z.boolean().optional() })
@@ -24,6 +29,7 @@ export const MEETING_COLUMNS = {
   title: 'title', topic: 'topic', description: 'description', groupId: 'group_id', startsAt: 'starts_at',
   durationMin: 'duration_min', passcode: 'passcode', allowGuests: 'allow_guests', waitingRoom: 'waiting_room',
   muteOnEntry: 'mute_on_entry', locked: 'locked',
+  provider: 'provider', joinUrl: 'join_url', extMeetingId: 'ext_meeting_id', extPasscode: 'ext_passcode',
 }
 
 // Saytdagi ochiq formalar (kurs arizasi, aloqa, obuna) — telefon yoki email shart

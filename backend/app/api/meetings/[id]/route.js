@@ -3,6 +3,7 @@ import { requireUser } from '@/lib/auth.js'
 import { query } from '@/lib/db.js'
 import { getMeeting, serializeMeeting, canManage, isMember, assertCanCreateFor } from '@/lib/meetings.js'
 import { MeetingPatch, MEETING_COLUMNS } from '@/lib/schemas.js'
+import { cleanLinkFields } from '@/lib/meetingInput.js'
 
 async function load(id) {
   const u = await requireUser()
@@ -21,6 +22,7 @@ export const PATCH = route(async (req, { id }) => {
   const { u, m } = await load(id)
   if (!canManage(u, m)) fail(403, 'Darsni faqat ustoz yoki administrator o‘zgartira oladi')
   const d = await body(req, MeetingPatch)
+  if (['provider', 'joinUrl', 'extMeetingId', 'extPasscode'].some((k) => d[k] !== undefined)) Object.assign(d, cleanLinkFields(d, m))
   if (m.status === 'ended' && Object.keys(d).some((k) => k !== 'title' && k !== 'description')) fail(409, 'Yakunlangan darsni o‘zgartirib bo‘lmaydi')
   if (d.groupId && d.groupId !== m.group_id) {
     const { error } = await assertCanCreateFor(u, d.groupId)

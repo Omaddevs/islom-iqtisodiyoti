@@ -8,6 +8,7 @@ import { meetingsApi, recordingUrl } from '../platform/api/meetings.js'
 import { useMeeting } from './useMeeting.js'
 import { listDevices, LevelMeter, mediaErrorText } from './rtc.js'
 import Room, { colorFor } from './Room.jsx'
+import { provDa, isExternal, fmtZoomId } from '../../backend/lib/meetingLinks.js'
 
 const GUEST_KEY = 'ii_guest_name'
 const PREFS_KEY = 'ii_meet_prefs'
@@ -58,6 +59,7 @@ function Meet({ code }) {
     )
   }
   if (!info) return <div className="mj mj--center"><span className="mt-spin mt-spin--lg" /></div>
+  if (isExternal(info.provider)) return <ExternalJoin info={info} viewer={viewer} code={code} />
 
   const st = mt.status
   if (st === 'joined' || (st === 'reconnecting' && mt.self)) return <Room mt={mt} info={info} />
@@ -285,7 +287,7 @@ function Waiting({ mt, info }) {
 }
 
 /* ---------------- Yakuniy / xato ekranlari ---------------- */
-function Screen({ icon, tone = 'blue', title, text, children, meeting }) {
+function Screen({ icon, tone = 'blue', title, text, children, meeting, extra }) {
   return (
     <div className="mj mj--center">
       <div className="mj__end">
@@ -293,8 +295,47 @@ function Screen({ icon, tone = 'blue', title, text, children, meeting }) {
         <h1>{title}</h1>
         {text && <p>{text}</p>}
         {meeting && <div className="mj__endm"><b>{meeting.title}</b><span>{meeting.hostName}{meeting.groupName ? ` · ${meeting.groupName}` : ''}</span></div>}
+        {extra}
         <div className="mj__endbtns">{children}</div>
       </div>
     </div>
+  )
+}
+
+/* ---------------- Tashqi dars (Zoom, Meet, Teams) ---------------- */
+function ExternalJoin({ info, viewer, code }) {
+  const user = viewer?.user
+  const ended = info.status === 'ended'
+  const back = <Btn as="a" href={user ? '#/platform/meetings' : '#/'}>{user ? 'Darslar ro‘yxati' : 'Bosh sahifa'}</Btn>
+  if (!user) {
+    return (
+      <Screen icon="logIn" title="Platformaga kiring" text={`Bu dars ${provDa(info.provider)} o‘tadi. Havola va kod guruh o‘quvchilariga platforma ichida ko‘rsatiladi.`} meeting={info}>
+        <Btn variant="primary" icon="logIn" as="a" href={`#/kirish?next=${encodeURIComponent(`/join/${code}`)}`}>Kirish</Btn>
+        {back}
+      </Screen>
+    )
+  }
+  if (!viewer.isMember || !info.joinUrl) {
+    return <Screen icon="lock" tone="red" title="Bu dars guruh a’zolari uchun" text="Darsga qo‘shilish uchun ustozingiz sizni guruhga qo‘shishi kerak." meeting={info}>{back}</Screen>
+  }
+  const open = () => {
+    window.open(info.joinUrl, '_blank', 'noopener,noreferrer')
+    meetingsApi.open(info.id).catch(() => {})
+  }
+  const details = !ended && (info.extMeetingId || info.extPasscode) && (
+    <div className="mj__ext">
+      {info.extMeetingId && <div><span>Konferensiya ID</span><b>{info.provider === 'zoom' ? fmtZoomId(info.extMeetingId) : info.extMeetingId}</b></div>}
+      {info.extPasscode && <div><span>Kod</span><b>{info.extPasscode}</b></div>}
+    </div>
+  )
+  return (
+    <Screen icon={ended ? 'checkCircle' : 'video'} tone={ended ? 'gray' : 'blue'} meeting={info} extra={details}
+      title={ended ? 'Dars yakunlangan' : `Dars ${provDa(info.provider)} o‘tadi`}
+      text={ended ? `«${info.title}» darsi yakunlangan.`
+        : info.status === 'live' ? 'Dars hozir davom etmoqda — qo‘shilish uchun tugmani bosing.'
+          : `Dars ${fmtWhen(info.startsAt)} da boshlanadi. Vaqti kelganda shu tugma orqali qo‘shiling.`}>
+      {!ended && <Btn variant={info.status === 'live' ? 'live' : 'primary'} icon="externalLink" onClick={open}>{info.provider === 'link' ? 'Darsga qo‘shilish' : `${provDa(info.provider)} qo‘shilish`}</Btn>}
+      {back}
+    </Screen>
   )
 }

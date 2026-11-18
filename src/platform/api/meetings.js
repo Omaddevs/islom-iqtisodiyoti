@@ -13,6 +13,7 @@ export const meetingsApi = {
   start: (id) => api(`/api/meetings/${id}/start`, { method: 'POST' }),
   end: (id) => api(`/api/meetings/${id}/end`, { method: 'POST' }),
   attendance: (id) => api(`/api/meetings/${id}/attendance`),
+  open: (id) => api(`/api/meetings/${id}/open`, { method: 'POST' }),
   recordings: (id) => api(`/api/meetings/${id}/recordings`),
   joinInfo: (code) => api(`/api/join/${code}`),
   ticket: (code, body = {}) => api(`/api/join/${code}`, { method: 'POST', body }),

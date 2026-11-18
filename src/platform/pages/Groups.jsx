@@ -6,7 +6,8 @@ import { fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { groupLessonsText, nextLessonTs, hasFuture, lessonWhen, lessonTime, lessonPlace } from '../ui/agenda.js'
 import { LessonForm } from './Schedule.jsx'
 import { UserForm } from './Users.jsx'
-import { MeetingForm, hashQuery } from './Meetings.jsx'
+import { MeetingForm, hashQuery, openExternal } from './Meetings.jsx'
+import { PROVIDERS, isExternal } from '../../../backend/lib/meetingLinks.js'
 import { HomeworkForm } from './Homework.jsx'
 import { HeroArt } from './Articles.jsx'
 
@@ -240,7 +241,9 @@ function GroupDetail({ id }) {
                   <div className="pitem__body"><b>{m.title}</b><span>{fmtWhen(m.startsAt)} · {m.durationMin} daq{m.topic ? ` · ${m.topic}` : ''}</span></div>
                   <div className="pitem__side">
                     {m.status === 'live' ? <Badge tone="live" dot>Jonli</Badge> : m.status === 'ended' ? <Badge tone="gray">O‘tildi</Badge> : <Badge tone="blue">Reja</Badge>}
-                    {m.status !== 'ended' ? <Btn size="sm" variant="soft" as="a" href={`#/platform/meetings/${m.id}/room`}>Xona</Btn> : m.recordingId && <Btn size="sm" variant="soft" icon="play" as="a" href={`#/platform/videos/${m.recordingId}`}>Yozuv</Btn>}
+                    {m.status !== 'ended' ? (isExternal(m.provider)
+                      ? <Btn size="sm" variant="soft" icon="externalLink" onClick={() => openExternal(m)}>{PROVIDERS[m.provider]?.short}</Btn>
+                      : <Btn size="sm" variant="soft" as="a" href={`#/platform/meetings/${m.id}/room`}>Xona</Btn>) : m.recordingId && <Btn size="sm" variant="soft" icon="play" as="a" href={`#/platform/videos/${m.recordingId}`}>Yozuv</Btn>}
                   </div>
                 </div>
               ))}

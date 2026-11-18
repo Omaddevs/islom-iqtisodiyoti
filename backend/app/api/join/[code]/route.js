@@ -5,7 +5,8 @@ import { timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
 import { json, route, body, fail } from '@/lib/http.js'
 import { currentUser, publicUser, signRoomTicket } from '@/lib/auth.js'
-import { getMeetingByCode, isMember, canManage } from '@/lib/meetings.js'
+import { getMeetingByCode, isMember, canManage, effectiveStatus } from '@/lib/meetings.js'
+import { isExternal } from '@/lib/meetingLinks.js'
 import { rateLimit, clientIp } from '@/lib/rateLimit.js'
 import { isMeetingCode } from '@/lib/ids.js'
 import { iceServersFor } from '@/lib/turn.js'
@@ -30,7 +31,10 @@ export const GET = route(async (_req, { code }) => {
     meeting: {
       id: m.id, code: m.code, title: m.title, topic: m.topic, description: member ? m.description : null,
       hostName: m.host_name, hostColor: m.host_color, groupName: m.group_name, groupCourse: m.group_course,
-      startsAt: m.starts_at, durationMin: m.duration_min, status: m.status, startedAt: m.started_at,
+      startsAt: m.starts_at, durationMin: m.duration_min, status: effectiveStatus(m), startedAt: m.started_at,
+      provider: m.provider || 'platform',
+      // Tashqi xizmat havolasi va kodi faqat guruh a'zolariga (mehmon havolani o'tkazib yubora olmasin)
+      ...(member && isExternal(m.provider) ? { joinUrl: m.join_url, extMeetingId: m.ext_meeting_id, extPasscode: m.ext_passcode } : {}),
       allowGuests: m.allow_guests, hasPasscode: !!m.passcode, locked: m.locked, invitedCount: m.invited_count ?? 0,
       recordingId: member ? m.recording_id : null,
       online: globalThis.__iiHub?.count(m.id) ?? 0,
@@ -47,6 +51,7 @@ const Schema = z.object({
 export const POST = route(async (req, { code }) => {
   const m = await load(code)
   const d = await body(req, Schema)
+  if (isExternal(m.provider)) fail(409, 'Bu dars tashqi xizmatda o‘tadi — «Onlayn darslar» sahifasidagi havola orqali qo‘shiling', { external: true })
   if (m.status === 'ended') fail(410, 'Dars yakunlangan')
 
   const u = await currentUser()

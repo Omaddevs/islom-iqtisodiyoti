@@ -3,8 +3,20 @@ import { useState } from 'react'
 import { Modal, Btn, Icon, cx } from '../platform/ui/kit.jsx'
 import { joinLink } from '../platform/api/meetings.js'
 import { fmtDateTime } from '../platform/ui/format.js'
+import { PROVIDERS, isExternal, fmtZoomId } from '../../backend/lib/meetingLinks.js'
 
-export const inviteText = (m) => [
+// Tashqi dars (Zoom va h.k.): havola, ID va kod
+const externalText = (m) => [
+  `«${m.title}» onlayn darsi (${PROVIDERS[m.provider]?.label || 'onlayn'})`,
+  m.startsAt ? `Vaqt: ${fmtDateTime(m.startsAt)} (${m.durationMin} daqiqa)` : null,
+  m.hostName ? `Ustoz: ${m.hostName}` : null,
+  '',
+  `Qo‘shilish: ${m.joinUrl}`,
+  m.extMeetingId ? `Konferensiya ID: ${m.provider === 'zoom' ? fmtZoomId(m.extMeetingId) : m.extMeetingId}` : null,
+  m.extPasscode ? `Kod: ${m.extPasscode}` : null,
+].filter((x) => x !== null).join('\n')
+
+export const inviteText = (m) => (isExternal(m.provider) ? externalText(m) : [
   `«${m.title}» onlayn darsiga taklif qilinasiz`,
   m.startsAt ? `Vaqt: ${fmtDateTime(m.startsAt)} (${m.durationMin} daqiqa)` : null,
   m.hostName ? `Ustoz: ${m.hostName}` : null,
@@ -12,7 +24,7 @@ export const inviteText = (m) => [
   `Qo‘shilish: ${joinLink(m.code)}`,
   `Dars kodi: ${m.code}`,
   m.passcode ? `Parol: ${m.passcode}` : null,
-].filter((x) => x !== null).join('\n')
+].filter((x) => x !== null).join('\n'))
 
 export async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true } catch {
@@ -43,7 +55,8 @@ function CopyField({ label, value, mono }) {
 export default function InviteModal({ open, onClose, meeting }) {
   const [copied, setCopied] = useState(false)
   if (!meeting) return null
-  const link = joinLink(meeting.code)
+  const ext = isExternal(meeting.provider)
+  const link = ext ? meeting.joinUrl : joinLink(meeting.code)
   const text = inviteText(meeting)
   const copyAll = async () => { if (await copyText(text)) { setCopied(true); setTimeout(() => setCopied(false), 1800) } }
   const tg = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text.replace(`\nQo‘shilish: ${link}`, ''))}`
@@ -51,14 +64,22 @@ export default function InviteModal({ open, onClose, meeting }) {
 
   return (
     <Modal open={open} onClose={onClose} width={520} title="Darsga taklif qilish"
-      sub="Havolani yuboring — qabul qiluvchi bir bosishda darsga qo‘shiladi"
+      sub={ext ? `${PROVIDERS[meeting.provider]?.label} ma’lumotlarini yuboring. Guruh o‘quvchilari darsni platformadan ham ochadi` : 'Havolani yuboring — qabul qiluvchi bir bosishda darsga qo‘shiladi'}
       footer={<>
         {navigator.share && <Btn icon="externalLink" onClick={share}>Ulashish</Btn>}
         <Btn as="a" href={tg} target="_blank" rel="noreferrer" icon="send">Telegram</Btn>
         <Btn variant={copied ? 'success' : 'primary'} icon={copied ? 'check' : 'copy'} onClick={copyAll}>{copied ? 'Nusxalandi' : 'Taklif matnini nusxalash'}</Btn>
       </>}>
       <div className="minv">
-        <CopyField label="Havola" value={link} />
+        <CopyField label={ext ? `${PROVIDERS[meeting.provider]?.label} havolasi` : 'Havola'} value={link} />
+        {ext ? (
+          (meeting.extMeetingId || meeting.extPasscode) && (
+            <div className="minv__row minv__row--ext">
+              {meeting.extMeetingId && <CopyField label="Konferensiya ID" value={meeting.provider === 'zoom' ? fmtZoomId(meeting.extMeetingId) : meeting.extMeetingId} mono />}
+              {meeting.extPasscode && <CopyField label="Kod" value={meeting.extPasscode} mono />}
+            </div>
+          )
+        ) : <>
         <div className="minv__row">
           <CopyField label="Dars kodi" value={meeting.code} mono />
           {meeting.passcode && <CopyField label="Parol" value={meeting.passcode} mono />}
@@ -70,6 +91,7 @@ export default function InviteModal({ open, onClose, meeting }) {
             {meeting.waitingRoom ? 'Guruhdan tashqaridagilar kutish zalida sizning ruxsatingizni kutadi' : 'Havolaga ega hamma to‘g‘ridan-to‘g‘ri kiradi'}</li>
           {meeting.hasPasscode && !meeting.passcode && <li><Icon name="key" size={16} />Mehmonlar uchun parol talab qilinadi</li>}
         </ul>
+        </>}
       </div>
     </Modal>
   )

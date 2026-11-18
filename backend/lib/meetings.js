@@ -1,6 +1,7 @@
 // Onlayn darslar domeni: kim ko'radi, kim boshqaradi, kim qanday qo'shiladi.
 // Route handler'lar ham, WebSocket serveri ham shu qoidalardan foydalanadi.
 import { one, many } from './db.js'
+import { isExternal } from './meetingLinks.js'
 
 const isAdmin = (u) => u?.role === 'superadmin' || u?.role === 'org_admin'
 
@@ -12,6 +13,17 @@ export const MEETING_SELECT = `
     FROM meetings m
     JOIN users h ON h.id = m.host_id
     LEFT JOIN groups g ON g.id = m.group_id`
+
+// Tashqi darsning holatini server bilmaydi (Zoom'da o'tadi): vaqtga qarab hisoblanadi.
+// Ustoz «Boshlash»/«Yakunlash» bossa — o'sha holat ustun turadi.
+const EARLY_MS = 10 * 60e3, GRACE_MS = 30 * 60e3
+export function effectiveStatus(m, now = Date.now()) {
+  if (!isExternal(m.provider) || m.status === 'ended') return m.status
+  const start = new Date(m.starts_at).getTime(), end = start + m.duration_min * 60e3
+  if (now > end + GRACE_MS) return 'ended'
+  if (m.status === 'live' || now >= start - EARLY_MS) return 'live'
+  return 'scheduled'
+}
 
 // Bazadagi qator → frontend shakli (mavjud localStorage modeliga mos)
 export function serializeMeeting(m, viewer) {
@@ -32,7 +44,10 @@ export function serializeMeeting(m, viewer) {
     description: m.description,
     startsAt: m.starts_at,
     durationMin: m.duration_min,
-    status: m.status,
+    status: effectiveStatus(m),
+    provider: m.provider || 'platform',
+    // Tashqi havola, ID va kod — ro'yxatni faqat guruh a'zolari va xodimlar oladi
+    ...(isExternal(m.provider) ? { joinUrl: m.join_url, extMeetingId: m.ext_meeting_id, extPasscode: m.ext_passcode } : {}),
     startedAt: m.started_at,
     endedAt: m.ended_at,
     invitedCount: m.invited_count ?? 0,

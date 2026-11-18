@@ -19,5 +19,5 @@ export const GET = route(async (_req, { id }) => {
     SELECT u.id, u.name FROM group_members gm JOIN users u ON u.id = gm.user_id
      WHERE gm.group_id = $1 AND NOT EXISTS (SELECT 1 FROM meeting_attendance a WHERE a.meeting_id = $2 AND a.user_id = u.id)
      ORDER BY u.name`, [m.group_id, id]) : []
-  return json({ present, absent })
+  return json({ present, absent, external: (m.provider || 'platform') !== 'platform' })
 })
