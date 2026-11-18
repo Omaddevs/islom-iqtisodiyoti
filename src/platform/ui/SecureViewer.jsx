@@ -1,6 +1,7 @@
 // Himoyalangan material ko'ruvchisi. Asl fayl brauzerga kelmaydi: hujjat sahifalari rasm sifatida canvas'ga
-// chiziladi. Yuklab olish, nusxalash va chop etish yopiladi; oyna fokusni yo'qotganda yoki
-// skrinshot tugmalari bosilganda kontent yashiriladi va urinish jurnalga yoziladi.
+// chiziladi. Yuklab olish va nusxalash yopiladi; oyna fokusni yo'qotganda yoki skrinshot tugmalari
+// bosilganda kontent yashiriladi va urinish jurnalga yoziladi. Chop etish — «Chop etish» tugmasi (yoki Ctrl+P)
+// orqali: sahifa rasmlari yashirin oynaga joylanadi va bu ham jurnalga yoziladi.
 // Eslatma: brauzer skrinshotni butunlay taqiqlay olmaydi.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -109,6 +110,42 @@ function MediaView({ meta, mark, hidden }) {
   )
 }
 
+/* ---------- Chop etish: sahifa rasmlari yashirin iframe'da ---------- */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const PRINT_CSS = `@page{margin:8mm}html,body{margin:0;background:#fff}
+.p{break-inside:avoid;page-break-inside:avoid;break-after:page;page-break-after:always}
+.p:last-child{break-after:auto;page-break-after:auto}
+img{display:block;margin:0 auto;max-width:100%;max-height:100vh;object-fit:contain}`
+// Rasmlar (blob URL) iframe ixtiyoriga o'tadi: chop etish oynasi yopilgach iframe va URL'lar tozalanadi
+function printImages(urls, title) {
+  return new Promise((resolve) => {
+    const frame = document.createElement('iframe')
+    frame.setAttribute('aria-hidden', 'true')
+    frame.tabIndex = -1
+    Object.assign(frame.style, { position: 'fixed', right: '0', bottom: '0', width: '0', height: '0', border: '0', visibility: 'hidden' })
+    document.body.appendChild(frame)
+    const doc = frame.contentDocument
+    doc.open()
+    doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${PRINT_CSS}</style></head><body>${urls.map((u) => `<div class="p"><img src="${u}" alt=""></div>`).join('')}</body></html>`)
+    doc.close()
+    let cleaned = false
+    const cleanup = () => {
+      if (cleaned) return
+      cleaned = true
+      frame.remove()
+      urls.forEach((u) => URL.revokeObjectURL(u))
+    }
+    Promise.all([...doc.images].map((img) => (img.complete ? null : new Promise((r) => { img.onload = r; img.onerror = r })))).then(() => {
+      const w = frame.contentWindow
+      w.addEventListener('afterprint', () => setTimeout(cleanup, 500))
+      setTimeout(cleanup, 10 * 60e3) // afterprint kelmasa (ba'zi brauzerlar) — baribir tozalanadi
+      w.focus()
+      w.print()
+      resolve()
+    })
+  })
+}
+
 /* ---------- Asosiy oyna ---------- */
 export function SecureViewer({ item, user, onClose }) {
   const fileId = item.fileId
@@ -121,6 +158,10 @@ export function SecureViewer({ item, user, onClose }) {
   const [jump, setJump] = useState('')
   const [unfocused, setUnfocused] = useState(false)
   const [capture, setCapture] = useState(null) // 'hold' — Win/Cmd bosilgan, 'flag' — urinish qayd etildi
+  const [printing, setPrinting] = useState(null) // { done, total } — sahifalar yuklanmoqda
+  const [printErr, setPrintErr] = useState(null)
+  const printAbort = useRef(null)
+  const printRef = useRef(null)
   const captureTimer = useRef(null)
   const lastFlag = useRef(0)
   const closeRef = useRef(onClose)
@@ -174,7 +215,7 @@ export function SecureViewer({ item, user, onClose }) {
       if (e.metaKey && e.shiftKey && ['s', '3', '4', '5'].includes(k)) { e.preventDefault(); flagCapture('Ekran tasviri tugmalari'); return }
       const mod = e.ctrlKey || e.metaKey
       if ((mod && ['s', 'p', 'u', 'c', 'a'].includes(k)) || e.key === 'F12' || (mod && e.shiftKey && ['i', 'j', 'c', 's'].includes(k))) e.preventDefault()
-      if (mod && k === 'p') flagCapture('Chop etish')
+      if (mod && k === 'p' && !e.shiftKey) printRef.current?.() // ko'ruvchi oynasi emas, hujjat sahifalari chop etiladi
     }
     const onKeyUp = (e) => {
       if (e.key === 'PrintScreen') flagCapture('PrintScreen')
@@ -186,13 +227,11 @@ export function SecureViewer({ item, user, onClose }) {
     const onBlur = () => setUnfocused(true)
     const onFocus = () => setUnfocused(false)
     const onVis = () => setUnfocused(document.hidden || !document.hasFocus())
-    const onPrint = () => flagCapture('Chop etish')
     document.addEventListener('keydown', onKey, true)
     document.addEventListener('keyup', onKeyUp, true)
     window.addEventListener('blur', onBlur)
     window.addEventListener('focus', onFocus)
     document.addEventListener('visibilitychange', onVis)
-    window.addEventListener('beforeprint', onPrint)
     const el = root.current
     for (const t of ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut']) el.addEventListener(t, block)
     return () => {
@@ -204,7 +243,6 @@ export function SecureViewer({ item, user, onClose }) {
       window.removeEventListener('blur', onBlur)
       window.removeEventListener('focus', onFocus)
       document.removeEventListener('visibilitychange', onVis)
-      window.removeEventListener('beforeprint', onPrint)
       for (const t of ['contextmenu', 'dragstart', 'selectstart', 'copy', 'cut']) el.removeEventListener(t, block)
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
     }
@@ -217,6 +255,46 @@ export function SecureViewer({ item, user, onClose }) {
     setCurrent(t)
   }, [meta])
   const isPages = meta?.status === 'ready' && meta.kind === 'pages'
+
+  // Barcha sahifalar ketma-ket yuklanadi (tezlik chegarasiga duch kelsa — kutib davom etadi), so'ng chop etish oynasi
+  const printDoc = useCallback(async () => {
+    if (!isPages || printAbort.current) return
+    const ctl = new AbortController()
+    printAbort.current = ctl
+    setPrintErr(null)
+    setPrinting({ done: 0, total: meta.pages })
+    const urls = []
+    let handed = false
+    const wait = (s) => new Promise((r, j) => {
+      const t = setTimeout(r, s * 1000)
+      ctl.signal.addEventListener('abort', () => { clearTimeout(t); j(new DOMException('', 'AbortError')) }, { once: true })
+    })
+    try {
+      for (let n = 1; n <= meta.pages; n++) {
+        for (;;) {
+          const res = await fetch(materialsApi.pageUrl(meta.id, n), { credentials: 'include', signal: ctl.signal, cache: 'no-store' })
+          if (res.status === 429) { await wait((await res.json().catch(() => ({}))).retryAfter || 5); continue }
+          if (!res.ok) throw new Error(`${n}-sahifani yuklab bo‘lmadi. Qayta urinib ko‘ring.`)
+          urls.push(URL.createObjectURL(await res.blob()))
+          break
+        }
+        setPrinting({ done: n, total: meta.pages })
+      }
+      materialsApi.event(meta.id, 'print', `${meta.pages} sahifa`)
+      handed = true
+      setPrinting(null)
+      await printImages(urls, item.title)
+    } catch (e) {
+      if (e.name !== 'AbortError') setPrintErr(e.message)
+    } finally {
+      if (!handed) urls.forEach((u) => URL.revokeObjectURL(u))
+      printAbort.current = null
+      setPrinting(null)
+    }
+  }, [isPages, meta, item.title])
+  printRef.current = printDoc
+  useEffect(() => () => printAbort.current?.abort(), [])
+
   useEffect(() => {
     if (!isPages) return undefined
     const onKey = (e) => {
@@ -255,6 +333,11 @@ export function SecureViewer({ item, user, onClose }) {
             </div>
           </div>
         )}
+        {isPages && (
+          <button type="button" className="psv__print" onClick={printDoc} disabled={!!printing} title="Chop etish (Ctrl+P)">
+            <Icon name="printer" size={17} /><span>Chop etish</span>
+          </button>
+        )}
         {canFullscreen && <button type="button" className="psv__btn psv__fs" onClick={fullscreen} aria-label="To‘liq ekran" title="To‘liq ekran"><Icon name="maximize" size={17} /></button>}
       </header>
 
@@ -267,6 +350,28 @@ export function SecureViewer({ item, user, onClose }) {
                   : meta.kind === 'pages' ? <PagesView meta={meta} zoom={zoom} setCurrent={setCurrent} scrollRef={scrollRef} />
                     : <MediaView meta={meta} mark={mark} hidden={hidden} />}
       </div>
+
+      {(printing || printErr) && (
+        <div className={cx('psv__toast', printErr && 'is-err')} role="status" aria-live="polite">
+          {printing ? (
+            <>
+              <span className="psv__spin" />
+              <div className="psv__toast-body">
+                <b>Chop etishga tayyorlanmoqda</b>
+                <span>{printing.done} / {printing.total} sahifa</span>
+                <i style={{ '--p': `${Math.round((printing.done / printing.total) * 100)}%` }} />
+              </div>
+              <button type="button" onClick={() => printAbort.current?.abort()}>Bekor</button>
+            </>
+          ) : (
+            <>
+              <Icon name="alertCircle" size={18} />
+              <div className="psv__toast-body"><b>Chop etib bo‘lmadi</b><span>{printErr}</span></div>
+              <button type="button" onClick={() => setPrintErr(null)}>Yopish</button>
+            </>
+          )}
+        </div>
+      )}
 
       {hidden && (
         <button type="button" className="psv__shield" onClick={() => { setUnfocused(false); setCapture(null) }}>

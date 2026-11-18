@@ -600,11 +600,12 @@ function FileJournal({ item, onClose }) {
             : (
               <div className="ptable-wrap">
                 <table className="ptable">
-                  <thead><tr><th>Foydalanuvchi</th><th>Ochgan</th><th>Skrinshot urinishi</th><th>So‘nggi marta</th></tr></thead>
+                  <thead><tr><th>Foydalanuvchi</th><th>Ochgan</th><th>Chop etgan</th><th>Skrinshot urinishi</th><th>So‘nggi marta</th></tr></thead>
                   <tbody>{rows.map((r) => (
                     <tr key={r.id}>
                       <td><b>{r.name}</b></td>
                       <td>{r.opens} marta</td>
+                      <td>{r.prints ? `${r.prints} marta` : <span className="pmuted">Yo‘q</span>}</td>
                       <td>{r.captures ? <Badge tone="red">{r.captures} ta</Badge> : <span className="pmuted">Yo‘q</span>}</td>
                       <td>{fmtDateTime(r.lastAt)}</td>
                     </tr>

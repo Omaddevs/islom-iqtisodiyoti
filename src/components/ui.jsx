@@ -35,6 +35,7 @@ const PATHS = {
   star: 'M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z',
   upload: 'M12 16V4M7 9l5-5 5 5M4 20h16',
   download: 'M12 4v12M7 11l5 5 5-5M4 20h16',
+  printer: 'M7 9V3h10v6M7 18H4v-9h16v9h-3M7 14h10v7H7z',
   filter: 'M3 5h18l-7 8v6l-4 2v-8z',
   refresh: 'M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5',
   key: 'M14 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM13 13l-8 8M8 18l2 2M11 15l2 2',
