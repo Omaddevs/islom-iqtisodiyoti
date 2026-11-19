@@ -39,6 +39,8 @@ export async function canViewStudent(viewer, studentId) {
 
 const sinceDay = (days) => `(now() AT TIME ZONE '${TZ}')::date - ${Math.max(0, days - 1)}`
 const ms = (d) => (d ? new Date(d).getTime() : null)
+// Toshkent bo'yicha bugungi sana (YYYY-MM-DD)
+export const tashkentToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date())
 const dayStr = (d) => (typeof d === 'string' ? d.slice(0, 10) : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
 
 // Bitta o'quvchi: kunlik vaqt, materiallar bo'yicha jami, kutubxona fayllarini ochishlar, onlayn darslar
@@ -83,11 +85,13 @@ export async function studentsOverview(viewer, days, orgId) {
     GROUP BY s.user_id, s.day, s.kind`, params)
   const by = new Map()
   for (const r of rows) {
-    const x = by.get(r.user_id) || { userId: r.user_id, seconds: 0, kinds: {}, daily: {}, lastAt: 0 }
+    const x = by.get(r.user_id) || { userId: r.user_id, seconds: 0, kinds: {}, daily: {}, dailyKinds: {}, lastAt: 0 }
     x.seconds += r.seconds
     x.kinds[r.kind] = (x.kinds[r.kind] || 0) + r.seconds
     const d = dayStr(r.day)
     x.daily[d] = (x.daily[d] || 0) + r.seconds
+    const dk = x.dailyKinds[d] || (x.dailyKinds[d] = {})
+    dk[r.kind] = (dk[r.kind] || 0) + r.seconds
     x.lastAt = Math.max(x.lastAt, ms(r.last_at))
     by.set(r.user_id, x)
   }

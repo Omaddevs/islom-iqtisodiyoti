@@ -6,6 +6,7 @@ import { Card, Stat, Btn, Badge, UAvatar, Icon, Progress, Empty, Menu, Table, cx
 import { leadsApi } from '../api/client.js'
 import { fmtWhen, fmtAgo, fmtLeft, fmtDateFull, pct, DAYS_FULL, MONTHS_FULL } from '../ui/format.js'
 import { DAY_MS, startOfDay, eventsForDay, lessonCountsFor } from '../ui/agenda.js'
+import ClassStats from './ClassStats.jsx'
 
 const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Xayrli tun' : h < 12 ? 'Xayrli tong' : h < 18 ? 'Xayrli kun' : 'Xayrli kech' }
 const dayOfYear = () => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 1)) / DAY_MS)
@@ -69,13 +70,14 @@ export default function Dashboard() {
 }
 
 // Umumiy karkas: chapda asosiy ustunlar, o'ngda yon panel
-function Layout({ stats, left, right, side, notice }) {
+function Layout({ stats, left, right, side, notice, wide }) {
   return (
     <div className="pdash">
       <div className="pdash__main">
         <HeroBanner />
         {notice}
         <div className="pgrid pgrid--4 pdash__stats">{stats.map((s) => <Stat key={s.label} {...s} />)}</div>
+        {wide}
         <div className="pdash__cols">
           <div className="pdash__col">{left}</div>
           <div className="pdash__col">{right}</div>
@@ -137,6 +139,7 @@ function OrgAdminDash() {
   ]
   return (
     <Layout stats={stats}
+      wide={<ClassStats />}
       left={<><TodayLessons day={day} setDay={setDay} /><GroupsHealth /></>}
       right={<><Attention /><QuickActions items={actions} /></>}
       side={<><MiniCalendar day={day} setDay={setDay} /><ActivityFeed items={scope.activity} /></>} />
@@ -165,6 +168,7 @@ function TeacherDash() {
   return (
     <Layout stats={stats}
       notice={!scope.groups.length && <NoGroups text="Hali guruhingiz yo‘q. Guruh yarating yoki administrator biriktirishini kuting — darslar va o‘quvchilaringiz shu yerda ko‘rinadi." action={<Btn size="sm" variant="primary" icon="plus" as="a" href="#/platform/groups?new=1">Guruh yaratish</Btn>} />}
+      wide={<ClassStats />}
       left={<><TodayLessons day={day} setDay={setDay} /><MyGroups groups={scope.groups} staff /></>}
       right={<><QuickActions items={actions} /><GradingQueue items={queue} /></>}
       side={<><MiniCalendar day={day} setDay={setDay} /><Reminders items={teacherReminders(db, scope, user)} /><ActivityFeed items={scope.activity.filter((a) => mine.has(a.userId))} title="O‘quvchilar faolligi" /></>} />
