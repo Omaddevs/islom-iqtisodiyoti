@@ -38,7 +38,7 @@ export default function GlobalSearch({ className }) {
     scope.videos.filter((v) => hit(v.title)).forEach((v) => out.push({ id: v.id, icon: 'play', title: v.title, sub: 'Video dars', href: `#/platform/videos/${v.id}` }))
     scope.tests.filter((t) => hit(t.title)).forEach((t) => out.push({ id: t.id, icon: 'clipboard', title: t.title, sub: 'Test', href: `#/platform/tests/${t.id}` }))
     scope.homework.filter((h) => hit(h.title)).forEach((h) => out.push({ id: h.id, icon: 'fileText', title: h.title, sub: 'Uy vazifasi', href: `#/platform/homework/${h.id}` }))
-    scope.library.filter((l) => hit(l.title, l.author)).forEach((l) => out.push({ id: l.id, icon: 'bookOpen', title: l.title, sub: 'Kutubxona', href: '#/platform/library' }))
+    scope.library.filter((l) => hit(l.title, l.author)).forEach((l) => out.push({ id: l.id, icon: 'bookOpen', title: l.title, sub: l.type === 'unit' ? 'Kutubxona · Dars' : 'Kutubxona', href: '#/platform/library' }))
     scope.articles.filter((a) => hit(a.title)).forEach((a) => out.push({ id: a.id, icon: 'bookmark', title: a.title, sub: 'Maqola', href: `#/platform/articles/${a.id}` }))
     return out.slice(0, 8)
   }, [q, db, scope, user.role, staff])

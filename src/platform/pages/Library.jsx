@@ -5,6 +5,7 @@ import { PageHead, Card, Btn, Badge, Modal, FField, Input, Textarea, Select, Chi
 import { fmtDate, fmtDateTime, fmtDuration, fmtNum } from '../ui/format.js'
 import { SecureViewer, fmtSize } from '../ui/SecureViewer.jsx'
 import { materialsApi } from '../api/client.js'
+import { LessonGrid, LessonView, UnitForm, UnitDelete, isUnit, sortUnits, childrenOf } from './LibraryLessons.jsx'
 
 /* ---------- Ma'lumotnomalar ---------- */
 
@@ -27,7 +28,7 @@ const TYPES = {
 // hujjat/PDF ko'rinishidagilar — Standartlar, o'quv materiallari — Darslar, taqdimotlar — PPTX
 const TABS = [
   { value: 'standard', label: 'Standartlar', icon: 'scale', types: ['standard', 'pdf', 'document', 'sheet', 'link'] },
-  { value: 'textbook', label: 'Darslar', icon: 'book', types: ['textbook', 'book', 'article', 'research', 'audio', 'video'] },
+  { value: 'textbook', label: 'Darslar', icon: 'book', types: ['unit', 'textbook', 'book', 'article', 'research', 'audio', 'video'] },
   { value: 'slides', label: 'PPTX', icon: 'layers', types: ['slides'] },
 ]
 // Material qo'shishda tanlanadigan turlar
@@ -66,7 +67,7 @@ const sortFn = {
   popular: (a, b) => (b.downloads || 0) - (a.downloads || 0),
   title: (a, b) => a.title.localeCompare(b.title),
 }
-const tabOf = (l) => (TABS.find((t) => t.types.includes(l.type)) || TABS[0]).value
+const tabOf = (l) => (l.unitId ? 'textbook' : (TABS.find((t) => t.types.includes(l.type)) || TABS[0]).value)
 const inTab = (l, tab) => tabOf(l) === tab
 const MONTH = 30 * 864e5
 
@@ -111,12 +112,22 @@ export default function Library() {
   const [del, setDel] = useState(null)
   const [viewing, setViewing] = useState(null)
   const [journal, setJournal] = useState(null)
+  const [unitId, setUnitId] = useState(null)
+  const [unitUpload, setUnitUpload] = useState(0)
+  const [unitEdit, setUnitEdit] = useState(null)
+  const [unitDel, setUnitDel] = useState(null)
   const [saved, toggleSaved] = useSaved(user.id)
   const canEdit = user.role !== 'student' && can('content.create')
   const changeView = (v) => { setView(v); try { localStorage.setItem('ii_lib_view', v) } catch { /* xotira */ } }
 
-  const all = scope.library
+  const everything = scope.library
+  const all = useMemo(() => everything.filter((l) => !isUnit(l)), [everything])
+  const units = useMemo(() => everything.filter(isUnit).sort(sortUnits), [everything])
+  const unit = units.find((u) => u.id === unitId) || null
   const count = (fn) => all.filter(fn).length
+  const mineOf = (l) => l.authorId === user.id || user.role === 'org_admin' || user.role === 'superadmin'
+  const openUnit = (u, opts) => { setUnitId(u.id); setUnitUpload(opts?.upload ? Date.now() : 0); window.scrollTo?.({ top: 0, behavior: 'smooth' }) }
+  useEffect(() => { if (unitId && !unit) setUnitId(null) }, [unitId, unit])
   const fresh = count((l) => Date.now() - l.createdAt < MONTH)
   const savedCount = count((l) => saved.includes(l.id))
   const categories = useMemo(() => [...new Set(all.map((l) => l.category).filter(Boolean))].sort(), [all])
@@ -126,7 +137,7 @@ export default function Library() {
   const list = useMemo(() => {
     const s = q.trim().toLowerCase()
     return all
-      .filter((l) => inTab(l, tab))
+      .filter((l) => inTab(l, tab) && !(tab === 'textbook' && l.unitId))
       .filter((l) => !s || [l.title, l.author, l.description, l.category, ...(l.tags || [])].some((x) => (x || '').toLowerCase().includes(s)))
       .filter((l) => !cat || l.category === cat)
       .filter((l) => !fmt || l.format === fmt)
@@ -138,6 +149,15 @@ export default function Library() {
 
   const activeFilters = [cat, fmt, lang, year].filter(Boolean).length
   const filtered = q || activeFilters || onlySaved
+  // Darslar: dars nomi/tavsifi yoki ichidagi biror material filtrga mos kelsa, dars ko'rinadi
+  const shownUnits = useMemo(() => {
+    if (tab !== 'textbook') return []
+    const s = q.trim().toLowerCase()
+    const hit = (x) => !s || [x.title, x.author, x.description, x.category, ...(x.tags || [])].some((v) => (v || '').toLowerCase().includes(s))
+    const pass = (l) => (!cat || l.category === cat) && (!fmt || l.format === fmt) && (!lang || (l.lang || 'uz') === lang) && (!year || String(l.year) === year) && (!onlySaved || saved.includes(l.id))
+    const plain = !activeFilters && !onlySaved
+    return units.filter((u) => (plain && hit(u)) || all.some((l) => l.unitId === u.id && pass(l) && hit(l)))
+  }, [tab, units, all, q, cat, fmt, lang, year, onlySaved, saved, activeFilters])
   const clear = () => { setQ(''); setCat(''); setFmt(''); setLang(''); setYear(''); setOnlySaved(false) }
 
   // Asosiy amal: yuklangan fayl platforma ichida, havola yangi oynada ochiladi
@@ -154,7 +174,7 @@ export default function Library() {
   }
   const save = (l) => { toast(saved.includes(l.id) ? 'Saqlanganlardan olib tashlandi' : 'Saqlanganlarga qo‘shildi'); toggleSaved(l.id) }
   const menuFor = (l) => {
-    const mine = l.authorId === user.id || user.role === 'org_admin' || user.role === 'superadmin'
+    const mine = mineOf(l)
     return [
       { label: 'Batafsil', icon: 'info', onClick: () => setOpen(l) },
       { label: saved.includes(l.id) ? 'Saqlanganlardan olish' : 'Saqlab qo‘yish', icon: 'bookmark', onClick: () => save(l) },
@@ -168,18 +188,20 @@ export default function Library() {
   return (
     <>
       <PageHead icon="bookOpen" title="Kutubxona" sub="Bilim manbalari bir joyda"
-        actions={canEdit && <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Material qo‘shish</Btn>} />
+        actions={canEdit && (tab === 'textbook'
+          ? <>{unit ? <Btn icon="link" onClick={() => setEditing({ unitId: unit.id })}>Havola qo‘shish</Btn> : <Btn icon="plus" onClick={() => setEditing({ type: 'textbook' })}>Material qo‘shish</Btn>}<Btn variant="primary" icon="plus" onClick={() => setUnitEdit({})}>Yangi dars</Btn></>
+          : <Btn variant="primary" icon="plus" onClick={() => setEditing({})}>Material qo‘shish</Btn>)} />
 
       {/* Statistika */}
       <div className="plibstats">
         <LibStat icon="bookOpen" tone="violet" value={all.length} label="Jami materiallar" trend={fresh ? `+${fresh} bu oy` : null} />
-        <LibStat icon="scale" tone="green" value={count((l) => inTab(l, 'standard'))} label="Standartlar" onClick={() => setTab('standard')} />
-        <LibStat icon="book" tone="blue" value={count((l) => inTab(l, 'textbook'))} label="Darslar" onClick={() => setTab('textbook')} />
-        <LibStat icon="layers" tone="amber" value={count((l) => inTab(l, 'slides'))} label="PPTX taqdimotlar" onClick={() => setTab('slides')} />
+        <LibStat icon="scale" tone="green" value={count((l) => inTab(l, 'standard'))} label="Standartlar" onClick={() => { setTab('standard'); setUnitId(null) }} />
+        <LibStat icon="book" tone="blue" value={units.length} label="Darslar" onClick={() => { setTab('textbook'); setUnitId(null) }} />
+        <LibStat icon="layers" tone="amber" value={count((l) => inTab(l, 'slides'))} label="PPTX taqdimotlar" onClick={() => { setTab('slides'); setUnitId(null) }} />
       </div>
 
       {/* Qidiruv va filtrlar */}
-      <div className="plibbar">
+      {!(tab === 'textbook' && unit) && <div className="plibbar">
         <div className="plibbar__search">
           <label className="plibsearch">
             <Icon name="search" size={18} />
@@ -200,7 +222,7 @@ export default function Library() {
             <span className="plibsort"><Icon name="sort" size={16} /><Select value={sort} onChange={setSort} options={SORTS} aria-label="Saralash" /></span>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Turlar va ko'rinish */}
       <div className="plibnav">
@@ -208,13 +230,13 @@ export default function Library() {
           {TABS.map((t) => {
             const n = count((l) => inTab(l, t.value))
             return (
-              <button key={t.value} role="tab" aria-selected={tab === t.value} className={cx('plibtabs__tab', tab === t.value && 'is-on')} onClick={() => setTab(t.value)} title={`${n} ta material`}>
+              <button key={t.value} role="tab" aria-selected={tab === t.value} className={cx('plibtabs__tab', tab === t.value && 'is-on')} onClick={() => { setTab(t.value); setUnitId(null) }} title={t.value === 'textbook' ? `${units.length} ta dars` : `${n} ta material`}>
                 <Icon name={t.icon} size={16} />{t.label}
               </button>
             )
           })}
         </div>
-        <div className="plibnav__right">
+        {!(tab === 'textbook' && unit) && <div className="plibnav__right">
           <button type="button" className={cx('plibsaved', onlySaved && 'is-on')} onClick={() => setOnlySaved((v) => !v)} aria-pressed={onlySaved} aria-label="Saqlanganlar" title="Saqlanganlar">
             <Icon name="bookmark" size={17} />{savedCount > 0 && <b>{savedCount}</b>}
           </button>
@@ -222,9 +244,38 @@ export default function Library() {
             <button className={cx(view === 'grid' && 'is-on')} onClick={() => changeView('grid')} aria-pressed={view === 'grid'}><Icon name="grid" size={16} /> Karta</button>
             <button className={cx(view === 'list' && 'is-on')} onClick={() => changeView('list')} aria-pressed={view === 'list'}><Icon name="list" size={16} /> Ro‘yxat</button>
           </div>
-        </div>
+        </div>}
       </div>
 
+      {tab === 'textbook' && unit ? (
+        <LessonView key={unit.id} unit={unit} units={units} items={childrenOf(all, unit.id)} canEdit={canEdit} mine={mineOf(unit)} mineOf={mineOf}
+          groups={db.groups} autoUpload={unitUpload} onBack={() => setUnitId(null)} onOpenUnit={openUnit} onRun={run} menuFor={menuFor}
+          onEditUnit={() => setUnitEdit(unit)} onDeleteUnit={() => setUnitDel(unit)} onAddLink={() => setEditing({ unitId: unit.id })} />
+      ) : tab === 'textbook' ? (
+        <>
+          {filtered && (shownUnits.length > 0 || list.length > 0) && (
+            <div className="plibresult">
+              <span><b>{shownUnits.length}</b> ta dars{list.length > 0 && <>, <b>{list.length}</b> ta material</>} topildi</span>
+              <button type="button" onClick={clear}><Icon name="x" size={14} /> Filtrni tozalash</button>
+            </div>
+          )}
+          {filtered && !shownUnits.length && !list.length ? (
+            <Card><Empty icon="search" title="Hech narsa topilmadi" text="Qidiruv yoki filtr shartlariga mos dars yo‘q." action={<Btn icon="refresh" onClick={clear}>Filtrni tozalash</Btn>} /></Card>
+          ) : (
+            (!filtered || shownUnits.length > 0) && <LessonGrid units={shownUnits} items={all} canEdit={canEdit && !filtered} mineOf={mineOf} onOpen={openUnit} onCreate={() => setUnitEdit({})} onEdit={setUnitEdit} onDelete={setUnitDel} />
+          )}
+          {list.length > 0 && (
+            <section className="plibloose">
+              <h3 className="plibloose__title">Boshqa materiallar <span>{list.length}</span></h3>
+              <div className={view === 'grid' ? 'plibgrid' : 'pliblist'}>
+                {list.map((l) => (
+                  <LibCard key={l.id} l={l} row={view === 'list'} saved={saved.includes(l.id)} onOpen={() => setOpen(l)} onRun={run} onSave={() => save(l)} onTag={pickTag} menu={menuFor(l)} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      ) : <>
       {filtered && list.length > 0 && (
         <div className="plibresult">
           <span><b>{list.length}</b> ta material topildi</span>
@@ -246,10 +297,13 @@ export default function Library() {
           ))}
         </div>
       )}
+      </>}
 
       <LibDetail item={open && all.find((x) => x.id === open.id)} onClose={() => setOpen(null)} groups={db.groups} uploader={open && db.users.find((u) => u.id === open.authorId)}
         saved={open && saved.includes(open.id)} onSave={() => save(open)} onRun={run} onTag={pickTag} />
-      <LibForm open={!!editing} item={editing} onClose={() => setEditing(null)} categories={categories} />
+      <LibForm open={!!editing} item={editing} onClose={() => setEditing(null)} categories={categories} unit={editing?.unitId ? units.find((u) => u.id === editing.unitId) : null} />
+      <UnitForm open={!!unitEdit} item={unitEdit} units={units} onClose={() => setUnitEdit(null)} onSaved={(u) => openUnit(u)} />
+      <UnitDelete unit={unitDel} count={unitDel ? all.filter((l) => l.unitId === unitDel.id).length : 0} onClose={() => setUnitDel(null)} onDone={() => setUnitId(null)} />
       {viewing && <SecureViewer item={viewing} user={user} onClose={() => setViewing(null)} />}
       <FileJournal item={journal} onClose={() => setJournal(null)} />
       <Confirm open={!!del} onClose={() => setDel(null)} danger title="Materialni o‘chirish" text={`«${del?.title}» o‘chiriladi. Bu amalni qaytarib bo‘lmaydi.`} confirmLabel="O‘chirish" onConfirm={() => { remove('library', del.id); toast('Material o‘chirildi') }} />
@@ -420,10 +474,11 @@ function LibDetail({ item: l, onClose, groups, uploader, saved, onSave, onRun, o
 const DEFAULT_FORMAT = { audio: 'MP3', video: 'MP4', link: 'Havola' }
 const COVERS = ['#12402f', '#0d4a3c', '#3a2414', '#1d4ed8', '#5b21b6', '#7c2d12', '#1e3a5f', '#831843']
 
-function LibForm({ open, item, onClose, categories }) {
+function LibForm({ open, item, onClose, categories, unit }) {
   const { user, scope } = useAuth()
   const toast = useToast()
   const isNew = !item?.id
+  const inUnit = !!item?.unitId
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
   const [source, setSource] = useState('file')
@@ -436,10 +491,10 @@ function LibForm({ open, item, onClose, categories }) {
   useFormInit(open, item?.id, () => {
     setErr({})
     setDrag(false)
-    setSource(isNew || item?.fileId || !item?.url ? 'file' : 'link')
+    setSource(isNew ? (inUnit ? 'link' : 'file') : item?.fileId || !item?.url ? 'file' : 'link')
     setUp(item?.fileId ? { file: { id: item.fileId, name: item.fileName, size: item.fileSize, ext: item.fileExt } } : null)
     setF(isNew
-      ? { title: '', author: '', type: 'standard', pages: '', minutes: '', year: new Date().getFullYear(), category: '', lang: 'uz', format: 'PDF', url: '', description: '', tags: '', groupIds: [] }
+      ? { title: '', author: '', type: item?.type || (inUnit ? 'textbook' : 'standard'), pages: '', minutes: '', year: new Date().getFullYear(), category: unit?.title || '', lang: 'uz', format: inUnit ? 'Havola' : 'PDF', url: '', description: '', tags: '', groupIds: inUnit ? unit?.groupIds || [] : [] }
       : { ...item, minutes: item.duration ? Math.round(item.duration / 60) : '', tags: (item.tags || []).join(', ') })
   })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
@@ -498,6 +553,10 @@ function LibForm({ open, item, onClose, categories }) {
       category: f.category?.trim(), lang: f.lang, format: f.format, url: useFile ? '' : f.url?.trim(), fileId: useFile ? file.id : null, description: f.description?.trim(),
       tags: (f.tags || '').split(',').map((s) => s.trim()).filter(Boolean).slice(0, 6), groupIds: f.groupIds || [],
     }
+    if (inUnit) {
+      data.groupIds = unit?.groupIds || item.groupIds || []
+      if (isNew) Object.assign(data, { unitId: item.unitId, order: Math.max(0, ...scope.library.filter((l) => l.unitId === item.unitId).map((l) => l.order || 0)) + 1 })
+    }
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       add('library', { ...data, orgId: scope.orgId, authorId: user.id, downloads: 0, cover: COVERS[Math.floor(Math.random() * COVERS.length)] })
@@ -508,7 +567,7 @@ function LibForm({ open, item, onClose, categories }) {
     onClose()
   }
   return (
-    <Modal open={open} onClose={onClose} title={isNew ? 'Material qo‘shish' : 'Materialni tahrirlash'} sub="Istalgan turdagi fayl yoki havola" width={620}
+    <Modal open={open} onClose={onClose} title={isNew ? (inUnit ? 'Darsga material qo‘shish' : 'Material qo‘shish') : 'Materialni tahrirlash'} sub={inUnit && unit ? `«${unit.title}» darsi uchun fayl yoki havola` : 'Istalgan turdagi fayl yoki havola'} width={620}
       footer={<><Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" icon={isNew ? 'plus' : 'check'} disabled={uploading} onClick={submit}>{isNew ? 'Qo‘shish' : 'Saqlash'}</Btn></>}>
       <div className="pform">
         <div className="pfield">
@@ -548,13 +607,13 @@ function LibForm({ open, item, onClose, categories }) {
             <p className="plibnote"><Icon name="lock" size={14} />O‘quvchilar faylni faqat platforma ichida ko‘radi: yuklab olish yopiq, har bir sahifada ismi va telefoni yoziladi.</p>
           </div>
         )}
-        <FField label="Turi">
+        {!inUnit && <FField label="Turi">
           <div className="plibtypes">
             {Object.entries(FORM_TYPES).map(([k, label]) => (
               <button key={k} type="button" className={cx('plibtypes__opt', tabOf(f) === k && 'is-on')} onClick={() => setType(k)}><Icon name={TYPES[k].icon} size={15} /> {label}</button>
             ))}
           </div>
-        </FField>
+        </FField>}
         <FField label="Nomi" error={err.title}><Input value={f.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Masalan: Islom moliyasi asoslari" autoFocus /></FField>
         <div className="pform__row">
           <FField label="Muallif"><Input value={f.author || ''} onChange={(e) => set('author', e.target.value)} /></FField>
@@ -572,7 +631,7 @@ function LibForm({ open, item, onClose, categories }) {
         </div>
         {source === 'link' && <FField label="Havola" error={err.url} hint="Havola orqali ochilgan material himoyalanmaydi: u tashqi saytda ochiladi"><Input value={f.url || ''} onChange={(e) => set('url', e.target.value)} placeholder="https://…" /></FField>}
         <FField label="Teglar" hint="Vergul bilan ajrating, masalan: Murobaha, Amaliy"><Input value={f.tags || ''} onChange={(e) => set('tags', e.target.value)} /></FField>
-        <FField label="Kimlar ko‘radi"><ChipSelect allLabel="Barcha guruhlar" value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>
+        {!inUnit && <FField label="Kimlar ko‘radi"><ChipSelect allLabel="Barcha guruhlar" value={f.groupIds || []} onChange={(v) => set('groupIds', v)} options={scope.groups.map((g) => ({ value: g.id, label: g.name, color: g.color }))} /></FField>}
         <FField label="Tavsif"><Textarea value={f.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Qisqacha mazmuni…" /></FField>
       </div>
     </Modal>

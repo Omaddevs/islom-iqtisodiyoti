@@ -371,7 +371,7 @@ function NewMaterials() {
   const items = [
     ...scope.videos.map((x) => ({ ...x, icon: 'play', tone: 'blue', kind: 'Video dars', href: `#/platform/videos/${x.id}` })),
     ...scope.articles.filter((x) => x.published).map((x) => ({ ...x, icon: 'bookmark', tone: 'green', kind: 'Maqola', href: `#/platform/articles/${x.id}` })),
-    ...scope.library.map((x) => ({ ...x, icon: 'bookOpen', tone: 'violet', kind: 'Kutubxona', href: '#/platform/library' })),
+    ...scope.library.filter((x) => x.type !== 'unit').map((x) => ({ ...x, icon: 'bookOpen', tone: 'violet', kind: 'Kutubxona', href: '#/platform/library' })),
     ...scope.vocabSets.map((x) => ({ ...x, icon: 'translate', tone: 'teal', kind: 'Lug‘at', href: `#/platform/vocabulary/${x.id}` })),
   ].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
   return (
@@ -607,7 +607,7 @@ function Reminders({ items }) {
 /* ---------------- Kutubxona reklamasi ---------------- */
 function LibraryPromo() {
   const { scope } = useAuth()
-  const n = scope.library.length
+  const n = scope.library.filter((x) => x.type !== 'unit').length
   return (
     <section className="pdp">
       <h4>Ilmiy manbalarga ega bo‘ling</h4>
