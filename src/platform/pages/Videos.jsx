@@ -4,6 +4,7 @@ import { add, patch, remove, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Search, Select, CopyBtn, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDuration, fmtAgo, fmtNum } from '../ui/format.js'
 import { Cover, CoverPicker } from '../ui/media.jsx'
+import { useStudyTimer } from '../api/study.js'
 
 export default function Videos({ param }) {
   if (param) return <VideoPlayer id={param} />
@@ -339,6 +340,8 @@ function VideoPlayer({ id }) {
   const stageRef = useRef(null)
   const posRef = useRef(pos)
   posRef.current = pos
+  // O'quvchi video sahifasida o'tkazgan vaqt va ko'rilgan qismi (tomosha paytida harakat bo'lmaydi — kutish uzun)
+  useStudyTimer('video', v ? id : null, { idle: 45 * 60e3, progress: () => (v?.duration ? Math.max(prog[id]?.done ? 100 : 0, Math.round((posRef.current / v.duration) * 100)) : (prog[id]?.done ? 100 : null)) })
 
   // Ko'rishlar sonini bir marta oshiramiz
   useEffect(() => { if (v) patch('videos', v.id, { views: (v.views || 0) + 1 }) }, [id]) // eslint-disable-line

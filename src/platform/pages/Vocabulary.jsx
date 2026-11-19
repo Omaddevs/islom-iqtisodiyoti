@@ -4,6 +4,7 @@ import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, Confirm, Menu, useToast, Progress, cx, Search, useFormInit, Select } from '../ui/kit.jsx'
 import { pct } from '../ui/format.js'
 import { uid } from '../store/ids.js'
+import { useStudyTimer } from '../api/study.js'
 
 export default function Vocabulary({ param }) {
   if (param) return <VocabSet id={param} />
@@ -166,6 +167,7 @@ function VocabSet({ id }) {
   const [editing, setEditing] = useState(false)
   const prog = db.vocabProgress.find((x) => x.setId === id && x.studentId === user.id)
   const learned = useMemo(() => new Set(prog?.learned || []), [prog])
+  useStudyTimer('vocab', v ? id : null, { progress: () => (v?.terms?.length ? Math.round((learned.size / v.terms.length) * 100) : null) })
   if (!v) return <Card><Empty icon="translate" title="To‘plam topilmadi" action={<Btn as="a" href="#/platform/vocabulary">Orqaga</Btn>} /></Card>
 
   const toggleLearned = (tid) => {

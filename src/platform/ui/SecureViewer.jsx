@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Btn, Icon, cx } from './kit.jsx'
 import { materialsApi } from '../api/client.js'
+import { useStudyTimer } from '../api/study.js'
 
 const fmtSize = (b) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`)
 export { fmtSize }
@@ -167,6 +168,11 @@ export function SecureViewer({ item, user, onClose }) {
   const closeRef = useRef(onClose)
   closeRef.current = onClose
   const hidden = unfocused || !!capture
+  // O'quvchi materialda o'tkazgan vaqt va ko'rgan eng oxirgi sahifasi
+  const seen = useRef(1)
+  useEffect(() => { seen.current = Math.max(seen.current, current) }, [current])
+  const media = meta?.kind === 'video' || meta?.kind === 'audio'
+  useStudyTimer('library', item.id, { idle: media ? 45 * 60e3 : 5 * 60e3, progress: () => (meta?.kind === 'pages' && meta.pages ? Math.round((seen.current / meta.pages) * 100) : null) })
   const mark = `${user.name} · ${user.phone || ''}`
 
   // Holat: fayl tayyor bo'lguncha so'rab turiladi

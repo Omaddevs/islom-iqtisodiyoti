@@ -9,8 +9,39 @@ import { formatPhone, isFullPhone } from '../../utils/phone.js'
 import { hashQuery } from './Meetings.jsx'
 import { HeroArt } from './Articles.jsx'
 import { StatSpark } from '../ui/charts.jsx'
+import StudentProfile, { fmtSpent } from './StudentProfile.jsx'
+import { studyApi } from '../api/study.js'
+import '../../styles/student-profile.css'
 
-export default function Users() {
+export default function Users({ param }) {
+  if (param) return <StudentProfile id={param} />
+  return <UserList />
+}
+
+// O'quvchilarning oxirgi 7 kundagi faolligi (jadvaldagi ustun uchun)
+function useWeekActivity(enabled, orgId) {
+  const [map, setMap] = useState(null)
+  useEffect(() => {
+    if (!enabled) return undefined
+    let alive = true
+    studyApi.overview(7, orgId).then((d) => { if (alive) setMap(new Map(d.students.map((x) => [x.userId, x]))) }).catch(() => { if (alive) setMap(new Map()) })
+    return () => { alive = false }
+  }, [enabled, orgId])
+  return map
+}
+const last7 = () => Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() - (6 - i) * 864e5); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })
+function WeekCell({ a }) {
+  const vals = last7().map((k) => a?.daily?.[k] || 0)
+  const max = Math.max(...vals, 1)
+  return (
+    <div className="sp-mini" title="Oxirgi 7 kunda o‘qishga sarflangan vaqt">
+      <span className="sp-mini__bars" aria-hidden>{vals.map((v, i) => <i key={i} className={v ? undefined : 'is-zero'} style={{ height: `${Math.max(8, (v / max) * 100)}%` }} />)}</span>
+      <b>{a?.seconds ? fmtSpent(a.seconds) : '—'}<span>{a?.seconds ? `${vals.filter(Boolean).length} kun faol` : 'Faollik yo‘q'}</span></b>
+    </div>
+  )
+}
+
+function UserList() {
   const { user, db, scope, can } = useAuth()
   const toast = useToast()
   const isTeacher = user.role === 'teacher'
@@ -23,6 +54,9 @@ export default function Users() {
   const [del, setDel] = useState(null)
 
   useEffect(() => { if (hashQuery().get('new')) setCreating('student') }, [])
+  const students = role === 'student'
+  const week = useWeekActivity(students, user.role === 'superadmin' ? scope.orgId : null)
+  const openStats = (u) => { window.location.hash = `#/platform/users/${u.id}` }
 
   const base = isTeacher ? scope.myStudents : scope.users.filter((u) => u.role === role)
   const rows = useMemo(() => base.filter((u) => (u.name + u.phone).toLowerCase().includes(q.toLowerCase()))
@@ -80,21 +114,26 @@ export default function Users() {
         </div>
       </div>
       <Card pad={false} className="putable">
-        <Table rows={rows} empty={<Empty icon="users" title="Foydalanuvchi topilmadi" text="Yangi foydalanuvchi qo‘shing — login va parol avtomatik yaratiladi." action={<Btn variant="primary" onClick={() => setCreating(isTeacher ? 'student' : role)}>Qo‘shish</Btn>} />} cols={[
+        <Table rows={rows} onRow={students ? openStats : undefined} empty={<Empty icon="users" title="Foydalanuvchi topilmadi" text="Yangi foydalanuvchi qo‘shing — login va parol avtomatik yaratiladi." action={<Btn variant="primary" onClick={() => setCreating(isTeacher ? 'student' : role)}>Qo‘shish</Btn>} />} cols={[
           { key: 'name', label: 'Foydalanuvchi', render: (u) => <div className="pcell-user"><UAvatar user={u} size={38} /><div><b>{u.name}</b><span>{u.role === 'student' ? ROLES[u.role].label : u.title || ROLES[u.role].label}</span></div></div> },
           { key: 'phone', label: 'Telefon (login)', render: (u) => <span className="mono" style={{ fontSize: 13.5 }}>{u.phone}</span> },
           { key: 'groups', label: 'Guruhlar', render: (u) => u.groups.length ? <div className="pgchips">{u.groups.map((g) => <a key={g.id} href={`#/platform/groups/${g.id}`} className="pgchip" style={{ '--gc': g.color }}>{g.name}</a>)}</div> : <span className="pmuted" style={{ fontSize: 13 }}>Biriktirilmagan</span> },
           { key: 'status', label: 'Holat', render: (u) => u.status === 'blocked' ? <Badge tone="red" dot>Bloklangan</Badge> : <Badge tone="green" dot>Faol</Badge> },
-          { key: 'lastSeen', label: 'Oxirgi faollik', render: (u) => <span className="pmuted" style={{ fontSize: 13 }}>{u.lastSeen ? fmtAgo(u.lastSeen) : '—'}</span> },
-          { key: 'act', label: '', align: 'right', render: (u) => manageable(u) && (
-            <Menu items={[
+          ...(students ? [{ key: 'week', label: 'Faollik · 7 kun', render: (u) => <WeekCell a={week?.get(u.id)} /> }] : []),
+          { key: 'lastSeen', label: 'Oxirgi faollik', render: (u) => <span className="pmuted" style={{ fontSize: 13 }}>{(() => { const t = Math.max(u.lastSeen || 0, week?.get(u.id)?.lastAt || 0); return t ? fmtAgo(t) : '—' })()}</span> },
+          { key: 'act', label: '', align: 'right', render: (u) => (manageable(u) || u.role === 'student') && (
+            <span onClick={(e) => e.stopPropagation()}><Menu items={[
+              u.role === 'student' && { label: 'Statistika', icon: 'chart', onClick: () => openStats(u) },
+              u.role === 'student' && manageable(u) && 'sep',
+              ...(manageable(u) ? [
               { label: 'Tahrirlash', icon: 'edit', onClick: () => setEditing(u) },
               { label: 'Parolni yangilash', icon: 'key', onClick: () => resetPass(u) },
               { label: 'Kirish ma’lumotlari', icon: 'copy', onClick: () => setCreds({ ...u, _note: 'Parol xavfsizlik uchun shifrlangan holda saqlanadi. Yangi parol berish uchun «Parolni yangilash»ni tanlang.' }) },
               !isTeacher && 'sep',
               !isTeacher && { label: u.status === 'blocked' ? 'Blokdan chiqarish' : 'Bloklash', icon: u.status === 'blocked' ? 'lockOpen' : 'block', onClick: () => toggleBlock(u) },
               !isTeacher && { label: 'O‘chirish', icon: 'trash', danger: true, onClick: () => setDel(u) },
-            ]} />
+              ] : []),
+            ].filter(Boolean)} /></span>
           ) },
         ]} />
       </Card>

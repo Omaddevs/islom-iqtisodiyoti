@@ -5,6 +5,7 @@ import { Card, Btn, Badge, Modal, FField, Input, Textarea, ChipSelect, Empty, Ic
 import { fmtDate } from '../ui/format.js'
 import { StatBars, endOfDay } from '../ui/charts.jsx'
 import { Cover, CoverPicker, IMAGE_TYPES, checkImage, readImage } from '../ui/media.jsx'
+import { useStudyTimer } from '../api/study.js'
 
 export default function Articles({ param }) {
   if (param) return <Reader id={param} />
@@ -389,6 +390,7 @@ function Reader({ id }) {
   useEffect(() => {
     if (a?.published && !(a.readBy || []).includes(user.id)) patch('articles', a.id, (x) => ({ views: (x.views || 0) + 1, readBy: [...(x.readBy || []), user.id] }))
   }, [a?.id, a?.published, user.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  useStudyTimer('article', a?.published ? id : null, { scroll: true })
   if (!a) return <Card><Empty icon="bookmark" title="Maqola topilmadi" action={<Btn as="a" href="#/platform/articles">Orqaga</Btn>} /></Card>
   const au = db.users.find((u) => u.id === a.authorId)
   const more = scope.articles.filter((x) => x.id !== a.id && x.published).slice(0, 3)

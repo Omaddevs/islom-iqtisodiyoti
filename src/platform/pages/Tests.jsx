@@ -6,6 +6,7 @@ import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInp
 import { uid } from '../store/ids.js'
 import { StatSpark, series, endOfDay } from '../ui/charts.jsx'
 import { ChartPanel } from '../ui/chartpanel.jsx'
+import { useStudyTimer } from '../api/study.js'
 
 export default function Tests({ param }) {
   const { user } = useAuth()
@@ -716,6 +717,7 @@ function TakeTest({ id, preview = false }) {
   const left = active ? Math.max(0, Math.ceil((run.startedAt + t.timeLimit * 60e3 - now) / 1000)) : 0
 
   useEffect(() => { writeRun(storeKey, result ? null : run) }, [storeKey, run, result])
+  useStudyTimer('test', id, { enabled: active && !preview, idle: 10 * 60e3, progress: () => (t?.questions?.length ? Math.round((Object.keys(run?.answers || {}).length / t.questions.length) * 100) : null) })
   useEffect(() => {
     if (!active) return undefined
     setNow(Date.now())

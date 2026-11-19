@@ -4,6 +4,7 @@ import { add, patch, remove, notify, logActivity } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDateTime, fmtLeft, fmtAgo, toLocalInput, fromLocalInput, pct } from '../ui/format.js'
 import { StatSpark, Donut, series, endOfDay } from '../ui/charts.jsx'
+import { useStudyTimer } from '../api/study.js'
 
 export default function Homework({ param }) {
   if (param) return <HomeworkDetail id={param} />
@@ -300,6 +301,7 @@ function HomeworkDetail({ id }) {
   const h = db.homework.find((x) => x.id === id)
   const [text, setText] = useState('')
   const [grading, setGrading] = useState({}) // subId -> {grade, feedback}
+  useStudyTimer('homework', h ? id : null, { idle: 5 * 60e3 })
   if (!h) return <Card><Empty icon="fileText" title="Vazifa topilmadi" action={<Btn as="a" href="#/platform/homework">Orqaga</Btn>} /></Card>
   const g = db.groups.find((x) => x.id === h.groupId)
   const author = db.users.find((u) => u.id === h.authorId)

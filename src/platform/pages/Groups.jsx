@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx, useFormInit } from '../ui/kit.jsx'
+import '../../styles/student-profile.css'
 import { fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { groupLessonsText, nextLessonTs, hasFuture, lessonWhen, lessonTime, lessonPlace } from '../ui/agenda.js'
 import { LessonForm } from './Schedule.jsx'
@@ -221,12 +222,13 @@ function GroupDetail({ id }) {
           {tab === 'students' && (
             <Card pad={false} title="O‘quvchilar" action={canEdit && <><Btn size="sm" icon="userPlus" onClick={() => setAddOpen(true)}>Mavjudini qo‘shish</Btn><Btn size="sm" variant="primary" icon="plus" onClick={() => setCreateOpen(true)}>Yangi o‘quvchi</Btn></>}>
               <Table rows={students} empty={<Empty icon="users" title="Guruhda o‘quvchi yo‘q" action={canEdit && <Btn variant="primary" onClick={() => setCreateOpen(true)}>O‘quvchi qo‘shish</Btn>} />} cols={[
-                { key: 'name', label: 'O‘quvchi', render: (s) => <div className="pcell-user"><UAvatar user={s} size={36} /><div><b>{s.name}</b><span className="mono">{s.phone}</span></div></div> },
+                { key: 'name', label: 'O‘quvchi', render: (s) => <a href={`#/platform/users/${s.id}`} className="pcell-user pcell-link" title="O‘quvchi statistikasi"><UAvatar user={s} size={36} /><div><b>{s.name}</b><span className="mono">{s.phone}</span></div></a> },
                 { key: 'hw', label: 'Vazifalar', render: (s) => { const { hw } = stat(s); return hw == null ? '—' : <div style={{ minWidth: 100 }}><span style={{ fontSize: 12.5 }}>{hw}%</span><Progress2 v={hw} /></div> } },
                 { key: 'avg', label: 'Test o‘rtachasi', render: (s) => { const { avg } = stat(s); return avg == null ? <span className="pmuted">—</span> : <a href={`#/platform/tests/student.${s.id}`} title="Test statistikasi"><Badge tone={avg >= 60 ? 'green' : 'red'}>{avg}%</Badge></a> } },
                 { key: 'st', label: 'Holat', render: (s) => s.status === 'blocked' ? <Badge tone="red">Bloklangan</Badge> : <Badge tone="green" dot>Faol</Badge> },
                 { key: 'a', label: '', align: 'right', render: (s) => <Menu items={[
-                  { label: 'Test statistikasi', icon: 'chart', onClick: () => { window.location.hash = `#/platform/tests/student.${s.id}` } },
+                  { label: 'Faollik statistikasi', icon: 'chart', onClick: () => { window.location.hash = `#/platform/users/${s.id}` } },
+                  { label: 'Test statistikasi', icon: 'clipboard', onClick: () => { window.location.hash = `#/platform/tests/student.${s.id}` } },
                   ...(canEdit ? [{ label: 'Kirish ma’lumotlari', icon: 'key', onClick: () => setCreds(s) }, { label: 'Guruhdan chiqarish', icon: 'minus', danger: true, onClick: () => setRm(s) }] : []),
                 ]} /> },
               ]} />
