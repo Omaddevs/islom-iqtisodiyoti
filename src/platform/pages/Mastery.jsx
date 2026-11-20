@@ -174,7 +174,7 @@ function GroupBoard({ data, onOpen }) {
                 <tr>
                   <th className="pms-sticky">O‘quvchi</th>
                   {data.lessons.map((l) => (
-                    <th key={l.id} className={cx('pms-lcol', !l.passed && 'is-future')} title={`${l.title} · ${fmtDate(dateOf(l.date))}${l.passed ? '' : ' (hali o‘tilmagan)'}`}>
+                    <th key={l.id} className={cx('pms-lcol', !l.passed && 'is-future')} title={`${l.title} · ${fmtDate(dateOf(l.date))}${l.passed ? '' : l.held === false ? ' (hali o‘tilmagan)' : ' (topshiriq bog‘lanmagan va davomat belgilanmagan — hisobga olinmaydi)'}`}>
                       <a href={`#/platform/library/unit.${l.id}`}>D{l.num || ''}</a><small>{fmtDate(dateOf(l.date)).replace(/ \d{4}$/, '')}</small>
                     </th>
                   ))}
@@ -270,7 +270,7 @@ function StudentReport({ data, s, staff }) {
                   const on = open === l.id
                   return [
                     <tr key={l.id} className={cx(!l.passed && 'is-future', on && 'is-open')} onClick={() => setOpen(on ? null : l.id)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') setOpen(on ? null : l.id) }}>
-                      <td><span className="pms-lname"><b>{l.title}</b><small>{fmtDate(dateOf(l.date))}{!l.passed ? ' · hali o‘tilmagan' : l.closed ? '' : ` · muddat ${fmtDate(dateOf(l.due))}`}</small></span></td>
+                      <td><span className="pms-lname"><b>{l.title}</b><small>{fmtDate(dateOf(l.date))}{l.held === false ? ' · hali o‘tilmagan' : !l.passed ? ' · topshiriq bog‘lanmagan va davomat belgilanmagan — hisobga olinmaydi' : l.closed ? '' : ` · muddat ${fmtDate(dateOf(l.due))}`}</small></span></td>
                       <td><Cell v={r.D} max={cfg.w.D} sub={VIA[r.via?.D]} /></td>
                       <td><Cell v={r.T} max={cfg.w.T} sub={r.T !== null && r.attempts ? `${r.attempts} urinish` : null} /></td>
                       <td><Cell v={r.S} max={cfg.w.S} sub={VIA[r.via?.S]} /></td>
@@ -369,7 +369,7 @@ function MethodModal({ open, cfg, onClose }) {
             <tr><td>L: Lug‘at</td><td>{w.L}</td><td>{w.L} × (o‘rganilgan atamalar / to‘plamdagi jami atamalar).</td></tr>
           </tbody>
         </table>
-        <p className="pmuted">Darsga biror komponent (test, standart, lug‘at) bog‘lanmagan bo‘lsa, uning vazni qolganlariga mutanosib taqsimlanadi.{cfg.minT > 0 && ` Test bali ${cfg.minT} dan past bo‘lsa, dars o‘zlashtirilmagan hisoblanadi (O ko‘pi bilan 54).`}</p>
+        <p className="pmuted">Darsga biror komponent (test, standart, lug‘at) bog‘lanmagan bo‘lsa, uning vazni qolganlariga mutanosib taqsimlanadi. Hech qanday topshiriq bog‘lanmagan va davomat belgilanmagan dars hisobga olinmaydi.{cfg.minT > 0 && ` Test bali ${cfg.minT} dan past bo‘lsa, dars o‘zlashtirilmagan hisoblanadi (O ko‘pi bilan 54).`}</p>
 
         <h4>Firibgarlikning oldini olish</h4>
         <ul>

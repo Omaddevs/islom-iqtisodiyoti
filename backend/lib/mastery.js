@@ -202,9 +202,14 @@ export async function computeGroup(groupId, { onlyStudent = null, now = Date.now
   const lessonsMeta = units.map((u) => {
     const d = lessonDates(u)
     const m = u.meetingId ? meetById.get(u.meetingId) : null
+    // Kuzatiladigan dars: unga topshiriq bog'langan yoki ustoz davomat/chop etishni belgilagan.
+    // Bo'sh dars kartasi (hech narsa o'lchanmaydi) natijani pasaytirmaydi va xavf signali bermaydi.
+    const tracked = !!(u.meetingId || u.videoId || u.testId || u.standardId || u.vocabSetId
+      || Object.keys(u.offline || {}).length || Object.keys(u.printed || {}).length)
+    const held = d.date <= today
     return {
       id: u.id, num: u.num, title: u.title, date: d.date, due: d.due, weight: Math.max(0.5, Math.min(20, Number(u.hours) || 1)),
-      passed: d.date <= today, closed: d.due < today, dueEnd: d.dueEnd,
+      held, tracked, passed: held && tracked, closed: tracked && d.due < today, dueEnd: d.dueEnd,
       links: {
         meeting: m ? { id: m.id, title: m.title } : null,
         video: u.videoId || null,

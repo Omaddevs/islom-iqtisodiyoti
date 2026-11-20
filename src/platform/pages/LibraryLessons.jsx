@@ -495,7 +495,7 @@ function UnitMastery({ unit, canMark, onRun, onEdit }) {
 
       {student ? (
         <Card title={<span className="pdt"><i className="pdt__ico"><Icon name="trending" size={17} /></i>Shu dars bo‘yicha natijam</span>}
-          sub={mine ? (lesson?.passed ? gradeOf(mine.O).label : 'Dars hali o‘tilmagan') : 'Hisoblanmoqda…'}>
+          sub={mine ? (lesson?.passed ? gradeOf(mine.O).label : lesson?.held === false ? 'Dars hali o‘tilmagan' : 'Hisobga olinmaydi') : 'Hisoblanmoqda…'}>
           {mine ? (
             <>
               <div className="pmu__score">
@@ -521,7 +521,7 @@ function UnitMastery({ unit, canMark, onRun, onEdit }) {
           {!people.length ? <Empty icon="users" title="O‘quvchi yo‘q" text="Dars ko‘rinadigan guruhlarda o‘quvchi yo‘q." /> : (
             <>
               <div className="pmu__bulk">
-                <span>{canMark ? 'Offline darsda qatnashganlarni va standartni chop etganlarni belgilang' : 'Belgilarni dars muallifi yoki administrator qo‘yadi'}</span>
+                <span>{canMark ? (linked || offN || prN ? 'Offline darsda qatnashganlarni va standartni chop etganlarni belgilang' : 'Davomat belgilanmaguncha yoki topshiriq bog‘lanmaguncha dars o‘zlashtirishda hisobga olinmaydi') : 'Belgilarni dars muallifi yoki administrator qo‘yadi'}</span>
                 {canMark && <span><button type="button" onClick={() => all('offline', offN < people.length)}>{offN < people.length ? 'Hammasi keldi' : 'Tozalash'}</button></span>}
               </div>
               <ul className="pmu__att">
