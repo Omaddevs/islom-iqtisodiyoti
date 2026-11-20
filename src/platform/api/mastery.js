@@ -1,5 +1,5 @@
 // O'zlashtirish ko'rsatkichi: serverda xom ma'lumotdan hisoblanadi (backend/lib/mastery.js)
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from './client.js'
 
 export const masteryApi = {
@@ -25,11 +25,14 @@ export const cfgOfOrg = (org) => {
 // Guruh natijalari: ochilganda, oyna qayta faollashganda va har daqiqada yangilanadi
 export function useMastery(groupId) {
   const [state, setState] = useState({ data: null, error: null, loading: !!groupId })
+  // Guruh tez almashtirilsa, eskisining kechikkan javobi yangisining ustiga yozilmasin
+  const current = useRef(groupId)
+  current.current = groupId
   const load = useCallback(() => {
     if (!groupId) return Promise.resolve()
     return masteryApi.group(groupId)
-      .then((data) => setState({ data, error: null, loading: false }))
-      .catch((error) => setState((s) => ({ ...s, error, loading: false })))
+      .then((data) => { if (current.current === groupId) setState({ data, error: null, loading: false }) })
+      .catch((error) => { if (current.current === groupId) setState((s) => ({ ...s, error, loading: false })) })
   }, [groupId])
   useEffect(() => {
     if (!groupId) { setState({ data: null, error: null, loading: false }); return undefined }
