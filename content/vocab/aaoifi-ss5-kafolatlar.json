@@ -1,0 +1,262 @@
+{
+  "title": "AAOIFI 5-shariat standarti: Kafolatlar — izohli lug‘at",
+  "lang": "uz · ar · en",
+  "description": "AAOIFI Shariat standarti №5 «Kafolatlar» (Guarantees) ni tushunish uchun zarur bo‘lgan 20 ta asosiy termin: shariat terminlari (kafolat, kafillik, rahn, omonat, ta’addiy va taqsir, urbun, hamish jiddiya va boshq.) hamda zamonaviy moliya terminlari (kafolat xati, akkreditiv, hisobraqamni muzlatish, obuna kafolati va boshq.). Har bir terminda arabcha asl shakli, inglizcha ekvivalenti, oddiy tildagi ta’rif, standart bandi va shariat hukmi berilgan. Ta’riflar standart matniga tayanadi; standartda bo‘lmagan izohlar «(qo‘shimcha izoh)» deb belgilangan. Auditoriya: bakalavr va magistratura talabalari, CSAA/CPSS imtihoniga tayyorlanuvchilar.",
+  "orderNote": "Terminlar alifbo bo‘yicha emas, standart bandlari ketma-ketligida joylashtirilgan: qamrov (1-band) → kafolatlarning umumiy qoidalari: joizligi, ishonchga asoslangan shartnomalar, ijara, yozma hujjat va guvohlik (2-band) → kafillik va uning turlari (3-band) → garov (4-band) → kafolat maqsadlarini amalga oshirish (5-band) → kafolatning zamonaviy ko‘rinishlari (6-band). Standart o‘zi «umumiy qoida → xususiy shakl → zamonaviy amaliyot» mantig‘ida tuzilgan, shu tartib bilan o‘qilganda yaqin terminlar (omonat va zamon, kafillik va garov, kafillik va uchinchi tomon kafolati, hamish jiddiya va urbun) yonma-yon solishtiriladi.",
+  "terms": [
+    {
+      "term": "Kafolat (tavsiq)",
+      "arabic": "الضَّمَانَات / التَّوْثِيق",
+      "translit": "aḍ-ḍamānāt / at-tawthīq",
+      "translation": "Guarantees (securing obligations)",
+      "definition": "Majburiyat bajarilishini ta’minlash, qarz to‘lanmasligi yoki to‘lov kechiktirilishining oldini olish uchun qo‘llanadigan vositalar. Standartga ko‘ra ular yozma hujjat, guvohlik, kafillik, garov (rahn), chek yoki veksel ko‘rinishida bo‘ladi. Talofot yetkazish, jinoyat va g‘asb bilan bog‘liq kafolatlar standart qamroviga kirmaydi (1-band). Savdo kabi evazli bitimlarda kafolat talab qilish joiz va bu shart shartnomani buzmaydi; bir bitimda bir nechta kafolat (masalan, kafillik va garov) birga olinishi mumkin (2/1/1–2/1/2).",
+      "clause": "1; 2/1/1; 2/1/2",
+      "ruling": "shartli joiz",
+      "distinction": "Kafolat — umumiy tushuncha (jins); kafillik, garov, kafolat xati va boshqalar — uning turlari. Hukmi shartnoma turiga bog‘liq: evazli (savdo, ijara to‘lovi, qarz) bitimlarda joiz, ishonchga asoslangan (omonat) shartnomalarda esa asosan nojoiz (2/2/1).",
+      "example": "Murobaha bo‘yicha muassasa mijozdan ham uchinchi shaxs kafilligini, ham ko‘chmas mulk garovini oladi — 2/1/2 ga ko‘ra joiz."
+    },
+    {
+      "term": "Ishonchga asoslangan shartnomalar",
+      "arabic": "عُقُود الأَمَانَة",
+      "translit": "ʿuqūd al-amānah",
+      "translation": "Fiduciary (trust-based) contracts",
+      "definition": "Bir tomon ikkinchisining mol-mulki yoki mablag‘ini ishonch asosida boshqaradigan yoki saqlaydigan shartnomalar: vakillik (vakala), vadia (omonatga qo‘yish), muzoraba, musharaka. Ularda kafillik yoki garov talab qilish joiz emas, chunki bu shartnoma mohiyatiga zid (2/2/1). Kafolat faqat ta’addiy, taqsir yoki shartlarni qasddan buzish holatlari uchungina olinishi mumkin.",
+      "clause": "2/2/1",
+      "ruling": "shartli joiz",
+      "distinction": "Evazli shartnomada (savdo) kafolat — tabiiy amaliyot; ishonchga asoslangan shartnomada esa asosiy summa yoki foyda uchun kafolat nojoiz, faqat aybli xatti-harakat uchun kafolat joiz.",
+      "example": "Muzoraba shartnomasida muzoribdan «agar zararga qolsak, sarmoyani qaytarasiz» degan kafillik olish — nojoiz; «shartnoma shartlarini buzsangiz, zararni qoplaysiz» degan kafillik — joiz."
+    },
+    {
+      "term": "Ta’addiy va taqsir",
+      "arabic": "التَّعَدِّي وَالتَّقْصِير",
+      "translit": "at-taʿaddī wa at-taqṣīr",
+      "translation": "Misconduct (transgression) and negligence",
+      "definition": "Ta’addiy — omonat mulkka nisbatan ruxsat etilmagan xatti-harakat (tajovuz); taqsir — uni saqlash yoki boshqarishda loqaydlik, beparvolik. Shartnoma shartlarini qasddan buzish ham shu qatorga qo‘shiladi. Standartga ko‘ra omonatdor (vakil, muzorib, sherik, ijaraga oluvchi) faqat shu holatlarda javobgar bo‘ladi, shuning uchun kafolat ham faqat shular uchun talab qilinishi mumkin (2/2/1, 2/3).",
+      "clause": "2/2/1; 2/3",
+      "ruling": "joiz",
+      "distinction": "Ta’addiy — faol harakat (ruxsatsiz ishlatish, maqsaddan boshqa yo‘nalishga sarflash); taqsir — passiv harakatsizlik (saqlamaslik, qarovsiz qoldirish). Ikkalasida ham omonat «javobgarlik ostidagi» mulkka aylanadi (qo‘shimcha izoh).",
+      "example": "Ijaraga olingan avtomobil yong‘inda yonib ketdi — ijaraga oluvchi javobgar emas. Agar u avtomobilni ruxsatsiz taksiga qo‘ygan bo‘lsa — ta’addiy, zararni qoplaydi."
+    },
+    {
+      "term": "Sarmoyani (investitsiyani) kafolatlash",
+      "arabic": "ضَمَان رَأْس الْمَال",
+      "translit": "ḍamān raʾs al-māl",
+      "translation": "Guaranteeing the capital (in Mudarabah, Musharakah, Wakalah bil-Istithmar)",
+      "definition": "Muzorib, sherik yoki investitsion vakildan sarmoyani yoki foydani kafolatlashni talab qilish. Standartga ko‘ra bu nojoiz: bunday kafolat investitsiyani riboli qarzga aylantiradi; «kafolatlangan investitsiya» deb reklama qilish ham joiz emas (2/2/1). Vakillik va kafillikni bitta shartnomada birlashtirish — bir tomonning ham vakil, ham kafil bo‘lishi — nojoiz (2/2/2). Valyuta kursi o‘zgarishlarini investor foydasiga kafolatlash ham taqiqlangan (3/3/4).",
+      "clause": "2/2/1; 2/2/2; 3/3/4",
+      "ruling": "nojoiz",
+      "distinction": "Shartnomada shart qilinmagan bo‘lsa, vakil keyinroq alohida shartnoma bilan kafillik bersa, bu kafillik vakillikdan mustaqil hisoblanadi va vakillik bekor bo‘lsa ham saqlanib qoladi (2/2/2). Boshqaruvchi bo‘lmagan uchinchi tomonning ixtiyoriy kafolati esa 6/6 ga ko‘ra joiz.",
+      "example": "Bank «muzoraba depozitingiz 100% kafolatlangan va 15% daromad beradi» deb reklama qiladi — 2/2/1 ga zid."
+    },
+    {
+      "term": "Omonat va javobgarlik (ijaradagi mulk)",
+      "arabic": "يَد الأَمَانَة وَيَد الضَّمَان",
+      "translit": "yad al-amānah wa yad aḍ-ḍamān",
+      "translation": "Trust possession vs. liability possession (leased asset)",
+      "definition": "Ijaraga berilgan mulkning javobgarligi mulk egasi zimmasida bo‘ladi, ijaraga oluvchi uchun esa bu mulk omonat hisoblanadi. Shu sababli mulkka talofot yetsa, uni qoplash uchun ijaraga oluvchidan kafillik yoki garov talab qilish joiz emas; kafolat faqat ta’addiy, loqaydlik yoki shartlarni qasddan buzish uchun joiz. Sug‘urta xarajatlari va asosiy ta’mirlash xarajatlarini ijaraga beruvchi o‘z zimmasiga oladi (2/3).",
+      "clause": "1; 2/3",
+      "ruling": "shartli joiz",
+      "distinction": "Omonat qo‘li (yad al-amānah) — zararni faqat aybi bo‘lsa qoplaydi; javobgarlik qo‘li (yad aḍ-ḍamān) — har qanday holatda qoplaydi (masalan, qarz oluvchi yoki g‘osib). Standart 1-bandda shu ikki toifa farqini ko‘rib chiqishini aytadi.",
+      "example": "Ijara uyi zilziladan zarar ko‘rdi — zarar ijaraga beruvchiniki. Ijara to‘lovini kafolatlash uchun ijaraga oluvchidan garov olish esa joiz (bu — qarz majburiyati, mulkning o‘zi emas) (qo‘shimcha izoh)."
+    },
+    {
+      "term": "Yozma hujjat va guvohlik",
+      "arabic": "الْكِتَابَة وَالإِشْهَاد",
+      "translit": "al-kitābah wa al-ishhād",
+      "translation": "Documentation (writing) and witnessing",
+      "definition": "Kelishuvlarni oddiy yoki rasmiy tartibda yozma hujjatlashtirish tavsiya etiladi; shakli urfga qarab belgilanadi (2/4/1). Moliyaviy munosabatlarni guvohlar ishtirokida rasmiylashtirish ham tavsiya etiladi (mustahab), zarurat tug‘ilganda guvohlikni ado etish esa vojib, yolg‘on guvohlik — katta gunoh (2/4/2). Hujjatlarni qalbakilashtirish, yashirish yoki yo‘q qilish taqiqlanadi.",
+      "clause": "2/4/1; 2/4/2; 2/4/3",
+      "ruling": "joiz",
+      "distinction": "Hujjatlashtirishning o‘zi mustahab, lekin foizli qarz kabi taqiqlangan amaliyotni yozma rasmiylashtirish yoki unga guvohlik berish joiz emas (2/4/3) — vosita maqsad hukmini oladi.",
+      "example": "Qarz shartnomasi notarial tasdiqlanib, ikki guvoh imzolaydi — tavsiya etilgan amal. Foizli kredit shartnomasiga guvoh sifatida imzo chekish — nojoiz."
+    },
+    {
+      "term": "Kafillik (kafala)",
+      "arabic": "الْكَفَالَة",
+      "translit": "al-kafālah",
+      "translation": "Guarantee (Kafalah, suretyship)",
+      "definition": "Kafilning boshqa shaxs (qarzdor) majburiyatini o‘z zimmasiga qo‘shib olishi: qarzdor to‘lamasa, kreditor qarzni kafildan talab qila oladi. Muassasa mijozdan bir yoki bir necha kafil talab qilishi mumkin (3/1/1). Kafillikni muddat, eng yuqori summa (limit) yoki shart bilan cheklash va kelajakdagi sanaga bog‘lash joiz (3/1/4). Kreditor qarzni qarzdordan yoki kafildan xohlaganidan talab qila oladi; kafil «avval qarzdordan talab qilinsin» degan ketma-ketlikni shart qilishi mumkin (3/3/1).",
+      "clause": "3/1/1; 3/1/4; 3/3/1–3/3/3",
+      "ruling": "joiz",
+      "distinction": "Kafillik — shaxsiy (zimmaviy) kafolat: kafilning butun mol-mulki javobgar. Garov (rahn) — ashyoviy kafolat: faqat garovga qo‘yilgan aktiv javobgar. Kreditor qarzdorni qarzdan ozod qilsa, kafil ham ozod bo‘ladi; faqat kafilni ozod qilsa, qarzdordan qarz soqit bo‘lmaydi (3/3/2).",
+      "example": "Mijoz murobaha bo‘yicha 50 mln so‘m qarz bo‘ldi, uning akasi «12 oy davomida 50 mln so‘mgacha» kafil bo‘ldi — muddat va limit bilan cheklangan kafillik, joiz."
+    },
+    {
+      "term": "Makful anhu va qaytarib olish huquqi",
+      "arabic": "الْمَكْفُول عَنْهُ / الرُّجُوع",
+      "translit": "al-makfūl ʿanhu / ar-rujūʿ",
+      "translation": "Guaranteed party (principal debtor) and right of recourse",
+      "definition": "Makful anhu — kafillik berilgan tomon, ya’ni qarzdor. Standart kafillikni ikki turga bo‘ladi: (1) qarzdorning iltimosi yoki roziligi bilan berilgan — kafil to‘lagan summani keyin qarzdordan undirib olishga haqli; (2) qarzdorning ruxsatisiz, tabarru’ (ixtiyoriy) berilgan — kafil to‘laganini qarzdordan talab qila olmaydi (3/1/2). Muassasa faqat xayriya qilish huquqiga ega bo‘lgan holdagina qaytarib olish huquqisiz kafillik berishi mumkin (3/1/3).",
+      "clause": "3/1/2; 3/1/3",
+      "ruling": "joiz",
+      "distinction": "Qaytarib olish huquqli kafillikda kafil aslida qarzdorga qarz beradi; qaytarib olish huquqisiz kafillik esa hadya (tabarru’) hisoblanadi. Kafil kreditorga kamroq summa to‘lab kelishsa, qarzdordan faqat haqiqatda to‘laganini oladi — aks holda riba yuzaga keladi (3/3/2).",
+      "example": "Kafil 10 mln so‘mlik qarzni kreditor bilan kelishib 8 mln so‘mga yopdi — qarzdordan faqat 8 mln so‘m talab qila oladi."
+    },
+    {
+      "term": "Kafillik haqi",
+      "arabic": "الأُجْرَة عَلَى الْكَفَالَة",
+      "translit": "al-ujrah ʿalā al-kafālah",
+      "translation": "Fee for providing a guarantee",
+      "definition": "Kafillik evaziga xizmat haqi olish yoki berish mutlaqo joiz emas: kafil faqat kafillik doirasida qilingan haqiqiy xarajatlarnigina undirishga haqli (3/1/5). Muassasa mijoz o‘ziga taqdim etgan kafillikni u qanday qilib qo‘lga kiritganini aniqlashga majbur emas. Xuddi shu qoida kafolat xatiga ham tatbiq etiladi (6/1/1).",
+      "clause": "3/1/5; 6/1/1",
+      "ruling": "nojoiz",
+      "distinction": "Kafillikning o‘zi uchun haq — nojoiz; kafillik bilan bog‘liq haqiqiy ma’muriy xarajatlar va xizmatlar uchun to‘lov (ujrat al-misl doirasida) — joiz (6/1/2). Sababi: kafil to‘lagan pulini qaytarib oladi, ustiga olingan haq esa qarz evaziga foyda — riboga olib boradi (qo‘shimcha izoh).",
+      "example": "«Sizga kafil bo‘laman, buning uchun summaning 2 foizini to‘laysiz» — nojoiz."
+    },
+    {
+      "term": "Bozor kafolati va daman ad-darak",
+      "arabic": "ضَمَان السُّوق / ضَمَان الدَّرَك",
+      "translit": "ḍamān as-sūq / ḍamān ad-darak",
+      "translation": "Market (contractual) guarantee; guarantee against defect of title",
+      "definition": "Miqdori aniq bo‘lmagan yoki hali yuzaga kelmagan (zimmada vojib bo‘lmagan) qarz uchun kafillik berish mumkin; qarz yuzaga kelishidan oldin kafil kreditorni ogohlantirib, kafilligini qaytarib olishi joiz. Bunday kafillik «bozor kafolati» yoki «shartnomaviy kafillik» deyiladi (3/2). Daman ad-darak — sotilgan mahsulot sotuvchidan boshqa shaxsga tegishli ekani ma’lum bo‘lsa, to‘langan pul xaridorga qaytarilishini kafolatlash (3/2).",
+      "clause": "3/2",
+      "ruling": "joiz",
+      "distinction": "Bozor kafolati — kelajakdagi, hali noma’lum qarzlar uchun ochiq kafillik; daman ad-darak — mulk huquqidagi nuqson (sotilgan narsa begonaniki chiqishi) xavfiga qarshi aniq kafolat.",
+      "example": "Ulgurji sotuvchi «mijozim kelgusi oylarda sizdan nasiyaga oladigan barcha tovarlar uchun kafilman» deydi — bozor kafolati."
+    },
+    {
+      "term": "Garov (rahn)",
+      "arabic": "الرَّهْن",
+      "translit": "ar-rahn",
+      "translation": "Pledge / mortgage (Rahn)",
+      "definition": "Moliyaviy aktiv yoki uning hukmidagi narsa bilan qarzni kafolatlash: qarz to‘lanmay qolsa, shu aktiv yoki uning qiymati hisobidan qarz yopiladi (4-band; batafsil — 39-sonli shariat standarti). Muassasa garov aktivlarining saqlanishini kuzatib borishga, ular bilan noto‘g‘ri muomala qilinsa tegishli choralar ko‘rishga haqli (6/9/2). Garov olgan kreditorlar oddiy kreditorlardan ustun turadi (6/9/3).",
+      "clause": "4; 6/9/2; 6/9/3",
+      "ruling": "joiz",
+      "distinction": "Garov — ashyoviy kafolat, qarz aktiv qiymati hisobidan qoplanadi; kafillik — shaxsiy kafolat, qarz kafilning zimmasidan undiriladi. Ikkalasi bir bitimda birga olinishi mumkin (2/1/2).",
+      "example": "Uy sotib olish uchun ijara muntahiya bittamlik bo‘yicha mijoz avtomobilini garovga qo‘yadi; bankrotlikda bank shu avtomobil bo‘yicha boshqa kreditorlardan oldin haqini oladi."
+    },
+    {
+      "term": "Hulul (to‘lovlarni muddatidan oldin talab qilish)",
+      "arabic": "حُلُول الأَقْسَاط",
+      "translit": "ḥulūl al-aqsāṭ",
+      "translation": "Acceleration of outstanding instalments",
+      "definition": "Qarzdor davriy to‘lovlardan birini hech qanday favqulodda holatsiz to‘lashni kechiktirsa, qolgan barcha davriy to‘lovlar yoki ularning bir qismi darhol (muddatidan oldin) to‘lanishini shart qilish joiz. Bu shart qarzdor ogohlantirilganidan va to‘lov uchun ma’lum muddat berilganidan so‘ng tatbiq etiladi (5/1).",
+      "clause": "5/1",
+      "ruling": "shartli joiz",
+      "distinction": "Hulul — qarz summasini oshirmaydi, faqat muddatni qisqartiradi, shuning uchun joiz; kechikish uchun qo‘shimcha summa (jarima foizi) undirish esa riba (qo‘shimcha izoh). Nasiya savdoda to‘lanmaslik sababli shartnomani sudsiz bekor qilish (faskh) shartini kiritish ham mumkin (5/2).",
+      "example": "24 oylik murobaha bo‘yicha mijoz uzrsiz 3 oy to‘lamadi; ogohlantirish va 30 kunlik muddatdan keyin bank qolgan 18 oylik to‘lovni darhol talab qiladi."
+    },
+    {
+      "term": "Kafolat xati",
+      "arabic": "خِطَاب الضَّمَان",
+      "translit": "khiṭāb aḍ-ḍamān",
+      "translation": "Letter of guarantee",
+      "definition": "Muassasaning mijoz majburiyatlari bo‘yicha uchinchi shaxsga beradigan yozma kafolati. Kafolat xati uchun haq olish joiz emas; odatda bunday haq summa va muddatga qarab hisoblanadi, bu esa uni qarzga o‘xshatadi (6/1/1). Ammo ma’muriy xarajatlar va xizmatlar uchun to‘lovni ujrat al-misl (o‘rtacha bozor bahosi) doirasida olish joiz; to‘liq yoki qisman ta’minot berilganda haqiqiy xizmatlar xarajatini hisobga olish mumkin (6/1/2). Riboli qarz yoki taqiqlangan amaliyot uchun kafolat xati berilmaydi (6/1/3).",
+      "clause": "6/1/1; 6/1/2; 6/1/3",
+      "ruling": "shartli joiz",
+      "distinction": "Boshlang‘ich va yakuniy kafolat xatlari (6/1/2): birinchisi tenderda ishtirok uchun, ikkinchisi g‘olib bilan shartnoma imzolanganda bajarilishni kafolatlash uchun beriladi (qo‘shimcha izoh). Hukm ikkalasiga bir xil.",
+      "example": "Qurilish kompaniyasi tender uchun bankdan kafolat xati oladi; bank «summaning 1% yillik» haq olsa — nojoiz, hujjat tayyorlash uchun belgilangan qat’iy xizmat haqi olsa — joiz."
+    },
+    {
+      "term": "Akkreditiv",
+      "arabic": "الاِعْتِمَاد الْمُسْتَنَدِي",
+      "translit": "al-iʿtimād al-mustanadī",
+      "translation": "Documentary credit (letter of credit)",
+      "definition": "Bank (emitent) tomonidan xaridor-mijoz talabi bilan sotuvchiga (benefitsiarga) beriladigan yozma majburiyat: sotuvchi mahsulot jo‘natilgani haqidagi hujjatlarni akkreditiv talablariga mos taqdim etsa, bank naqd to‘laydi, vekselni qabul qiladi yoki diskont qiladi. Qisqasi, akkreditiv — hujjatlar ko‘rsatmalarga mos bo‘lishi sharti bilan bankning to‘lov majburiyati (6/2; batafsil — 14-sonli shariat standarti).",
+      "clause": "6/2",
+      "ruling": "joiz",
+      "distinction": "Kafolat xati — mijoz majburiyatini bajarmasa ishga tushadigan zaxira kafolat; akkreditiv — hujjatlar taqdim etilganda ishga tushadigan asosiy to‘lov vositasi (qo‘shimcha izoh).",
+      "example": "O‘zbekistonlik importyor Turkiyadan uskuna olib keladi; bank konosament va invoys taqdim etilgach, sotuvchiga to‘lovni amalga oshiradi."
+    },
+    {
+      "term": "Chek va veksellardan kafolat sifatida foydalanish",
+      "arabic": "الشِّيكَات وَالْكَمْبِيَالَات",
+      "translit": "ash-shīkāt wa al-kambiyālāt",
+      "translation": "Cheques and promissory notes (bills) as security",
+      "definition": "Qarzdorni davriy to‘lovlarni o‘z vaqtida amalga oshirishga majburlash vositasi sifatida undan cheklar (qonun taqiqlamagan bo‘lsa) yoki veksellar olish joiz. Qarzdor qarzini to‘lasa, qog‘ozlar unga qaytariladi; to‘lov o‘z vaqtida qilinmasa, ular mavjud qarzlarni undirishga yo‘naltiriladi. Muassasa ulardan faqat muddati kelgan qarzni, hech qanday ustama hisoblamasdan yopish uchungina foydalanishi mumkin (6/3).",
+      "clause": "6/3",
+      "ruling": "shartli joiz",
+      "distinction": "Kafolat sifatida olingan vekselni muddatidan oldin diskont qilish (chegirma bilan sotish) — riba, nojoiz (qo‘shimcha izoh).",
+      "example": "Mijoz 12 oylik to‘lov uchun 12 ta sanasi qo‘yilgan chek beradi; bank har oy faqat o‘sha oy chekini naqdlashtiradi."
+    },
+    {
+      "term": "Hisobraqamdagi mablag‘larni muzlatish",
+      "arabic": "تَجْمِيد الْحِسَاب",
+      "translit": "tajmīd al-ḥisāb",
+      "translation": "Freezing of accounts",
+      "definition": "Davriy to‘lovlar yoki muayyan muddatdagi qarz o‘z vaqtida to‘lanishi uchun muassasa mijozning investitsiya hisobraqamidagi mablag‘larni muzlatish yoki ulardan foydalanishni butunlay yoki qarz miqdorida (shunisi afzal) to‘xtatib qo‘yish huquqini shart qilishi joiz (6/5/1). Muzlatilgan investitsiya hisobidan olingan foyda, muzorib o‘z ulushini olgach, mijozga tegishli (6/5/1). Mudoyana (qarzga bog‘liq) amaliyotlarda joriy hisobraqamni muzlatishni shart qilish joiz emas, faqat mijozning o‘zi ixtiyoriy rozi bo‘lsa mumkin (6/5/2).",
+      "clause": "6/5/1; 6/5/2",
+      "ruling": "shartli joiz",
+      "distinction": "Investitsiya hisobi — muzlatishni shart qilish joiz; joriy hisob — shart qilish nojoiz, ixtiyoriy rozilik bilan joiz (qo‘shimcha izoh: joriy hisob bankka berilgan qarz hukmida, unga yana qarz evazidan foyda bog‘lanmasligi uchun).",
+      "example": "Mijozning 100 mln so‘mlik muzoraba depozitidan 30 mln so‘mlik qarz miqdoridagi qismi muzlatiladi, lekin butun depozitga foyda hisoblanaveradi."
+    },
+    {
+      "term": "Uchinchi tomon kafolati",
+      "arabic": "ضَمَان الطَّرَف الثَّالِث",
+      "translit": "ḍamān aṭ-ṭaraf ath-thālith",
+      "translation": "Third-party guarantee (voluntary undertaking to bear investment losses)",
+      "definition": "Muzorib, investitsiyani boshqaruvchi vakil yoki musharakadagi sheriklardan biri bo‘lmagan uchinchi tomon zararni qoplash majburiyatini ixtiyoriy ravishda o‘z zimmasiga olishi joiz. Ammo bu majburiyat muzoraba yoki vakala bil-istismar shartnomasi bilan hech qanday bog‘liq bo‘lmasligi kerak (6/6).",
+      "clause": "6/6",
+      "ruling": "shartli joiz",
+      "distinction": "Boshqaruvchi tomonning (muzorib, vakil, sherik) kafolati — nojoiz (2/2/1); boshqaruvda ishtirok etmaydigan mustaqil uchinchi tomonning tabarru’ kafolati — joiz.",
+      "example": "Davlat jamg‘armasi kichik biznesni qo‘llash uchun muzoraba loyihasidagi zararni o‘z hisobidan qoplash majburiyatini alohida hujjat bilan oladi."
+    },
+    {
+      "term": "Obuna kafolati (anderrayting)",
+      "arabic": "التَّعَهُّد بِالاِكْتِتَاب",
+      "translit": "at-taʿahhud bi al-iktitāb",
+      "translation": "Underwriting (subscription undertaking)",
+      "definition": "Muassasa boshqa muassasaning obunaga taklif qilingan aksiyalaridan obuna muddati tugaganidan keyin obunadan ortib qolganlariga o‘zi obuna bo‘lish majburiyatini olishi joiz. Bunda obuna taklif qilingan qiymatda bo‘lishi va kafolat evaziga qo‘shimcha to‘lov ko‘zda tutilmasligi kerak (6/7/1). Ammo majburiyat olgan tomon tadqiqot yoki marketing kabi kafolatdan boshqa ishlar uchun haq olishi mumkin (6/7/2).",
+      "clause": "6/7/1; 6/7/2",
+      "ruling": "shartli joiz",
+      "distinction": "Kafolat (obuna majburiyati) uchun haq — nojoiz; haqiqiy bajarilgan xizmatlar (tadqiqot, marketing) uchun haq — joiz. Bu kafillik haqi qoidasining (3/1/5) qo‘llanishi.",
+      "example": "IPO’da investitsiya banki sotilmay qolgan 20% aksiyani taklif narxida sotib olishga majburiyat oladi va faqat marketing xizmati uchun haq oladi."
+    },
+    {
+      "term": "Hamish jiddiya (garov puli)",
+      "arabic": "هَامِش الْجِدِّيَّة",
+      "translit": "hāmish al-jiddiyyah",
+      "translation": "Hamish Jiddiyyah (security deposit)",
+      "definition": "Murobahada sotib olish va’dasini bergan mijozdan va’daning bajarilishini ta’minlash uchun olinadigan ma’lum summa (va’da mijoz uchun majburiy bo‘lsa). U hali shartnoma imzolanmagani uchun urbun emas, balki omonat hisoblanadi. Mijoz va’dasini buzsa, shu summadan faqat haqiqiy zarar — mahsulot tannarxi va uni boshqa shaxsga sotish narxi o‘rtasidagi farq — ushlab qolinadi (6/8/2). Aukcion va tenderlardagi boshlang‘ich va yakuniy kafolat pullari ham omonat hisoblanadi, ulardan haqiqiy zarardan ortiq summa musodara qilinmaydi (6/8/1).",
+      "clause": "6/8/1; 6/8/2",
+      "ruling": "joiz",
+      "distinction": "Hamish jiddiya — shartnomadan oldin olinadi, omonat, ortiqchasi qaytariladi; urbun — shartnoma paytida olinadi, narxning bir qismi, xiyor muddatida bekor qilinsa to‘liq sotuvchida qoladi.",
+      "example": "Mijoz 200 mln so‘mlik avtomobilni sotib olishga va’da berib, 20 mln so‘m hamish jiddiya to‘ladi; keyin voz kechdi, bank avtomobilni 195 mln so‘mga sotdi — 5 mln ushlab qolinib, 15 mln qaytariladi."
+    },
+    {
+      "term": "Urbun (bayʼona)",
+      "arabic": "الْعُرْبُون",
+      "translit": "al-ʿurbūn",
+      "translation": "Urbun (earnest money)",
+      "definition": "Oldi-sotdi yoki ijara shartnomasi imzolanayotganda xaridor yoki ijaraga oluvchidan olinadigan summa: agar shartnoma belgilangan muddat ichida bekor qilish tanlovi (xiyor al-fasx) sababli bekor bo‘lmasa, urbun narxning bir qismi bo‘ladi; shu muddatda shartnoma buzilsa, pul sotuvchi yoki ijaraga beruvchida qoladi. Eng afzali — muassasa urbundan faqat haqiqiy zarar miqdorini olib qolib, qolganidan voz kechishi (6/8/3).",
+      "clause": "6/8/3",
+      "ruling": "joiz",
+      "distinction": "Urbun shartnoma tuzilgandan keyin olinadi va bekor qilishda to‘liq sotuvchiga o‘tishi mumkin; hamish jiddiya va’da bosqichida olinadi va faqat haqiqiy zarar miqdorida ushlab qolinadi (6/8/2).",
+      "example": "Xaridor uy oldi-sotdi shartnomasini imzolab, 10% urbun to‘laydi va 30 kunlik bekor qilish huquqini oladi; 30 kun ichida voz kechsa, urbun sotuvchida qoladi."
+    }
+  ],
+  "questions": [
+    {
+      "text": "Nima uchun muzorib yoki investitsion vakildan sarmoyani kafolatlashni talab qilish nojoiz, lekin aynan shu shartnomada ta’addiy va taqsir uchun kafolat olish joiz? Standart bandlari bilan izohlang.",
+      "answer": "Muzoraba va vakala — ishonchga asoslangan shartnomalar; boshqaruvchidan sarmoya yoki foydani kafolatlash investitsiyani riboli qarzga aylantiradi (2/2/1). Ta’addiy, taqsir yoki shartlarni qasddan buzishda esa omonatdor baribir javobgar bo‘ladi, shuning uchun bu holatlar uchun kafolat olish shartnoma mohiyatiga zid emas (2/2/1)."
+    },
+    {
+      "text": "Quyidagilardan qaysi biri AAOIFI SS 5 ga ko‘ra joiz?",
+      "options": [
+        "Kafillik uchun kafolat summasining 2 foizi miqdorida haq olish",
+        "Kafolat xati bo‘yicha ujrat al-misl doirasidagi ma’muriy xarajatlarni olish",
+        "Ijaraga oluvchidan mulk tabiiy ofatda halok bo‘lishini qoplaydigan garov olish",
+        "Mudoyana amaliyotida mijozning joriy hisobini muzlatishni shart qilish"
+      ],
+      "answer": "B — 6/1/2 ga ko‘ra haqiqiy ma’muriy xarajatlar ujrat al-misl doirasida olinishi joiz. A — nojoiz (3/1/5, 6/1/1); C — nojoiz, ijaradagi mulk omonat (2/3); D — nojoiz, faqat ixtiyoriy rozilik bilan mumkin (6/5/2)."
+    },
+    {
+      "text": "Kafil kreditor bilan kelishib, 50 mln so‘mlik qarzni 40 mln so‘mga yopdi. Kafil qarzdordan qancha talab qila oladi va nima uchun?",
+      "options": [
+        "50 mln so‘m",
+        "40 mln so‘m",
+        "45 mln so‘m",
+        "Hech narsa"
+      ],
+      "answer": "B — 40 mln so‘m. Kafil qarz summasini emas, kreditorga haqiqatda to‘lagan summani qaytarib oladi; aks holda riba yuzaga keladi (3/3/2). (Agar kafillik qarzdorning ruxsatisiz, tabarru’ berilgan bo‘lsa — hech narsa talab qila olmaydi, 3/1/2.)"
+    },
+    {
+      "text": "Hamish jiddiya bilan urbunni uchta jihat bo‘yicha farqlang: qachon olinadi, huquqiy maqomi, mijoz voz kechganda nima bo‘ladi.",
+      "answer": "Hamish jiddiya — shartnomadan oldin, va’da bosqichida olinadi; omonat hisoblanadi; voz kechilsa faqat haqiqiy zarar (tannarx va boshqa shaxsga sotish narxi farqi) ushlab qolinadi, qolgani qaytariladi (6/8/2). Urbun — shartnoma imzolanayotganda olinadi; narxning bir qismi bo‘ladi; xiyor muddatida bekor qilinsa to‘liq sotuvchida qoladi, lekin afzali — faqat haqiqiy zararni olish (6/8/3)."
+    },
+    {
+      "text": "Mijoz murobaha bo‘yicha oylik to‘lovlarni uzrsiz kechiktirmoqda. Muassasa 5-band bo‘yicha qanday choralar ko‘rishi mumkin va qaysi chora riboga olib keladi?",
+      "answer": "Shartnomaga kiritilgan bo‘lsa, ogohlantirish va ma’lum muddat berilgandan so‘ng qolgan to‘lovlarni muddatidan oldin talab qilish (hulul, 5/1); nasiya savdoda sudsiz shartnomani bekor qilish (5/2); garov, kafil, chek/veksel hisobidan undirish (3/3/1, 6/3). Kechikkan summaga qo‘shimcha foiz yoki jarima hisoblab, o‘z daromadiga olish — riba (qo‘shimcha izoh)."
+    }
+  ]
+}
