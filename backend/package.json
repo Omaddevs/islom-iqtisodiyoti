@@ -12,7 +12,8 @@
     "gc:uploads": "node --env-file-if-exists=.env scripts/gc-uploads.mjs",
     "db:purge-demo": "node --env-file-if-exists=.env scripts/purge-demo.mjs",
     "db:reset": "node --env-file-if-exists=.env scripts/migrate.mjs --reset && node --env-file-if-exists=.env scripts/seed.mjs",
-    "test:smoke": "node --env-file-if-exists=.env scripts/smoke.mjs"
+    "test:smoke": "node --env-file-if-exists=.env scripts/smoke.mjs",
+    "test:mastery": "node scripts/mastery-check.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -22,6 +22,7 @@ import Leads from './pages/Leads.jsx'
 import Partners from './pages/Partners.jsx'
 import Schedule from './pages/Schedule.jsx'
 import Settings from './pages/Settings.jsx'
+import Mastery from './pages/Mastery.jsx'
 
 const PAGES = {
   '': { comp: Dashboard, icon: 'home', title: 'Bosh sahifa' },
@@ -29,6 +30,7 @@ const PAGES = {
   schedule: { comp: Schedule, icon: 'calendar', title: 'Dars jadvali', sub: 'Haftalik jadval' },
   videos: { comp: Videos, icon: 'play', title: 'Video darslar', sub: 'Yozib olingan darslar va video kurslar' },
   tests: { comp: Tests, icon: 'clipboard', title: 'Testlar', sub: 'Bilimni tekshirish' },
+  mastery: { comp: Mastery, icon: 'trending', title: 'O‘zlashtirish', sub: 'Darslar bo‘yicha o‘zlashtirish ko‘rsatkichi' },
   homework: { comp: Homework, icon: 'fileText', title: 'Uy vazifalari', sub: 'Topshiriqlar va baholar' },
   vocabulary: { comp: Vocabulary, icon: 'translate', title: 'Lug‘at', sub: 'Atamalar va so‘z boyligi' },
   library: { comp: Library, icon: 'bookOpen', title: 'Kutubxona', sub: 'Kitoblar, maqolalar, audio va boshqa manbalar' },

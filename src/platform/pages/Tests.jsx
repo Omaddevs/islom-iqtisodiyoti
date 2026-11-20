@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, Select, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
 import { StatSpark, series, endOfDay } from '../ui/charts.jsx'
 import { ChartPanel } from '../ui/chartpanel.jsx'
 import { useStudyTimer } from '../api/study.js'
+import { masteryApi } from '../api/mastery.js'
+import '../../styles/mastery.css'
 
 export default function Tests({ param }) {
   const { user } = useAuth()
@@ -363,7 +365,7 @@ function TestForm({ open, test, onClose }) {
   useEffect(() => { setErr('') }, [f]) // forma tuzatilganda eski xato ko'rinib turmasin
   // Topshirilgan testning savollari qulflanadi: aks holda eski natijalar buziladi
   const locked = !isNew && db.testAttempts.some((a) => a.testId === test.id)
-  useFormInit(open, test?.id, () => { setErr(''); setF(isNew ? { title: '', description: '', groupIds: scope.groups[0] ? [scope.groups[0].id] : [], timeLimit: 15, dueAt: toLocalInput(Date.now() + 7 * 864e5), questions: [emptyQ(), emptyQ()] } : { ...test, dueAt: toLocalInput(test.dueAt), questions: test.questions.map((q) => ({ ...q, options: [...q.options] })) }) })
+  useFormInit(open, test?.id, () => { setErr(''); setF(isNew ? { title: '', description: '', groupIds: scope.groups[0] ? [scope.groups[0].id] : [], timeLimit: 15, attempts: 3, shuffle: true, dueAt: toLocalInput(Date.now() + 7 * 864e5), questions: [emptyQ(), emptyQ()] } : { attempts: 1, shuffle: true, ...test, dueAt: toLocalInput(test.dueAt), questions: test.questions.map((q) => ({ ...q, options: [...q.options] })) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setQ = (i, k, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, [k]: v } : q)) }))
   const setOpt = (i, oi, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, options: q.options.map((o, k) => (k === oi ? v : o)) } : q)) }))
@@ -400,7 +402,7 @@ function TestForm({ open, test, onClose }) {
     const dueAt = fromLocalInput(f.dueAt)
     if (!dueAt) return setErr('Muddatni kiriting')
     if (isNew && dueAt <= Date.now()) return setErr('Muddat kelajakdagi vaqt bo‘lishi kerak')
-    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: limit, dueAt }
+    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: limit, dueAt, attempts: Math.min(3, Math.max(1, Number(f.attempts) || 1)), shuffle: f.shuffle !== false }
     if (!locked) {
       const qs = []
       for (let n = 0; n < f.questions.length; n++) {
@@ -444,6 +446,13 @@ function TestForm({ open, test, onClose }) {
         <div className="pform__row">
           <FField label="Vaqt chegarasi (daqiqa)"><Input type="number" min="1" max="600" value={f.timeLimit || ''} onChange={(e) => set('timeLimit', e.target.value)} /></FField>
           <FField label="Topshirish muddati"><Input type="datetime-local" value={f.dueAt || ''} onChange={(e) => set('dueAt', e.target.value)} /></FField>
+        </div>
+        <div className="pform__row">
+          <FField label="Urinishlar soni" hint="Eng yaxshi natija olinadi; o‘zlashtirishda 2- va 3-urinishga −10%. To‘g‘ri javoblar urinishlar tugagach ochiladi">
+            <Select value={String(f.attempts || 1)} onChange={(v) => set('attempts', Number(v))} options={[{ value: '1', label: '1 ta urinish' }, { value: '2', label: '2 ta urinish' }, { value: '3', label: '3 ta urinish' }]} />
+          </FField>
+          <label className="pms-check ptform__shuffle"><input type="checkbox" checked={f.shuffle !== false} onChange={(e) => set('shuffle', e.target.checked)} />
+            <span><b>Tasodifiy tartib</b> — har bir o‘quvchiga savollar va javob variantlari aralashtirib beriladi</span></label>
         </div>
         <div className="pfield">
           <span className="pfield__label">Guruhlar</span>
@@ -697,6 +706,12 @@ const readRun = (k) => {
 const writeRun = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k) } catch { /* xotira */ } }
 
 // Sinov rejimida ham faqat mavjud savol va variantlarga berilgan javoblar hisoblanadi (serverdagi kabi)
+// Tasodifiy tartib: har bir urinish boshida savollar va variantlar aralashtiriladi (javoblar asl indekslar bilan saqlanadi)
+const shuffled = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] } return a }
+const newRun = (t) => ({
+  startedAt: Date.now(), answers: {}, cur: 0, flags: [],
+  ...(t.shuffle !== false ? { order: shuffled(t.questions.map((q) => q.id)), opts: Object.fromEntries(t.questions.map((q) => [q.id, shuffled(q.options.map((_, i) => i))])) } : {}),
+})
 const cleanPreview = (t, answers) => Object.fromEntries(t.questions.filter((q) => Number.isInteger(answers?.[q.id]) && answers[q.id] >= 0 && answers[q.id] < q.options.length).map((q) => [q.id, answers[q.id]]))
 // `preview` — ustozning sinov rejimi: test o'quvchi kabi ishlanadi, natija bazaga yozilmaydi va statistikaga kirmaydi
 function TakeTest({ id, preview = false }) {
@@ -705,14 +720,28 @@ function TakeTest({ id, preview = false }) {
   const t = db.tests.find((x) => x.id === id)
   const existing = preview ? null : db.testAttempts.find((a) => a.testId === id && a.studentId === user.id)
   const storeKey = `ii_test_${preview ? 'preview' : 'run'}_${user.id}_${id}`
+  // Urinishlar: server o'quvchi/test bo'yicha eng yaxshi urinishni va tarixni (history) qaytaradi
+  const limit = Number(t?.attempts) || 1
+  const history = existing?.history || (existing ? [existing] : [])
+  const used = existing ? existing.used || history.length : 0
+  const solved = history.some((h) => h.total && h.score >= h.total)
+  const canRetry = !preview && !!existing && used < limit && !solved && !!t && t.dueAt > Date.now()
   // Javoblar va boshlangan vaqt saqlanadi: sahifa yangilansa ham test davom etadi, taymer qaytadan boshlanmaydi
-  const [run, setRun] = useState(() => (existing ? null : readRun(storeKey)))
+  const [run, setRun] = useState(() => { const r = readRun(storeKey); return existing && !(r && r.retry) ? null : r })
   const [fresh, setFresh] = useState(null)
+  const [retry, setRetry] = useState(() => !!readRun(storeKey)?.retry)
+  const [gate, setGate] = useState(null)
+  useEffect(() => {
+    if (preview || user.role !== 'student' || existing || !t) return undefined
+    let alive = true
+    masteryApi.gate(t.id).then((g) => { if (alive) setGate(g) }).catch(() => { if (alive) setGate({ locked: false }) })
+    return () => { alive = false }
+  }, [t?.id, preview, existing?.id]) // eslint-disable-line react-hooks/exhaustive-deps
   const [now, setNow] = useState(Date.now())
   const [busy, setBusy] = useState(false)
   const [ask, setAsk] = useState(false)
   const sending = useRef(false)
-  const result = existing || fresh
+  const result = retry ? null : fresh || existing
   const active = !!run && !result && !!t
   const left = active ? Math.max(0, Math.ceil((run.startedAt + t.timeLimit * 60e3 - now) / 1000)) : 0
 
@@ -743,11 +772,12 @@ function TakeTest({ id, preview = false }) {
       await loadDB().catch(() => {})
       notify([t.authorId], `${user.name} «${t.title}» testini topshirdi: ${r.item.score}/${r.item.total}`, `#/platform/tests/${t.id}`)
       setFresh(r.item)
+      setRetry(false)
       setRun(null)
       toast(auto ? 'Vaqt tugadi, test avtomatik topshirildi' : 'Test topshirildi')
     } catch (e) {
       sending.current = false
-      if (e.status === 409) { await loadDB().catch(() => {}); setRun(null) } // boshqa oynada allaqachon topshirilgan
+      if (e.status === 409) { await loadDB().catch(() => {}); setRun(null); setRetry(false); toast(e.message, 'err') } // boshqa oynada allaqachon topshirilgan
       else if (e.status === 422 || e.status === 404) { setRun(null); toast(e.message, 'err') }
       else toast(`${e.message}. Javoblaringiz saqlangan — qayta urinib ko‘ring.`, 'err')
     } finally { setBusy(false) }
@@ -757,6 +787,15 @@ function TakeTest({ id, preview = false }) {
   // Klaviatura: 1-9 — variant, ← → — savollar orasida
   const total = t?.questions.length || 0
   const cur = active ? Math.min(run.cur || 0, total - 1) : 0
+  // Ko'rinadigan tartib (aralashtirilgan bo'lsa): savollar va har bir savol variantlari
+  const qs = useMemo(() => {
+    if (!t) return []
+    if (!run?.order) return t.questions
+    const by = new Map(t.questions.map((q) => [q.id, q]))
+    const list = run.order.map((qid) => by.get(qid)).filter(Boolean)
+    return list.length === t.questions.length ? list : t.questions
+  }, [t, run?.order])
+  const permOf = (q) => { const pm = run?.opts?.[q.id]; return pm && pm.length === q.options.length ? pm : q.options.map((_, i) => i) }
   useEffect(() => {
     if (!active) return undefined
     const onKey = (e) => {
@@ -764,13 +803,13 @@ function TakeTest({ id, preview = false }) {
       if (e.key === 'ArrowLeft') setRun((r) => ({ ...r, cur: Math.max(0, (r.cur || 0) - 1) }))
       else if (e.key === 'ArrowRight') setRun((r) => ({ ...r, cur: Math.min(total - 1, (r.cur || 0) + 1) }))
       else if (/^[1-9]$/.test(e.key)) {
-        const q = t.questions[cur], oi = Number(e.key) - 1
-        if (q && oi < q.options.length) setRun((r) => ({ ...r, answers: { ...r.answers, [q.id]: oi } }))
+        const q = qs[cur], oi = Number(e.key) - 1
+        if (q && oi < q.options.length) setRun((r) => ({ ...r, answers: { ...r.answers, [q.id]: permOf(q)[oi] } }))
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [active, ask, total, cur, t])
+  }, [active, ask, total, cur, t, qs]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // To'g'ri javoblar hali yuklanmagan bo'lsa (tarmoq uzilishi) — qayta so'raladi
   const reviewReady = !!t && t.questions.every((q) => q.correct !== undefined)
@@ -804,7 +843,9 @@ function TakeTest({ id, preview = false }) {
             ? <><Btn icon="refresh" onClick={() => { setFresh(null); setRun(null); sending.current = false }}>Qayta boshlash</Btn><Btn as="a" href={`#/platform/tests/${t.id}`} icon="chart">Natijalar</Btn></>
             : <Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
         {previewBanner}
-        {!reviewReady ? (
+        {!preview && canRetry && !reviewReady ? (
+          <AttemptSummary test={t} history={history} limit={limit} last={fresh || history[history.length - 1]} onRetry={() => { setRetry(true); setFresh(null); sending.current = false }} />
+        ) : !reviewReady ? (
           <Card><Empty icon="refresh" title="Javoblar yuklanmoqda" text={`Natijangiz saqlandi: ${result.score}/${result.total}. To‘g‘ri javoblarni ko‘rish uchun yangilang.`} action={<Btn variant="primary" icon="refresh" onClick={() => loadDB().catch((e) => toast(e.message, 'err'))}>Yangilash</Btn>} /></Card>
         ) : (
           <>
@@ -824,36 +865,45 @@ function TakeTest({ id, preview = false }) {
 
   if (!run) {
     const closed = !preview && t.dueAt < Date.now()
+    const locked = !preview && !existing && gate?.locked
     return (
       <>
         <PageHead crumbs={crumbs} title={t.title} sub={t.description} />
         {previewBanner}
         <section className="pcard ptintro">
-          <span className="ptintro__icon"><Icon name={closed ? 'lock' : 'clipboard'} size={30} /></span>
-          <h2>{closed ? 'Test muddati tugagan' : 'Testni boshlashga tayyormisiz?'}</h2>
+          <span className="ptintro__icon"><Icon name={closed || locked ? 'lock' : 'clipboard'} size={30} /></span>
+          <h2>{closed ? 'Test muddati tugagan' : locked ? 'Test hali ochilmagan' : retry ? `${used + 1}-urinish` : 'Testni boshlashga tayyormisiz?'}</h2>
           <dl className="ptintro__facts">
             <div><dt><Icon name="clipboard" size={17} />Savollar</dt><dd>{t.questions.length} ta</dd></div>
             <div><dt><Icon name="timer" size={17} />Vaqt</dt><dd>{t.timeLimit} daqiqa</dd></div>
             <div><dt><Icon name="calendar" size={17} />Muddat</dt><dd>{fmtDateTime(t.dueAt)}</dd></div>
+            <div><dt><Icon name="refresh" size={17} />Urinishlar</dt><dd>{preview ? `${limit} ta` : `${used} / ${limit}`}</dd></div>
           </dl>
+          {locked && (
+            <div className="ptlock"><Icon name="lock" size={20} />
+              <span>Bu test «{gate.unitTitle}» darsiga bog‘langan. U darsda qatnashganingiz qayd etilgandan{gate.standardId ? <> yoki <a href={`#/platform/library/item.${gate.standardId}`}>standartni ochganingizdan</a></> : null}{gate.videoId ? <> yoki <a href={`#/platform/videos/${gate.videoId}`}>dars yozuvini ko‘rganingizdan</a></> : null} keyin ochiladi. <a href={`#/platform/library/unit.${gate.unitId}`}>Darsga o‘tish</a></span>
+            </div>
+          )}
           {closed ? <p className="pmuted">Bu testni endi topshirib bo‘lmaydi. Savollaringiz bo‘lsa, ustozingizga murojaat qiling.</p> : (
             <ul className="ptintro__rules">
-              <li><Icon name="check" size={16} />{preview ? 'Sinov rejimida testni xohlagancha qayta ishlash mumkin, o‘quvchilar uchun esa — faqat bir marta.' : 'Testni faqat bir marta topshirish mumkin.'}</li>
+              <li><Icon name="check" size={16} />{preview ? `Sinov rejimida testni xohlagancha qayta ishlash mumkin, o‘quvchilar uchun esa — ${limit} marta.` : limit > 1 ? `Testni ${limit} martagacha topshirish mumkin, eng yaxshi natija olinadi. 2- va 3-urinish o‘zlashtirish ko‘rsatkichida −10% bilan hisoblanadi.` : 'Testni faqat bir marta topshirish mumkin.'}</li>
+              {t.shuffle !== false && <li><Icon name="check" size={16} />Savollar va javob variantlari tasodifiy tartibda chiqadi.</li>}
               <li><Icon name="check" size={16} />Boshlaganingizdan so‘ng vaqt to‘xtamaydi, vaqt tugasa test avtomatik topshiriladi.</li>
               <li><Icon name="check" size={16} />Sahifa yangilansa, javoblaringiz saqlanib qoladi.</li>
               <li><Icon name="check" size={16} />Topshirgach, xatolaringiz va to‘g‘ri javoblarni ko‘rasiz.</li>
             </ul>
           )}
           <div className="prow ptintro__cta">
-            {!closed && <Btn variant="primary" size="lg" icon="play" onClick={() => setRun({ startedAt: Date.now(), answers: {}, cur: 0, flags: [] })}>Testni boshlash</Btn>}
-            <Btn as="a" href="#/platform/tests" size="lg">Orqaga</Btn>
+            {!closed && !locked && <Btn variant="primary" size="lg" icon="play" disabled={!preview && !existing && !gate} onClick={() => setRun({ ...newRun(t), retry: retry || undefined })}>{retry ? 'Qayta topshirishni boshlash' : 'Testni boshlash'}</Btn>}
+            {retry ? <Btn size="lg" onClick={() => setRetry(false)}>Natijaga qaytish</Btn> : <Btn as="a" href="#/platform/tests" size="lg">Orqaga</Btn>}
           </div>
         </section>
       </>
     )
   }
 
-  const q = t.questions[cur]
+  const q = qs[cur]
+  const perm = permOf(q)
   const answers = run.answers
   const flags = run.flags || []
   const answered = t.questions.filter((x) => answers[x.id] !== undefined).length
@@ -877,9 +927,9 @@ function TakeTest({ id, preview = false }) {
           </div>
           <h3>{q.text}</h3>
           <div role="radiogroup" aria-label="Javob variantlari">
-            {q.options.map((o, oi) => (
+            {perm.map((oi, k) => (
               <button key={oi} type="button" role="radio" aria-checked={answers[q.id] === oi} className={cx('pquiz__opt', answers[q.id] === oi && 'is-on')} onClick={() => pick(oi)}>
-                <i>{LETTER(oi)}</i><span>{o}</span>
+                <i>{LETTER(k)}</i><span>{q.options[oi]}</span>
               </button>
             ))}
           </div>
@@ -892,7 +942,7 @@ function TakeTest({ id, preview = false }) {
         </section>
         <Card title="Savollar" className="ptq__side">
           <div className="pquiz__dots">
-            {t.questions.map((qq, i) => (
+            {qs.map((qq, i) => (
               <button key={qq.id} type="button" className={cx(answers[qq.id] !== undefined && 'is-done', i === cur && 'is-cur', flags.includes(qq.id) && 'is-flag')} onClick={() => go(i)}
                 aria-label={`${i + 1}-savol${answers[qq.id] !== undefined ? ', javob berilgan' : ''}${flags.includes(qq.id) ? ', belgilangan' : ''}`} aria-current={i === cur ? 'true' : undefined}>{i + 1}</button>
             ))}
@@ -910,6 +960,28 @@ function TakeTest({ id, preview = false }) {
         text={missing ? `${missing} ta savolga javob berilmagan. Topshirgach, javoblarni o‘zgartirib bo‘lmaydi.` : 'Barcha savollarga javob berdingiz. Topshirgach, javoblarni o‘zgartirib bo‘lmaydi.'}
         onConfirm={() => finish(false)} />
     </>
+  )
+}
+
+// Urinish qolgan bo'lsa: to'g'ri javoblar yashirin, faqat ball va urinishlar tarixi
+function AttemptSummary({ test, history, limit, last, onRetry }) {
+  const best = history.reduce((b, h) => (h.score > (b?.score ?? -1) ? h : b), null)
+  const p = last ? pct(last.score, last.total) : 0
+  const g = gradeOf(p)
+  return (
+    <section className="pcard ptintro ptsum">
+      <div className="ptrh__ring" style={{ '--v': p, '--c': g.color, margin: '0 auto' }} role="img" aria-label={`Natija ${p}%`}><span><b>{p}%</b><small>{last?.score}/{last?.total}</small></span></div>
+      <h2>{history.length}-urinish natijasi</h2>
+      <div className="ptattempts" style={{ justifyContent: 'center' }}>
+        {history.map((h, i) => <span key={h.id || i} className={cx(best && h.id === best.id && 'is-best')}>{Number(h.n) || i + 1}-urinish: {h.score}/{h.total}{best && h.id === best.id ? ' · eng yaxshi' : ''}</span>)}
+      </div>
+      <p className="pmuted">Yana {limit - history.length} ta urinishingiz bor. To‘g‘ri javoblar va izohlar barcha urinishlar tugagach (yoki test muddati o‘tgach) ko‘rsatiladi. Hisobga eng yaxshi natija olinadi, lekin o‘zlashtirish ko‘rsatkichida har bir qayta urinish −10% bilan hisoblanadi.</p>
+      <div className="prow ptintro__cta">
+        <Btn variant="primary" size="lg" icon="refresh" onClick={onRetry}>Qayta topshirish</Btn>
+        <Btn as="a" href="#/platform/tests" size="lg">Testlarga qaytish</Btn>
+      </div>
+      <p className="pmuted" style={{ margin: 0 }}>Muddat: {fmtDateTime(test.dueAt)}</p>
+    </section>
   )
 }
 

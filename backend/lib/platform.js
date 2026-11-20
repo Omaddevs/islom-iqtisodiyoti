@@ -6,6 +6,7 @@ import { many } from './db.js'
 import { fail } from './http.js'
 import { digits } from './ids.js'
 import { cleanLesson, lessonMessages, lessonHref, writeNotes, wallDate } from './lessons.js'
+import { cleanCfg, testGate } from './mastery.js'
 
 export const CONTENT = ['videos', 'tests', 'vocabSets', 'library', 'articles', 'homework']
 // Guruhga bog'langan yozuvlar: o'quvchi faqat o'z guruhinikini oladi
@@ -16,7 +17,7 @@ export const COLLECTIONS = ['organizations', 'users', 'groups', ...RECORD_COLS]
 // Talaba (va boshqa ko'ruvchilar) faqat hisoblagichlarni o'zgartira oladi — server o'zi +1 qiladi
 const COUNTERS = { videos: ['views'], articles: ['views', 'readBy'], library: ['downloads'] }
 const ORG_FIELDS = ['slug', 'plan', 'color', 'phone', 'email', 'description']
-const GROUP_FIELDS = ['level', 'room', 'schedule']
+const GROUP_FIELDS = ['level', 'room', 'schedule', 'plannedLessons', 'finalTestId']
 const STAFF_ROLES = ['org_admin', 'teacher', 'student']
 const MAX_ITEM = 3 * 1024 * 1024
 
@@ -105,9 +106,32 @@ export async function loadState(u) {
   state.users = users.map((x) => userOut(x, !student || x.id === u.id))
   state.groups = (student ? groups.filter((g) => myGroups.has(g.id)) : groups).map(groupOut)
 
-  const attempted = new Set()
-  for (const r of records) if (r.collection === 'testAttempts' && r.owner_id === u.id) attempted.add(r.data.testId)
+  // Testlar: o'quvchi/test juftligi bo'yicha eng yaxshi urinish qaytariladi (tarix — `history` ichida).
+  // To'g'ri javoblar o'quvchiga barcha urinishlar ishlatilganda yoki test to'liq yechilganda ochiladi.
+  const testsById = new Map(records.filter((r) => r.collection === 'tests').map((r) => [r.id, r.data]))
+  const byPair = new Map()
   for (const r of records) {
+    if (r.collection !== 'testAttempts') continue
+    const k = `${r.owner_id}|${r.data.testId}`
+    byPair.set(k, [...(byPair.get(k) || []), r])
+  }
+  const bestOf = new Map()
+  for (const list of byPair.values()) {
+    list.sort((a, b) => (a.data.finishedAt || 0) - (b.data.finishedAt || 0))
+    const best = list.reduce((b, r) => (r.data.score > b.data.score ? r : b), list[0])
+    const history = list.map((r, i) => ({ id: r.id, n: Number(r.data.n) || i + 1, score: r.data.score, total: r.data.total, startedAt: r.data.startedAt, finishedAt: r.data.finishedAt }))
+    bestOf.set(best.id, { ...best, data: { ...best.data, history, used: list.length } })
+  }
+  const attempted = new Set()
+  for (const b of bestOf.values()) {
+    if (b.owner_id !== u.id) continue
+    const t = testsById.get(b.data.testId)
+    const closed = t?.dueAt && Date.now() > Number(t.dueAt) + ((Number(t.timeLimit) || 0) + 1) * 60e3
+    if (closed || b.data.used >= (Number(t?.attempts) || 1) || (b.data.total && b.data.history.some((h) => h.score >= h.total))) attempted.add(b.data.testId)
+  }
+  for (const raw of records) {
+    if (raw.collection === 'testAttempts' && !bestOf.has(raw.id)) continue
+    const r = raw.collection === 'testAttempts' ? bestOf.get(raw.id) : raw
     if (!state[r.collection]) continue
     let item = recOut(r)
     if (student) {
@@ -168,8 +192,15 @@ const orgOps = {
     if (changes.plan !== undefined && !['basic', 'pro'].includes(changes.plan)) fail(422, 'Tarif noto‘g‘ri')
     const name = changes.name !== undefined ? text(changes.name, { min: 2, max: 120, label: 'Tashkilot nomi' }) : o.name
     const status = sa && changes.status ? changes.status : o.status
+    const data = safeLinks(pick(changes, ORG_FIELDS))
+    // O'zlashtirish metodikasi sozlamalari (vaznlar, chegaralar) — faqat tashkilot administratori
+    if (changes.mastery !== undefined) {
+      const m = cleanCfg(changes.mastery)
+      if (typeof m === 'string') fail(422, m)
+      data.mastery = m
+    }
     const r = await row(c, 'UPDATE organizations SET name = $2, status = $3, data = data || $4 WHERE id = $1 RETURNING *',
-      [id, name, status, safeLinks(pick(changes, ORG_FIELDS))])
+      [id, name, status, data])
     return orgOut(r)
   },
   async delete(c, u, op, id) {
@@ -275,6 +306,11 @@ async function setMembers(c, groupId, ids) {
 const groupData = (o) => {
   const d = pick(o, GROUP_FIELDS)
   if (d.schedule !== undefined && (!Array.isArray(d.schedule) || d.schedule.length > 14)) fail(422, 'Jadval noto‘g‘ri')
+  if (d.plannedLessons !== undefined) {
+    d.plannedLessons = Number(d.plannedLessons) || 0
+    if (!Number.isInteger(d.plannedLessons) || d.plannedLessons < 0 || d.plannedLessons > 500) fail(422, 'Kursdagi darslar soni 0 dan 500 gacha bo‘lishi kerak')
+  }
+  if (d.finalTestId !== undefined) d.finalTestId = d.finalTestId ? checkId(d.finalTestId) : null
   return d
 }
 const loadGroup = async (c, id) => groupOut(await row(c, `${GROUPS_SQL} WHERE g.id = $1 GROUP BY g.id`, [id]))
@@ -440,6 +476,12 @@ function cleanTest(d) {
     if (!Number.isFinite(out.timeLimit) || out.timeLimit < 1 || out.timeLimit > 600) fail(422, 'Vaqt chegarasi 1 daqiqadan 600 daqiqagacha bo‘lishi kerak')
   }
   if (d.dueAt !== undefined && !Number.isFinite(Number(d.dueAt))) fail(422, 'Muddat noto‘g‘ri')
+  // Urinishlar soni (1–3): eng yaxshi natija olinadi, 2- va 3-urinishga o'zlashtirishda −10% jarima
+  if (d.attempts !== undefined) {
+    out.attempts = Number(d.attempts)
+    if (!Number.isInteger(out.attempts) || out.attempts < 1 || out.attempts > 3) fail(422, 'Urinishlar soni 1 dan 3 gacha bo‘lishi kerak')
+  }
+  if (d.shuffle !== undefined) out.shuffle = !!d.shuffle
   return out
 }
 // Faqat mavjud savol va variantlarga berilgan javoblar saqlanadi
@@ -450,6 +492,41 @@ function cleanAnswers(test, answers) {
     const v = answers[q.id]
     if (Number.isInteger(v) && v >= 0 && v < (q.options || []).length) out[q.id] = v
   }
+  return out
+}
+
+// Lug'at: har bir atama qachon o'rganilgani (muddatdan keyin o'rganilganlar o'zlashtirishda ×0,8)
+function learnedAt(prev, learned) {
+  const at = {}, now = Date.now()
+  for (const id of learned) at[id] = Number(prev?.[id]) || now
+  return at
+}
+
+// Dars kartasi (library, type: 'unit') — o'zlashtirish uchun bog'lanishlar va ustoz belgilari
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const UNIT_LINKS = ['meetingId', 'videoId', 'testId', 'standardId', 'vocabSetId']
+const stampMap = (v, label) => {
+  if (v == null) return {}
+  if (typeof v !== 'object' || Array.isArray(v) || Object.keys(v).length > 3000) fail(422, `${label} noto‘g‘ri`)
+  return Object.fromEntries(Object.entries(v).filter(([k, ts]) => ID_RE.test(k) && Number(ts) > 0).map(([k, ts]) => [k, Math.round(Number(ts))]))
+}
+function cleanUnit(o, base = {}) {
+  const out = { ...o }
+  for (const k of UNIT_LINKS) if (o[k] !== undefined) out[k] = o[k] ? checkId(o[k]) : null
+  for (const k of ['date', 'due']) {
+    if (o[k] === undefined) continue
+    if (o[k] && !DATE_RE.test(String(o[k]))) fail(422, 'Sana noto‘g‘ri')
+    out[k] = o[k] || null
+  }
+  const date = o.date !== undefined ? o.date : base.date, due = o.due !== undefined ? o.due : base.due
+  if (date && due && due < date) fail(422, 'Topshiriqlar muddati dars sanasidan oldin bo‘lishi mumkin emas')
+  if (o.hours !== undefined) {
+    out.hours = Number(o.hours) || 1
+    if (out.hours < 0.5 || out.hours > 20) fail(422, 'Dars vazni (soat) 0,5 dan 20 gacha bo‘lishi kerak')
+  }
+  if (o.gate !== undefined) out.gate = !!o.gate
+  if (o.offline !== undefined) out.offline = stampMap(o.offline, 'Davomat')
+  if (o.printed !== undefined) out.printed = stampMap(o.printed, 'Chop etish belgisi')
   return out
 }
 
@@ -466,22 +543,30 @@ const recordOps = {
         if (item.questions === undefined) fail(422, 'Testda kamida bitta savol bo‘lishi kerak')
         item = cleanTest({ timeLimit: 10, ...item })
       }
-      if (col === 'library') item = await attachFile(c, orgId, item)
+      if (col === 'library') item = await attachFile(c, orgId, item.type === 'unit' ? cleanUnit(item) : item)
       return insertRec(c, col, id, orgId, u.id, safeLinks({ createdAt: now, ...item, orgId, authorId: u.id }))
     }
     if (col === 'testAttempts') {
       if (u.role !== 'student') deny('Testni faqat o‘quvchi topshiradi')
       const t = await getRec(c, 'tests', String(item.testId))
       if (!t || t.org_id !== u.org_id) fail(404, 'Test topilmadi')
-      const dup = await row(c, `SELECT 1 FROM records WHERE collection = 'testAttempts' AND owner_id = $1 AND data->>'testId' = $2`, [u.id, t.id])
-      if (dup) fail(409, 'Bu test allaqachon topshirilgan')
+      const prev = (await c.query(`SELECT data FROM records WHERE collection = 'testAttempts' AND owner_id = $1 AND data->>'testId' = $2`, [u.id, t.id])).rows
+      const limit = Number(t.data.attempts) || 1
+      if (prev.length >= limit) fail(409, limit > 1 ? `Barcha ${limit} ta urinish ishlatilgan` : 'Bu test allaqachon topshirilgan')
+      // To'liq to'g'ri javob bergan o'quvchi qayta topshirmaydi (javoblar unga ochilgan)
+      if (prev.some((a) => a.data.total && a.data.score >= a.data.total)) fail(409, 'Test to‘liq to‘g‘ri yechilgan — qayta topshirish shart emas')
       const groupIds = t.data.groupIds || []
       if (groupIds.length && !(await row(c, 'SELECT 1 FROM group_members WHERE user_id = $1 AND group_id = ANY($2)', [u.id, groupIds]))) fail(404, 'Test topilmadi')
       // Muddat oxirida boshlangan test vaqti tugaguncha topshirila oladi (+1 daqiqa tarmoq uchun)
       if (t.data.dueAt && now > Number(t.data.dueAt) + ((Number(t.data.timeLimit) || 0) + 1) * 60e3) fail(422, 'Testni topshirish muddati tugagan')
+      // Darsga bog'langan test: avval davomat qayd etilgan yoki standart ochilgan bo'lishi kerak
+      if (!prev.length) {
+        const gate = await testGate(u.id, t.id)
+        if (gate.locked) fail(422, `Test «${gate.unitTitle}» darsida qatnashgandan yoki standartni ochgandan keyin ochiladi`)
+      }
       const answers = cleanAnswers(t.data, item.answers)
       return insertRec(c, col, id, t.org_id, u.id, {
-        testId: t.id, studentId: u.id, answers, score: scoreOf(t.data, answers), total: (t.data.questions || []).length,
+        testId: t.id, studentId: u.id, answers, score: scoreOf(t.data, answers), total: (t.data.questions || []).length, n: prev.length + 1,
         startedAt: Math.min(Number(item.startedAt) || now, now), finishedAt: now,
       })
     }
@@ -496,7 +581,8 @@ const recordOps = {
     if (col === 'vocabProgress') {
       const s = await getRec(c, 'vocabSets', String(item.setId))
       if (!s || s.org_id !== u.org_id) fail(404, 'To‘plam topilmadi')
-      return insertRec(c, col, id, s.org_id, u.id, { setId: s.id, studentId: u.id, learned: Array.isArray(item.learned) ? item.learned.slice(0, 5000).map(String) : [] })
+      const learned = Array.isArray(item.learned) ? item.learned.slice(0, 5000).map(String) : []
+      return insertRec(c, col, id, s.org_id, u.id, { setId: s.id, studentId: u.id, learned, at: learnedAt({}, learned) })
     }
     if (col === 'notifications') {
       const t = await row(c, 'SELECT id, org_id, role FROM users WHERE id = $1', [String(item.userId)])
@@ -545,6 +631,7 @@ const recordOps = {
         }
       }
       if (col === 'library') {
+        if (d.type === 'unit') changes = cleanUnit(changes, d)
         for (const k of ['fileName', 'fileExt', 'fileSize']) delete changes[k]
         if ('fileId' in changes) changes = await attachFile(c, r.org_id, changes)
       }
@@ -576,7 +663,8 @@ const recordOps = {
     }
     if (col === 'vocabProgress') {
       if (r.owner_id !== u.id) deny()
-      return updateRec(c, col, id, { ...d, learned: Array.isArray(changes.learned) ? changes.learned.slice(0, 5000).map(String) : d.learned })
+      const learned = Array.isArray(changes.learned) ? changes.learned.slice(0, 5000).map(String) : d.learned
+      return updateRec(c, col, id, { ...d, learned, at: learnedAt(d.at, learned) })
     }
     if (col === 'notifications') {
       if (r.owner_id !== u.id) deny()

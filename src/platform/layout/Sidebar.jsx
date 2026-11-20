@@ -20,6 +20,7 @@ export function navFor(user, scope, db) {
     meetings: { href: '#/platform/meetings', label: 'Onlayn darslar', icon: 'video', live: liveCount },
     schedule: { href: '#/platform/schedule', label: 'Dars jadvali', icon: 'calendar' },
     groups: { href: '#/platform/groups', label: user.role === 'teacher' ? 'Guruhlarim' : 'Guruhlar', icon: 'layers' },
+    mastery: { href: '#/platform/mastery', label: user.role === 'student' ? 'Mening natijam' : 'O‘zlashtirish', icon: 'trending' },
     homework: { href: '#/platform/homework', label: 'Uy vazifalari', icon: 'fileText', count: pendingHw || undefined },
     tests: { href: '#/platform/tests', label: 'Testlar', icon: 'clipboard', count: pendingTests || undefined },
     videos: { href: '#/platform/videos', label: 'Video darslar', icon: 'play' },
@@ -41,20 +42,20 @@ export function navFor(user, scope, db) {
   } else if (user.role === 'superadmin' || user.role === 'org_admin') {
     sections = [
       { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
-      { title: 'O‘quv jarayoni', links: [L.groups, L.homework, L.tests] },
+      { title: 'O‘quv jarayoni', links: [L.groups, L.mastery, L.homework, L.tests] },
       materials,
       { title: 'Boshqaruv', links: user.role === 'superadmin' ? [L.users, L.orgs, L.leads, L.partners] : [L.users] },
     ]
   } else if (user.role === 'teacher') {
     sections = [
       { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
-      { title: 'Mening sinfim', links: [L.groups, L.users, L.homework, L.tests] },
+      { title: 'Mening sinfim', links: [L.groups, L.users, L.mastery, L.homework, L.tests] },
       materials,
     ]
   } else {
     sections = [
       { title: 'Asosiy', links: [L.home, L.meetings, L.schedule] },
-      { title: 'Topshiriqlar', links: [L.homework, L.tests] },
+      { title: 'Topshiriqlar', links: [L.mastery, L.homework, L.tests] },
       materials,
     ]
   }

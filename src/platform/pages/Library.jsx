@@ -94,7 +94,7 @@ function useSaved(uid) {
 
 /* ---------- Sahifa ---------- */
 
-export default function Library() {
+export default function Library({ param }) {
   const { user, db, scope, can } = useAuth()
   const toast = useToast()
   const [tab, setTab] = useState('standard')
@@ -128,6 +128,19 @@ export default function Library() {
   const mineOf = (l) => l.authorId === user.id || user.role === 'org_admin' || user.role === 'superadmin'
   const openUnit = (u, opts) => { setUnitId(u.id); setUnitUpload(opts?.upload ? Date.now() : 0); window.scrollTo?.({ top: 0, behavior: 'smooth' }) }
   useEffect(() => { if (unitId && !unit) setUnitId(null) }, [unitId, unit])
+  // Tashqi havolalar: #/platform/library/unit.<darsId> — darsni, item.<materialId> — materialni ochadi
+  const routed = useRef('')
+  useEffect(() => {
+    if (!param || routed.current === param) return
+    const [kind, id] = [param.slice(0, param.indexOf('.')), param.slice(param.indexOf('.') + 1)]
+    const target = kind === 'unit' ? units.find((u) => u.id === id) : kind === 'item' ? all.find((l) => l.id === id) : null
+    if (!target) return
+    routed.current = param
+    if (kind === 'unit') { setTab('textbook'); openUnit(target) } else {
+      if (target.unitId) { setTab('textbook'); setUnitId(target.unitId) }
+      run(target)
+    }
+  }, [param, units, all]) // eslint-disable-line react-hooks/exhaustive-deps
   const fresh = count((l) => Date.now() - l.createdAt < MONTH)
   const savedCount = count((l) => saved.includes(l.id))
   const categories = useMemo(() => [...new Set(all.map((l) => l.category).filter(Boolean))].sort(), [all])
