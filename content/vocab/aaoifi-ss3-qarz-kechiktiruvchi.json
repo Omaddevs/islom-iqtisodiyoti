@@ -1,0 +1,229 @@
+{
+  "title": "AAOIFI 3-shariat standarti: Qarz to‘lovini kechiktiruvchi qarzdor — izohli lug‘at",
+  "lang": "uz · ar · en",
+  "description": "AAOIFI Shariat standarti №3 «Qarz to‘lovini kechiktiruvchi qarzdor» (Procrastinating Debtor) ni tushunish uchun zarur bo‘lgan 17 ta asosiy termin: shariat terminlari (mumotil, malī’ va mu’sir qarzdor, shar’iy uzr, rahn, kafil, hulul, sadaqa majburiyati, shart jazoiy, muqossa) hamda zamonaviy moliya amaliyoti terminlari (penya, yo‘qotilgan imkoniyat zarari, sud va undirish xarajatlari, «qora ro‘yxat», monitoring). Har bir terminda arabcha asl shakli, inglizcha ekvivalenti, oddiy tildagi ta’rif, standart bandi va shariat hukmi berilgan. Ta’riflar standart matniga tayanadi; standartda bo‘lmagan izohlar «(qo‘shimcha izoh)» deb belgilangan. Auditoriya: bakalavr va magistratura talabalari, CSAA/CPSS imtihoniga tayyorlanuvchilar.",
+  "orderNote": "Terminlar alifbo bo‘yicha emas, standart bandlari ketma-ketligida joylashtirilgan: qamrov — qarzdor turlari (1-band) → qarz to‘lovini kechiktiruvchi qarzdorga nisbatan ruxsat etilgan va taqiqlangan choralar (2/1) → kafil (2/2) → pudratchi (2/3) → nomoddiy jazo (2/4) → umumiy qoidalar (2/5) → kechiktirishni qayd etish (2/6). Standart avval «kim mumotil hisoblanadi», keyin «unga nisbatan nima qilish mumkin va nima mumkin emas» degan mantiqda tuzilgan; shu tartib bilan o‘qilganda taqiqlangan choralar (penya, yo‘qotilgan foyda kompensatsiyasi) va ruxsat etilgan choralar (sud xarajatlari, garov, hulul, sadaqa majburiyati) yonma-yon solishtiriladi.",
+  "terms": [
+    {
+      "term": "Mumotil (qarz to‘lovini kechiktiruvchi qarzdor)",
+      "arabic": "الْمَدِين الْمُمَاطِل",
+      "translit": "al-madīn al-mumāṭil",
+      "translation": "Procrastinating debtor",
+      "definition": "To‘lovga qodir bo‘la turib, qarzini o‘z vaqtida to‘lamaydigan qarzdor. Standart qamroviga to‘lovni kechiktiruvchi qarzdor va kafil, shuningdek majburiyatlarini o‘z vaqtida bajarmay, shartnomadagi jarima (penya) tufayli qarzdorga aylangan pudratchi va yetkazib beruvchilar kiradi (1-band). To‘lovga qodir qarzdorning qarzni kechiktirishi haromdir (2/1/1).",
+      "clause": "1; 2/1/1",
+      "ruling": "nojoiz",
+      "distinction": "Standart nomi ruschaga «qarzni qasddan kechiktirish» deb tarjima qilingan, arabcha asl matn va inglizcha tarjimada esa «qarzni kechiktiruvchi qarzdor» (al-madīn al-mumāṭil / procrastinating debtor) — ya’ni urg‘u amalga emas, shaxsga (qodir bo‘la turib to‘lamaydiganga) qaratilgan (1-band izohi). Hadis: «Boy (qodir) kishining kechiktirishi zulmdir» (qo‘shimcha izoh).",
+      "example": "Oylik daromadi yetarli bo‘lgan tadbirkor murobaha bo‘yicha to‘lovni «hozir boshqa ishlarga kerak» deb 4 oy to‘lamaydi — mumotil."
+    },
+    {
+      "term": "To‘lovga qodir qarzdor (malī’)",
+      "arabic": "الْمَدِين الْمَلِيء",
+      "translit": "al-madīn al-malīʾ",
+      "translation": "Solvent debtor (able to pay)",
+      "definition": "Qarzini to‘lash uchun yetarli mablag‘ yoki mol-mulkka ega qarzdor. Standartdagi barcha choralar aynan shunday qarzdorga — to‘lovga qodir bo‘la turib kechiktiradiganga nisbatan qo‘llanadi (1-band; 2/1/1).",
+      "clause": "1; 2/1/1",
+      "ruling": "nojoiz",
+      "distinction": "Malī’ — to‘lashga qodir; mu’sir — qiyin ahvolda, to‘lashga qodir emas. Mumotil — malī’ bo‘la turib to‘lamayotgan qarzdor. Hukm (kechiktirish harom) faqat malī’ga tegishli.",
+      "example": "Hisobida yetarli mablag‘i bor, lekin to‘lovni kechiktirayotgan mijoz — malī’."
+    },
+    {
+      "term": "Mu’sir qarzdor va shar’iy uzr",
+      "arabic": "الْمَدِين الْمُعْسِر / الْعُذْر الشَّرْعِي",
+      "translit": "al-madīn al-muʿsir / al-ʿudhr ash-sharʿī",
+      "translation": "Insolvent debtor (in financial hardship) and legitimate excuse",
+      "definition": "Moliyaviy tomondan qiyin ahvolda qolgan yoki to‘lovga qobiliyatsiz (bankrot) bo‘lib qolgan qarzdor, hamda shar’iy uzr (masalan, fors-major) sababli qarzni kechiktirayotgan qarzdor. Standart ularni o‘z qamroviga olmaydi: ularga mumotilga qo‘llanadigan choralar tatbiq etilmaydi (1-band).",
+      "clause": "1; 2/1/6",
+      "ruling": "joiz",
+      "distinction": "Mu’sirning kechiktirishi gunoh emas va unga muhlat beriladi (Baqara, 280 — qo‘shimcha izoh); mumotilning kechiktirishi esa harom. Hulul sharti ham faqat favqulodda holat (fors-major) bo‘lmagan holatda tatbiq etiladi (2/1/6).",
+      "example": "Sel ofati sababli ish joyini yo‘qotgan mijoz to‘lovlarni kechiktirdi — u mu’sir/uzrli, mumotil emas."
+    },
+    {
+      "term": "Jarima (penya) — kechikish uchun moliyaviy jarima",
+      "arabic": "الْغَرَامَة الْمَالِيَّة عَلَى التَّأْخِير",
+      "translit": "al-gharāmah al-māliyyah ʿalā at-taʾkhīr",
+      "translation": "Financial penalty for late payment",
+      "definition": "Qarzini o‘z vaqtida to‘lamagan qarzdorga nisbatan pul yoki moddiy ko‘rinishdagi moliyaviy jarimani shart qilish — oldindan kelishilgan bo‘lsin yoki yo‘q — taqiqlanadi (2/1/2). Qarzini qasddan to‘lamayotgan qarzdordan bunday jarimani sud orqali talab qilish ham joiz emas (2/1/3).",
+      "clause": "2/1/2; 2/1/3",
+      "ruling": "nojoiz",
+      "distinction": "Qarz evaziga (kechikish uchun) qo‘shimcha — bu riba an-nasī’a, «yo to‘la, yo oshir» degan johiliyat ribosining aynan o‘zi (qo‘shimcha izoh). Pudrat va istisna’ shartnomalaridagi jarima sharti esa joiz (2/3) — u qarz evaziga emas, ish bajarilmagani uchun.",
+      "example": "Murobaha shartnomasida «har kechiktirilgan kun uchun 0,1% penya» bandi — nojoiz."
+    },
+    {
+      "term": "Yo‘qotilgan imkoniyat va kurs zarari kompensatsiyasi",
+      "arabic": "التَّعْوِيض عَنِ الْفُرْصَة الضَّائِعَة",
+      "translit": "at-taʿwīḍ ʿan al-furṣah aḍ-ḍāʾiʿah",
+      "translation": "Compensation for opportunity loss (lost profit) and currency loss",
+      "definition": "Penya taqiqi qoidasi boy berilgan daromad (yo‘qotilgan imkoniyat) sababli ko‘rilgan zarar uchun ko‘zda tutilgan jarimaga ham, valyuta qiymati (kursi) o‘zgarishi sababli ko‘rilgan zararni qoplashga qaratilgan jarimaga ham birdek tegishli (2/1/2).",
+      "clause": "2/1/2",
+      "ruling": "nojoiz",
+      "distinction": "Yo‘qotilgan foyda — taxminiy, hali yuzaga kelmagan zarar, uni qarz summasiga qo‘shish amalda foiz bilan bir xil; sud va undirish xarajatlari esa haqiqatda qilingan sarflar, ularni qoplash joiz (2/1/4).",
+      "example": "Bank «pul vaqtida qaytmagani uchun boshqa loyihaga investitsiya qila olmadik, 5 mln so‘m foyda boy berdik» deb shu summani talab qiladi — nojoiz."
+    },
+    {
+      "term": "Sud va undirish xarajatlari",
+      "arabic": "مَصْرُوفَات الدَّعْوَى وَالتَّحْصِيل",
+      "translit": "maṣrūfāt ad-daʿwā wa at-taḥṣīl",
+      "translation": "Litigation and debt-collection expenses",
+      "definition": "Qarz to‘lovini (qasddan) kechiktirayotgan qarzdor sud xarajatlarini, shuningdek qarz beruvchi tomon qarzini undirib olish uchun qilgan boshqa tegishli sarf-xarajatlarni qoplab berishga majbur (2/1/4).",
+      "clause": "2/1/4",
+      "ruling": "joiz",
+      "distinction": "Faqat haqiqatda qilingan, hujjat bilan tasdiqlangan xarajatlar undiriladi; ularni qat’iy foiz yoki kun hisobida belgilash penyaga aylanadi (qo‘shimcha izoh).",
+      "example": "Bank qarzni undirish uchun yurist xizmati va notarius to‘loviga 3 mln so‘m sarfladi — shu summani qarzdordan talab qila oladi."
+    },
+    {
+      "term": "Garovni pulga aylantirish (rahnni sotish)",
+      "arabic": "تَسْيِيل الرَّهْن / بَيْع الرَّهْن",
+      "translit": "tasyīl ar-rahn / bayʿ ar-rahn",
+      "translation": "Liquidation (sale) of the pledge",
+      "definition": "Qarz beruvchi tomon qarzni undirish uchun garovni pulga aylantirish maqsadida uni sotishni talab qilish huquqiga ega. Shuningdek, sudga murojaat qilmasdan garov pulidan qarzni yopish uchun qarzdordan garovni sotishga vakolat berishini shart qilishi mumkin (2/1/5).",
+      "clause": "2/1/5",
+      "ruling": "joiz",
+      "distinction": "Sud orqali sotish — har doim mumkin; sudsiz sotish — faqat qarzdor oldindan (shartnomada) sotishga vakolat bergan bo‘lsa. Sotuvdan qarzdan ortgan summa qarzdorga qaytariladi (qo‘shimcha izoh).",
+      "example": "Mijoz shartnomada bankka garovdagi avtomobilni sotish vakolatini bergan; to‘lov kechiktirilgach bank uni sudsiz sotib, qarzni yopadi."
+    },
+    {
+      "term": "Hulul (qolgan qarzni muddatidan oldin talab qilish)",
+      "arabic": "حُلُول الأَقْسَاط",
+      "translit": "ḥulūl al-aqsāṭ",
+      "translation": "Acceleration of outstanding instalments",
+      "definition": "Qarzdor davriy to‘lovlardan birortasini kechiktirgan taqdirda, u qolgan qarzning barchasini darhol (muddatidan oldin) to‘lashini shart qilish joiz. Bu shart favqulodda holat (fors-major) bo‘lmagan holatda, qarzdor xabardor qilingandan keyin va unga muayyan munosib muddat berilgandan keyin tatbiq etilgani ma’qul (2/1/6; shuningdek, 5-sonli «Kafolatlar» standartining 5-bandi).",
+      "clause": "2/1/6",
+      "ruling": "shartli joiz",
+      "distinction": "Hulul qarz summasini oshirmaydi, faqat muddatni qisqartiradi — shuning uchun joiz; penya esa summani oshiradi — nojoiz (2/1/2).",
+      "example": "Azizbek bir to‘lovni kechiktirdi; bank ogohlantirish yuborib, 15 kun muddat berdi, shundan keyingina qolgan qarzning hammasini talab qildi."
+    },
+    {
+      "term": "Murobaha tovarini qaytarib olish huquqi",
+      "arabic": "حَقّ اسْتِرْدَاد السِّلْعَة",
+      "translit": "ḥaqq istirdād as-silʿah",
+      "translation": "Right to reclaim the sold item (in Murabahah)",
+      "definition": "Murobaha savdosi doirasida sotilgan mol (tovar) dastlabki sotilgan holatida bo‘lsa, mijoz esa to‘lovni kechiktirib, keyinroq to‘lovga layoqatsiz (bankrot) bo‘lib qolsa, sotuvchi (muassasa) bankrotlik holatida qilinadigan tegishli amaliyotlarga kirishib o‘tirmasdan, sotilgan molni qaytarib olish huquqiga ega (2/1/7).",
+      "clause": "2/1/7",
+      "ruling": "shartli joiz",
+      "distinction": "Shart — tovar o‘zgarmagan, dastlabki holatida bo‘lishi; agar tovar ishlatilib, qayta ishlangan yoki boshqaga sotilgan bo‘lsa, muassasa boshqa kreditorlar bilan birga bankrotlik tartibida qatnashadi (qo‘shimcha izoh).",
+      "example": "Bank murobaha orqali mijozga qadoqlash uskunasi sotdi; mijoz bankrot bo‘ldi, uskuna o‘rnatilmay omborda turibdi — bank uni qaytarib oladi."
+    },
+    {
+      "term": "Sadaqa qilish majburiyati",
+      "arabic": "الاِلْتِزَام بِالتَّصَدُّق",
+      "translit": "al-iltizām bi at-taṣadduq",
+      "translation": "Undertaking to donate to charity (in case of late payment)",
+      "definition": "Murobaha kabi qarzdorlik hosil bo‘luvchi shartnomalarda qarz to‘lovini kechiktirgan qarzdor muayyan mablag‘ni yoki qarz miqdorining ma’lum foizini (uchinchi tomonga) sadaqa (xayriya) qilish majburiyatini zimmasiga olishi joiz. Bunday mablag‘lar muassasaning Shariat kengashi nazorati ostida muassasa orqali xayriya maqsadlariga yo‘naltirilishi shart (2/1/8).",
+      "clause": "2/1/8",
+      "ruling": "shartli joiz",
+      "distinction": "Penyada pul kreditorning daromadiga o‘tadi — riba; sadaqa majburiyatida pul muassasa daromadiga kirmaydi, faqat xayriyaga ketadi — joiz. Uning maqsadi daromad emas, intizomga undash (qo‘shimcha izoh).",
+      "example": "Mijoz shartnomada «har kechikkan oy uchun 100 ming so‘m xayriyaga beraman» deb majburiyat oldi; bank bu pulni Shariat kengashi nazoratida xayriya fondiga o‘tkazadi."
+    },
+    {
+      "term": "Kafil",
+      "arabic": "الْكَفِيل",
+      "translit": "al-kafīl",
+      "translation": "Guarantor",
+      "definition": "Qarzdor majburiyatini o‘z zimmasiga qo‘shib olgan shaxs. Qarz beruvchi tomon qarzni kafildan ham, qarzdordan ham talab qilishga haqli — agar kafil qarzni yopishni birinchi navbatda qarzdordan talab qilish shartini qo‘ymagan bo‘lsa (2/2/1). Qarz to‘lovini kechiktirayotgan qarzdorga tegishli barcha qonun-qoidalar to‘lovni kechiktirayotgan kafilga nisbatan ham tatbiq etiladi (2/2/2).",
+      "clause": "2/2/1; 2/2/2",
+      "ruling": "joiz",
+      "distinction": "Kafil o‘zi kechiktirsa, u ham mumotil hisoblanadi: undan penya olinmaydi, lekin sud xarajatlari undiriladi va boshqa choralar qo‘llanadi (2/2/2). Batafsil — 5-sonli «Kafolatlar» standarti, 3-band.",
+      "example": "Botir kafil bo‘lib imzo chekdi, shartnomada «avval qarzdordan» degan band yo‘q — bank qarzni to‘g‘ridan-to‘g‘ri Botirdan talab qila oladi."
+    },
+    {
+      "term": "Jarima sharti (shart jazoiy) — pudrat va istisna’da",
+      "arabic": "الشَّرْط الْجَزَائِي",
+      "translit": "ash-sharṭ al-jazāʾī",
+      "translation": "Penalty clause (in construction, Istisna’a and supply contracts)",
+      "definition": "Qurilish, istisna’ (buyurtma asosida ishlab chiqarish) va ta’minot shartnomalariga ishni kechiktirgani uchun jarima (to‘lash) shartini kiritish joiz. Jarima to‘lovlarini kechiktirgan pudratchi yoki ta’minotchiga nisbatan qarz to‘lovini kechiktiruvchi qarzdorga qo‘llanadigan qoidalar tatbiq etiladi. Pudratchiga to‘lanishi kerak bo‘lgan pul mablag‘laridan jarima mablag‘larini ushlab qolish mumkin (2/3).",
+      "clause": "1; 2/3",
+      "ruling": "joiz",
+      "distinction": "Pudratchiga jarima — ish (amal) bajarilmagani uchun, joiz; qarzdorga penya — qarz (pul) kechiktirilgani uchun, nojoiz (2/1/2). Lekin pudratchi jarimani to‘lamasa, bu jarima qarzga aylanadi va unga endi penya qo‘shib bo‘lmaydi (2/3).",
+      "example": "Quruvchi uyni muddatida topshirmadi — shartnoma bo‘yicha har hafta uchun 2 mln so‘m jarima; bank uni pudratchiga to‘lanadigan summadan ushlab qoladi."
+    },
+    {
+      "term": "Nomoddiy jazo: «qora ro‘yxat»",
+      "arabic": "الْقَائِمَة السَّوْدَاء",
+      "translit": "al-qāʾimah as-sawdāʾ",
+      "translation": "Blacklisting (non-monetary sanctions)",
+      "definition": "Moliya muassasasi qarzdorning nomini qarz majburiyatlarini bajarmagan mijozlarning «qora» ro‘yxatiga kiritish va boshqa muassasalarga qarzdor o‘z majburiyatlarini bajarmaganligi haqida ogohlantiruvchi xat yuborish huquqiga ega. Bu boshqa muassasalar qarzdor haqida bevosita ma’lumot so‘raganda yoki kompaniyalar o‘rtasida shunday ro‘yxatlar almashilganda amalga oshirilishi mumkin (2/4).",
+      "clause": "2/4",
+      "ruling": "joiz",
+      "distinction": "Moddiy jazo (penya) — nojoiz (2/1/2); nomoddiy jazo (obro‘ga, kelajakdagi moliyalashtirish imkoniyatiga ta’sir) — joiz. Faqat haqiqatan mumotil bo‘lgan qarzdorga, mu’sirga emas (qo‘shimcha izoh).",
+      "example": "To‘lovni kechiktirgan Sherzod banklararo kredit tarixi tizimiga «muammoli qarzdor» sifatida kiritildi."
+    },
+    {
+      "term": "Qarzdor faoliyatini kuzatib borish (monitoring)",
+      "arabic": "مُتَابَعَة الْمَدِين",
+      "translit": "mutābaʿat al-madīn",
+      "translation": "Monitoring the debtor",
+      "definition": "Muassasa qarz to‘lovini kechiktiruvchi qarzdorning holatini va moliyaviy faoliyatini barcha shar’iy va qonuniy vositalar yordamida kuzatib borish (monitoring qilish) huquqiga ega (2/5/1).",
+      "clause": "2/5/1",
+      "ruling": "joiz",
+      "distinction": "Monitoring — qarzdorning to‘lov qobiliyatini aniqlash (mumotilmi yoki mu’sirmi) uchun zarur vosita; u faqat shar’iy va qonuniy yo‘llar bilan (josuslik, shaxsiy hayotga aralashuvsiz) amalga oshiriladi (qo‘shimcha izoh).",
+      "example": "Bank kechiktirayotgan korxonaning moliyaviy hisobotlarini so‘rab, uning savdo aylanmasi tushmaganini aniqladi — demak, kechiktirish uzrsiz."
+    },
+    {
+      "term": "Shart qilinmagan ustama (qarzdorning ixtiyoriy qo‘shimchasi)",
+      "arabic": "الزِّيَادَة غَيْر الْمَشْرُوطَة",
+      "translit": "az-ziyādah ghayr al-mashrūṭah",
+      "translation": "Unstipulated increment on repayment",
+      "definition": "Qarz to‘lovini kechiktiruvchi qarzdor qarzini to‘lash vaqtida qarzga qo‘shimcha ustama to‘lasa, bu ustama yozma, og‘zaki va/yoki turli imo-ishoralar orqali shart qilinmaganligi, urfda bo‘lmaganligi yoki maxfiy til biriktirilishi natijasida hosil bo‘lmaganligi sharti bilan qabul qilinishiga monelik yo‘q (2/5/2).",
+      "clause": "2/5/2",
+      "ruling": "shartli joiz",
+      "distinction": "Shart qilingan yoki urfga aylangan qo‘shimcha — riba; qarzdorning o‘z xohishi bilan, hech qanday kelishuvsiz bergan qo‘shimchasi — husn al-qazo (yaxshi ado etish), joiz (qo‘shimcha izoh).",
+      "example": "Qarzdor qarzni to‘lab, minnatdorchilik sifatida o‘z ixtiyori bilan qo‘shimcha summa berdi, oldindan hech qanday kelishuv bo‘lmagan — qabul qilish joiz."
+    },
+    {
+      "term": "Hisobraqamlardan undirish (muqossa)",
+      "arabic": "الْمُقَاصَّة",
+      "translit": "al-muqāṣṣah",
+      "translation": "Set-off against the client’s accounts",
+      "definition": "Qarzdorlik hosil bo‘ladigan bitimda, agar qarzdor to‘lovni kechiktirsa, muassasa mijozning muassasadagi har qanday hisobraqamlaridan — joriy yoki investitsiya hisobraqami bo‘lsin — qarzni undirish huquqini shart qilishi joiz. Hisobraqamdagi pullar qarz valyutasi bilan bir xil bo‘lganda, bu mijozning roziligisiz ham amalga oshirilishi mumkin. Agar pullar boshqa valyutada bo‘lsa, valyuta kursi o‘sha paytdagi bozor kursi asosida belgilanishi kerak (2/5/3).",
+      "clause": "2/5/3",
+      "ruling": "shartli joiz",
+      "distinction": "Bir xil valyuta — oddiy muqossa (qarzni qarz bilan hisob-kitob qilish); turli valyuta — aslida sarf (valyuta ayirboshlash) bo‘lgani uchun to‘lov kunidagi bozor kursi qo‘llanadi, oldindan qat’iy kurs belgilab bo‘lmaydi (1-sonli standart, 2/5 — qo‘shimcha izoh).",
+      "example": "Mijozning dollardagi qarzi bor, hisobida esa so‘m. Shartnomada ruxsat berilgan bo‘lsa, bank so‘mni shu kungi bozor kursida dollarga hisoblab, qarzni yopadi."
+    },
+    {
+      "term": "Kechiktirishni qayd etish (mumotalani isbotlash)",
+      "arabic": "إِثْبَات الْمُمَاطَلَة",
+      "translit": "ithbāt al-mumāṭalah",
+      "translation": "Establishing (proving) procrastination",
+      "definition": "Qarzdor odatiy talabnomadan keyin belgilangan muddatda to‘lovni amalga oshirmasa hamda to‘lovga qodir emasligini isbotlamasa, qarz to‘lovi kechiktirilgan hisoblanadi (2/6).",
+      "clause": "2/6",
+      "ruling": "majburiy shart",
+      "distinction": "Isbot yuki qarzdorda: to‘lovga qodir emasligini (mu’sirligini) u o‘zi isbotlashi kerak, aks holda mumotil deb hisoblanadi. Faqat to‘lov muddatining o‘tishi yetarli emas — avval odatiy talabnoma (ogohlantirish) yuborilishi va muddat berilishi kerak.",
+      "example": "Bank to‘lov muddati o‘tgach rasmiy talabnoma yuborib, 10 kun berdi; mijoz to‘lamadi va qiyin ahvolini hujjat bilan isbotlamadi — u mumotil hisoblanadi."
+    }
+  ],
+  "questions": [
+    {
+      "text": "Malī’, mu’sir va mumotil qarzdorlarni farqlang. AAOIFI SS 3 qaysi biriga tatbiq etiladi va qaysilari uning qamrovidan chiqarilgan?",
+      "answer": "Malī’ — to‘lashga qodir qarzdor; mu’sir — moliyaviy qiyin ahvoldagi yoki bankrot qarzdor; mumotil — to‘lashga qodir bo‘la turib kechiktiruvchi. Standart mumotilga (shuningdek kechiktiruvchi kafil va penya tufayli qarzdorga aylangan pudratchiga) tatbiq etiladi; mu’sir va shar’iy uzr bilan kechiktirayotgan qarzdorlar qamrovdan chiqarilgan (1-band)."
+    },
+    {
+      "text": "Quyidagilardan qaysi biri qarzni kechiktiruvchi qarzdordan undirilishi joiz?",
+      "options": [
+        "Kechikkan har bir kun uchun oldindan kelishilgan penya",
+        "Boy berilgan daromad (yo‘qotilgan imkoniyat) kompensatsiyasi",
+        "Qarzni undirish uchun haqiqatda qilingan sud va yurist xarajatlari",
+        "Valyuta kursi o‘zgarishi tufayli ko‘rilgan zarar"
+      ],
+      "answer": "C — 2/1/4 ga ko‘ra haqiqiy sud va undirish xarajatlari qoplanadi. A, B va D — 2/1/2 ga ko‘ra taqiqlangan (oldindan kelishilgan bo‘lsa ham, sud orqali ham — 2/1/3)."
+    },
+    {
+      "text": "Penya va sadaqa qilish majburiyatining (2/1/8) farqi nimada? Nima uchun biri nojoiz, ikkinchisi joiz?",
+      "answer": "Penyada kechikish uchun olingan pul kreditor daromadiga o‘tadi — bu qarz evaziga qo‘shimcha, ya’ni riba (2/1/2). Sadaqa majburiyatida qarzdor ma’lum summani xayriyaga berishni o‘z zimmasiga oladi; pul muassasa daromadiga kirmaydi, Shariat kengashi nazoratida xayriya maqsadlariga yo‘naltiriladi (2/1/8)."
+    },
+    {
+      "text": "Qurilish kompaniyasi uyni 2 oy kechiktirib topshirdi. Shartnomada jarima sharti bor. Bu jarima joizmi va pudratchi jarimani o‘zi to‘lamasa, muassasa nima qila oladi?",
+      "options": [
+        "Jarima nojoiz, chunki har qanday jarima riba",
+        "Jarima joiz; muassasa uni pudratchiga to‘lanadigan summadan ushlab qolishi mumkin",
+        "Jarima joiz, to‘lanmasa unga qo‘shimcha penya hisoblanadi",
+        "Jarima faqat sud qarori bilan joiz"
+      ],
+      "answer": "B — qurilish, istisna’ va ta’minot shartnomalarida jarima sharti joiz va u pudratchiga to‘lanadigan summadan ushlab qolinishi mumkin (2/3). C nojoiz: to‘lanmagan jarima qarzga aylanadi va unga mumotil qoidalari tatbiq etiladi — penya qo‘shib bo‘lmaydi."
+    },
+    {
+      "text": "Mijozning dollardagi murobaha qarzi bor, muassasadagi joriy hisobida esa faqat so‘m bor. Muassasa qarzni shu hisobdan undira oladimi? Qaysi shartlar va qaysi kurs bo‘yicha?",
+      "answer": "Ha, agar shartnomada muassasaga mijozning hisobraqamlaridan undirish huquqi shart qilingan bo‘lsa (2/5/3). Pullar qarz valyutasidan boshqa valyutada bo‘lgani uchun valyuta kursi undirish paytidagi bozor kursi asosida belgilanishi kerak; bir xil valyutada bo‘lganda esa mijoz roziligisiz ham undirish mumkin bo‘lardi."
+    }
+  ]
+}
