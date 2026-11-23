@@ -139,7 +139,8 @@ const leftText = (min) => (min >= 55 ? '1 soatdan keyin' : `${Math.max(1, min)} 
 export async function remindLessons(now = Date.now()) {
   const days = [wallDate(now), wallDate(now + 864e5)]
   const rows = await many(`
-    SELECT r.id, r.data, g.teacher_id, COALESCE(array_agg(gm.user_id) FILTER (WHERE gm.user_id IS NOT NULL), '{}') AS members
+    SELECT r.id, r.data, COALESCE((SELECT array_agg(gt.user_id) FROM group_teachers gt WHERE gt.group_id = g.id), '{}') AS teacher_ids,
+      COALESCE(array_agg(gm.user_id) FILTER (WHERE gm.user_id IS NOT NULL), '{}') AS members
       FROM records r JOIN groups g ON g.id = r.data->>'groupId' LEFT JOIN group_members gm ON gm.group_id = g.id
      WHERE r.collection = 'lessons' AND (r.data->>'until' IS NULL OR r.data->>'until' >= $1) AND r.data->>'date' <= $2
      GROUP BY r.collection, r.id, g.id`, [days[0], days[1]])
@@ -152,7 +153,7 @@ export async function remindLessons(now = Date.now()) {
       if (left <= 0 || left > REMIND_MIN * 60e3) continue
       const p = placeOf(l)
       const text = `Eslatma: «${l.title}» darsi ${leftText(Math.round(left / 60e3))}, soat ${l.time}da boshlanadi${p ? ` · ${p}` : ''}`
-      sent += await writeNotes({ query: (...a) => query(...a) }, [...r.members, r.teacher_id], text, lessonHref(r.id, ds), (uid) => hashId(`${r.id}|${ds}|${l.time}|${uid}`))
+      sent += await writeNotes({ query: (...a) => query(...a) }, [...r.members, ...r.teacher_ids], text, lessonHref(r.id, ds), (uid) => hashId(`${r.id}|${ds}|${l.time}|${uid}`))
     }
   }
   return sent

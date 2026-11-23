@@ -34,7 +34,7 @@ export async function canViewStudent(viewer, studentId) {
   if (viewer.role === 'org_admin') return true
   if (viewer.role !== 'teacher') return false
   return !!(await one(`SELECT 1 FROM group_members gm JOIN groups g ON g.id = gm.group_id
-    WHERE gm.user_id = $1 AND g.teacher_id = $2 LIMIT 1`, [studentId, viewer.id]))
+    WHERE gm.user_id = $1 AND EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $2) LIMIT 1`, [studentId, viewer.id]))
 }
 
 const sinceDay = (days) => `(now() AT TIME ZONE '${TZ}')::date - ${Math.max(0, days - 1)}`
@@ -75,7 +75,7 @@ export async function studentsOverview(viewer, days, orgId) {
   const params = [], where = []
   if (viewer.role === 'teacher') {
     params.push(viewer.id)
-    where.push(`s.user_id IN (SELECT gm.user_id FROM group_members gm JOIN groups g ON g.id = gm.group_id WHERE g.teacher_id = $${params.length})`)
+    where.push(`s.user_id IN (SELECT gm.user_id FROM group_members gm JOIN group_teachers gt ON gt.group_id = gm.group_id WHERE gt.user_id = $${params.length})`)
   } else if (viewer.role === 'org_admin' || (viewer.role === 'superadmin' && orgId)) {
     params.push(viewer.role === 'org_admin' ? viewer.org_id : orgId)
     where.push(`s.org_id = $${params.length}`)

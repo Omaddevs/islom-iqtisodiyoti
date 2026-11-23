@@ -4,7 +4,7 @@
 // server tomonidan bildirishnoma sifatida yuboriladi.
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { commit } from '../store/db.js'
+import { commit, teacherIdsOf, teachesGroup } from '../store/db.js'
 import { uid } from '../store/ids.js'
 import { PageHead, Card, Btn, Badge, Icon, Empty, Table, Menu, Search, Modal, Confirm, FField, Input, Textarea, Select, useToast, useFormInit, cx } from '../ui/kit.jsx'
 import { DAYS, DAYS_FULL, MONTHS_FULL } from '../ui/format.js'
@@ -26,7 +26,7 @@ const parseLink = (p) => {
 // Kim qaysi guruh jadvalini boshqaradi (server ham xuddi shunday tekshiradi)
 export function useLessonRights() {
   const { user, scope, can } = useAuth()
-  const canGroup = (g) => !!g && can('lessons.manage') && (user.role !== 'teacher' || g.teacherId === user.id)
+  const canGroup = (g) => !!g && can('lessons.manage') && (user.role !== 'teacher' || teachesGroup(g, user.id))
   return { canGroup, groups: scope.groups.filter(canGroup) }
 }
 
@@ -188,7 +188,7 @@ function LessonsTable({ q, setQ, canGroup, canAdd, onOpen, onEdit, onAdd, studen
             action={canAdd && <Btn variant="primary" icon="plus" onClick={onAdd}>Dars qo‘shish</Btn>} />}
         cols={[
           { key: 'title', label: 'Dars', render: (l) => { const g = groupOf(l); return <div className="pcell-user"><span className="pcell-icon" style={{ background: (g?.color || '#4aa3f8') + '1f', color: g?.color || '#4aa3f8' }}><Icon name={l.online ? 'video' : 'calendar'} size={20} /></span><div><b>{l.title}</b><span>{g ? `${g.name} · ${g.course}` : 'Guruh o‘chirilgan'}</span></div></div> } },
-          { key: 'teacher', label: 'O‘qituvchi', render: (l) => { const t = db.users.find((u) => u.id === groupOf(l)?.teacherId); return <span className="pcell-muted"><Icon name="user" size={16} />{t?.name || 'Biriktirilmagan'}</span> } },
+          { key: 'teacher', label: 'O‘qituvchi', render: (l) => { const names = teacherIdsOf(groupOf(l)).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', '); return <span className="pcell-muted"><Icon name="user" size={16} />{names || 'Biriktirilmagan'}</span> } },
           { key: 'when', label: 'Kunlar', render: (l) => <div className="pweek__times">{l.repeat === 'weekly' ? l.days.slice().sort((a, b) => WEEK_ORDER.indexOf(a) - WEEK_ORDER.indexOf(b)).map((d) => <span key={d}>{DAYS[d]}</span>) : <span>{lessonWhen(l)}</span>}</div> },
           { key: 'time', label: 'Vaqt', render: (l) => <span className="mono">{lessonTime(l)}</span> },
           { key: 'place', label: 'Joy', render: (l) => l.online ? <Badge tone="green"><Icon name="wifi" size={13} /> Onlayn</Badge> : <Badge tone="blue"><Icon name="building" size={13} /> {lessonPlace(l, groupOf(l)) || 'Xona'}</Badge> },
@@ -214,7 +214,7 @@ function LessonDetail({ open, id, date, onClose, onEdit }) {
   const [busy, setBusy] = useState(false)
   const l = db.lessons.find((x) => x.id === id)
   const g = l && db.groups.find((x) => x.id === l.groupId)
-  const teacher = g && db.users.find((u) => u.id === g.teacherId)
+  const teacher = g && { name: teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ') || null }
   const manage = l && canGroup(g)
   // Aniq kun tanlanmagan bo'lsa — eng yaqin dars kuni
   const k = l && (date && occursOn(l, date) ? date : nextOccurrence(l))
@@ -320,7 +320,8 @@ export function LessonForm({ open, lesson, defaultGroupId, defaultDate, onClose,
     return scope.lessons.find((o) => {
       if (o.id === lesson?.id || !hasFuture(o)) return false
       const og = db.groups.find((x) => x.id === o.groupId)
-      return (o.groupId === g.id || (g.teacherId && og?.teacherId === g.teacherId)) && clashes(cand, o)
+      // Bir guruh yoki umumiy ustozi bor guruhlar darslari ustma-ust tushmasin
+      return (o.groupId === g.id || teacherIdsOf(g).some((t) => teachesGroup(og, t))) && clashes(cand, o)
     })
   }, [open, f, g, scope.lessons, db.groups, lesson?.id])
 

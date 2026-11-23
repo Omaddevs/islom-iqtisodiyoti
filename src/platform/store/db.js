@@ -163,11 +163,15 @@ export const NO_ORG = 'Avval tashkilotni tanlang: yuqoridagi «Barcha tashkilotl
 
 // ---- Ko'rinish doirasi (scope) ----
 // Har bir rol qaysi ma'lumotlarni ko'rishini bitta joyda hisoblaymiz.
+// Guruh ustozlari: bir guruhda bir nechta ustoz bo'lishi mumkin (birinchisi — asosiy)
+export const teacherIdsOf = (g) => (g?.teacherIds?.length ? g.teacherIds : g?.teacherId ? [g.teacherId] : [])
+export const teachesGroup = (g, uid) => !!uid && teacherIdsOf(g).includes(uid)
+
 export function scopeFor(db, user, viewOrgId) {
   const orgId = user.role === 'superadmin' ? viewOrgId : user.orgId
   const inOrg = (x) => !orgId || x.orgId === orgId
   let groups = db.groups.filter(inOrg)
-  if (user.role === 'teacher') groups = groups.filter((g) => g.teacherId === user.id)
+  if (user.role === 'teacher') groups = groups.filter((g) => teachesGroup(g, user.id))
   if (user.role === 'student') groups = groups.filter((g) => g.studentIds.includes(user.id))
   const gids = new Set(groups.map((g) => g.id))
   const isStaff = user.role !== 'student'

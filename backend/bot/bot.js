@@ -130,7 +130,7 @@ async function fullAdminIds() {
 async function onProfile(chat, me) {
   if (!me.user) return me.botAdmin ? askContact(chat, true) : askContact(chat)
   let groups = []
-  if (me.user.role === 'teacher') groups = await many('SELECT name FROM groups WHERE teacher_id = $1 ORDER BY name', [me.user.id])
+  if (me.user.role === 'teacher') groups = await many(`SELECT name FROM groups g WHERE EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $1) ORDER BY name`, [me.user.id])
   if (me.user.role === 'student') groups = await many('SELECT g.name FROM group_members m JOIN groups g ON g.id = m.group_id WHERE m.user_id = $1 ORDER BY g.name', [me.user.id])
   return send(chat, `👤 <b>${esc(me.user.name)}</b>\n🎓 ${ROLE[me.user.role]}${me.user.orgName ? `\n🏢 ${esc(me.user.orgName)}` : ''}${groups.length ? `\n👥 ${groups.map((g) => esc(g.name)).join(', ')}` : ''}\n📞 +${esc(me.phone || '')}`,
     ik([[openApp()], [{ text: '🔓 Akkauntdan uzish', callback_data: 'unlink' }]]))
@@ -169,7 +169,7 @@ async function stats(me) {
   }
   const gs = await many(`SELECT g.name, count(m.user_id) n, count(b.tg_id) linked FROM groups g
     LEFT JOIN group_members m ON m.group_id=g.id LEFT JOIN bot_users b ON b.user_id=m.user_id
-    WHERE g.teacher_id=$1 GROUP BY g.id ORDER BY g.name`, [me.user.id])
+    WHERE EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $1) GROUP BY g.id ORDER BY g.name`, [me.user.id])
   if (!gs.length) return '📊 Sizga hali guruh biriktirilmagan.'
   return `📊 <b>Guruhlarim</b>\n\n${gs.map((g) => `👥 <b>${esc(g.name)}</b> — ${fmtN(g.n)} o‘quvchi, botda ${fmtN(g.linked)}`).join('\n')}`
 }
@@ -187,7 +187,7 @@ async function audiences(me) {
     for (const g of await many('SELECT id, name FROM groups WHERE org_id=$1 ORDER BY name LIMIT 20', [me.user.orgId])) list.push({ k: `g:${g.id}`, label: `👥 ${g.name}` })
   } else if (me.level === 'teacher') {
     list.push({ k: 'my', label: '👥 Barcha guruhlarim' })
-    for (const g of await many('SELECT id, name FROM groups WHERE teacher_id=$1 ORDER BY name LIMIT 20', [me.user.id])) list.push({ k: `g:${g.id}`, label: `👥 ${g.name}` })
+    for (const g of await many(`SELECT id, name FROM groups g WHERE EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $1) ORDER BY name LIMIT 20`, [me.user.id])) list.push({ k: `g:${g.id}`, label: `👥 ${g.name}` })
   }
   return list
 }
@@ -211,8 +211,8 @@ async function recipients(me, k) {
     else if (t === 'g') rows = await many(`${base} AND u.id IN (SELECT m.user_id FROM group_members m JOIN groups g ON g.id=m.group_id WHERE g.id=$1 AND g.org_id=$2)`, [v, org])
   }
   if (me.level === 'teacher') {
-    if (k === 'my') rows = await many(`${base} AND u.id IN (SELECT m.user_id FROM group_members m JOIN groups g ON g.id=m.group_id WHERE g.teacher_id=$1)`, [me.user.id])
-    else if (t === 'g') rows = await many(`${base} AND u.id IN (SELECT m.user_id FROM group_members m JOIN groups g ON g.id=m.group_id WHERE g.id=$1 AND g.teacher_id=$2)`, [v, me.user.id])
+    if (k === 'my') rows = await many(`${base} AND u.id IN (SELECT m.user_id FROM group_members m JOIN groups g ON g.id=m.group_id WHERE EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $1))`, [me.user.id])
+    else if (t === 'g') rows = await many(`${base} AND u.id IN (SELECT m.user_id FROM group_members m JOIN groups g ON g.id=m.group_id WHERE g.id=$1 AND EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = g.id AND gt.user_id = $2))`, [v, me.user.id])
   }
   return rows ? [...new Set(rows.map((r) => Number(r.tg_id)))] : null
 }

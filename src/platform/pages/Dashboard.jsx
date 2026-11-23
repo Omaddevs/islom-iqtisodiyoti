@@ -271,13 +271,13 @@ function LeadsWidget({ leads, loading }) {
 // Tashkilot admini: guruhlar holati
 function GroupsHealth() {
   const { db, scope } = useAuth()
-  const rows = scope.groups.map((g) => ({ ...g, teacher: db.users.find((u) => u.id === g.teacherId) }))
+  const rows = scope.groups.map((g) => ({ ...g, teacher: teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ') }))
   return (
     <Card pad={false} title={<CardTitle icon="layers">Guruhlar</CardTitle>} action={<MoreBtn href="#/platform/groups" />}>
       <Table rows={rows.slice(0, 6)} onRow={(g) => { window.location.hash = `#/platform/groups/${g.id}` }}
         empty={<Empty icon="layers" title="Hali guruh yo‘q" text="Guruh yarating, ustoz va o‘quvchilarni biriktiring." action={<Btn variant="primary" icon="plus" as="a" href="#/platform/groups?new=1">Guruh yaratish</Btn>} />} cols={[
           { key: 'name', label: 'Guruh', render: (g) => <div><b style={{ color: g.color }}>{g.name}</b><div className="pmuted" style={{ fontSize: 12.5 }}>{g.course}</div></div> },
-          { key: 'teacher', label: 'Ustoz', render: (g) => g.teacher ? g.teacher.name : <Badge tone="red">Biriktirilmagan</Badge> },
+          { key: 'teacher', label: 'Ustoz', render: (g) => g.teacher || <Badge tone="red">Biriktirilmagan</Badge> },
           { key: 'n', label: 'O‘quvchi', align: 'center', render: (g) => g.studentIds.length || <Badge tone="amber">0</Badge> },
         ]} />
     </Card>
@@ -288,9 +288,9 @@ function GroupsHealth() {
 function Attention() {
   const { db, scope } = useAuth()
   const items = []
-  scope.groups.filter((g) => !g.teacherId).forEach((g) => items.push({ id: `t${g.id}`, icon: 'alertCircle', tone: 'red', title: `${g.name}: ustoz biriktirilmagan`, sub: g.course, href: `#/platform/groups/${g.id}` }))
+  scope.groups.filter((g) => !teacherIdsOf(g).length).forEach((g) => items.push({ id: `t${g.id}`, icon: 'alertCircle', tone: 'red', title: `${g.name}: ustoz biriktirilmagan`, sub: g.course, href: `#/platform/groups/${g.id}` }))
   scope.groups.filter((g) => !g.studentIds.length).forEach((g) => items.push({ id: `s${g.id}`, icon: 'users', tone: 'amber', title: `${g.name}: o‘quvchi yo‘q`, sub: 'O‘quvchilarni guruhga qo‘shing', href: `#/platform/groups/${g.id}` }))
-  const idle = scope.teachers.filter((t) => !scope.groups.some((g) => g.teacherId === t.id))
+  const idle = scope.teachers.filter((t) => !scope.groups.some((g) => teachesGroup(g, t.id)))
   if (idle.length) items.push({ id: 'idle', icon: 'user', tone: 'gray', title: `${idle.length} ta ustozga guruh biriktirilmagan`, sub: idle.map((t) => t.name).slice(0, 2).join(', '), href: '#/platform/users?role=teacher' })
   const lonely = scope.students.filter((s) => !scope.groups.some((g) => g.studentIds.includes(s.id)))
   if (lonely.length) items.push({ id: 'lonely', icon: 'userPlus', tone: 'amber', title: `${lonely.length} ta o‘quvchi guruhsiz`, sub: 'Ular dars va vazifalarni ko‘rmaydi', href: '#/platform/users' })
@@ -508,7 +508,7 @@ function MyGroups({ groups, staff = false }) {
                 <span>{g.course}</span>
                 <small>{staff
                   ? <><Icon name="users" size={14} /> {g.studentIds.length} o‘quvchi</>
-                  : <><Icon name="user" size={14} /> {db.users.find((u) => u.id === g.teacherId)?.name || 'Ustoz biriktirilmagan'}</>}</small>
+                  : <><Icon name="user" size={14} /> {teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ') || 'Ustoz biriktirilmagan'}</>}</small>
                 <div className="pdg__prog" title="O‘tilgan darslar ulushi"><Progress value={p} size="sm" /><em>{p}%</em></div>
               </a>
             )

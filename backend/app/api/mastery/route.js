@@ -15,7 +15,8 @@ export const GET = route(async (req) => {
     if (!(await one('SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2', [g.id, u.id]))) fail(404, 'Guruh topilmadi')
     onlyStudent = u.id
   } else {
-    const ok = u.role === 'superadmin' || (u.org_id === g.org_id && (u.role === 'org_admin' || (u.role === 'teacher' && g.teacher_id === u.id)))
+    const ok = u.role === 'superadmin' || (u.org_id === g.org_id && (u.role === 'org_admin'
+      || (u.role === 'teacher' && !!(await one('SELECT 1 FROM group_teachers WHERE group_id = $1 AND user_id = $2', [g.id, u.id])))))
     if (!ok) fail(403, 'Bu guruh natijalarini ko‘rishga ruxsat yo‘q')
   }
   return json(await computeGroup(g.id, { onlyStudent }))

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG } from '../store/db.js'
+import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG, teacherIdsOf, teachesGroup } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, Select, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
@@ -1203,7 +1203,7 @@ function GroupTestStats({ gid }) {
 
   if (!g) return <Card><Empty icon="layers" title="Guruh topilmadi" text="Guruh o‘chirilgan yoki sizga biriktirilmagan." action={<Btn as="a" href="#/platform/tests">Testlarga qaytish</Btn>} /></Card>
   const rows = [...st.rows].sort((a, b) => (sort === 'name' ? a.s.name.localeCompare(b.s.name) : (b.avg ?? -1) - (a.avg ?? -1) || a.s.name.localeCompare(b.s.name)))
-  const teacher = db.users.find((u) => u.id === g.teacherId)
+  const teacherNames = teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ')
   const now = Date.now()
   const exportCsv = () => downloadCsv(`${g.name} — test natijalari`,
     ['O‘quvchi', ...st.tests.map((t) => t.title), 'O‘rtacha, %', 'Topshirgan', 'Qoldirgan'],
@@ -1214,7 +1214,7 @@ function GroupTestStats({ gid }) {
   return (
     <>
       <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: `${g.name} statistikasi` }]} title={`${g.name} — testlar statistikasi`}
-        sub={`${g.course}${teacher ? ` · ${teacher.name}` : ''}`}
+        sub={`${g.course}${teacherNames ? ` · ${teacherNames}` : ''}`}
         actions={<>
           <Btn icon="layers" as="a" href={`#/platform/groups/${g.id}`}>Guruh sahifasi</Btn>
           {st.tests.length > 0 && st.students.length > 0 && <Btn variant="primary" icon="download" onClick={exportCsv}>Excel’ga yuklash</Btn>}
@@ -1404,7 +1404,7 @@ function FeedbackBox({ test, attempt }) {
   const { user, db } = useAuth()
   const toast = useToast()
   const staff = user.role !== 'student'
-  const canWrite = staff && (user.role !== 'teacher' || test.authorId === user.id || db.groups.some((g) => g.teacherId === user.id && test.groupIds.includes(g.id)))
+  const canWrite = staff && (user.role !== 'teacher' || test.authorId === user.id || db.groups.some((g) => teachesGroup(g, user.id) && test.groupIds.includes(g.id)))
   const [edit, setEdit] = useState(false)
   const [v, setV] = useState(attempt.feedback || '')
   const [busy, setBusy] = useState(false)

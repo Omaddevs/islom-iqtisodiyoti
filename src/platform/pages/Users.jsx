@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, setDB, logActivity, notify, NO_ORG } from '../store/db.js'
+import { add, patch, remove, setDB, logActivity, notify, NO_ORG, teacherIdsOf, teachesGroup } from '../store/db.js'
 import { Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Credentials, Search, useFormInit } from '../ui/kit.jsx'
 import { fmtAgo, fmtDate } from '../ui/format.js'
 import { ROLES } from '../store/seed.js'
@@ -60,15 +60,20 @@ function UserList() {
 
   const base = isTeacher ? scope.myStudents : scope.users.filter((u) => u.role === role)
   const rows = useMemo(() => base.filter((u) => (u.name + u.phone).toLowerCase().includes(q.toLowerCase()))
-    .filter((u) => !groupF || db.groups.some((g) => g.id === groupF && (g.studentIds.includes(u.id) || g.teacherId === u.id)))
-    .map((u) => ({ ...u, groups: db.groups.filter((g) => g.studentIds.includes(u.id) || g.teacherId === u.id) })), [base, q, groupF, db.groups])
+    .filter((u) => !groupF || db.groups.some((g) => g.id === groupF && (g.studentIds.includes(u.id) || teachesGroup(g, u.id))))
+    .map((u) => ({ ...u, groups: db.groups.filter((g) => g.studentIds.includes(u.id) || teachesGroup(g, u.id)) })), [base, q, groupF, db.groups])
 
   const resetPass = (u) => { const p = genPassword(); patch('users', u.id, { password: p }); setCreds({ ...u, password: p, _note: 'Parol yangilandi. Yangi parolni foydalanuvchiga yetkazing.' }) }
   const toggleBlock = (u) => { patch('users', u.id, { status: u.status === 'blocked' ? 'active' : 'blocked' }); toast(u.status === 'blocked' ? 'Hisob faollashtirildi' : 'Hisob bloklandi') }
   // Server ham xuddi shu qoidani tekshiradi: org admini boshqa adminlarni, ustoz faqat o'quvchilarni boshqaradi
   const manageable = (u) => u.id !== user.id && (user.role === 'superadmin' || (user.role === 'org_admin' ? u.role !== 'org_admin' : u.role === 'student'))
   const doDelete = (u) => {
-    setDB((s) => ({ ...s, users: s.users.filter((x) => x.id !== u.id), groups: s.groups.map((g) => ({ ...g, studentIds: g.studentIds.filter((id) => id !== u.id), teacherId: g.teacherId === u.id ? null : g.teacherId })) }))
+    // Faqat shu foydalanuvchi bor guruhlar o'zgaradi; ustoz o'chsa, guruhning boshqa ustozlari saqlanib qoladi
+    setDB((s) => ({ ...s, users: s.users.filter((x) => x.id !== u.id), groups: s.groups.map((g) => {
+      if (!g.studentIds.includes(u.id) && !teachesGroup(g, u.id)) return g
+      const teacherIds = teacherIdsOf(g).filter((id) => id !== u.id)
+      return { ...g, studentIds: g.studentIds.filter((id) => id !== u.id), teacherIds, teacherId: teacherIds[0] || null }
+    }) }))
     toast('Foydalanuvchi o‘chirildi')
   }
 
@@ -161,7 +166,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
     const taken = new Set(db.users.map((u) => digits(u.phone)))
     setF(isNew
       ? { name: '', phone: genPhone(taken), password: genPassword(), title: '', groupIds: defaultGroupId ? [defaultGroupId] : [] }
-      : { name: editUser.name, phone: editUser.phone, password: '', title: editUser.title || '', groupIds: db.groups.filter((g) => g.studentIds.includes(editUser.id) || g.teacherId === editUser.id).map((g) => g.id) })
+      : { name: editUser.name, phone: editUser.phone, password: '', title: editUser.title || '', groupIds: db.groups.filter((g) => g.studentIds.includes(editUser.id) || teachesGroup(g, editUser.id)).map((g) => g.id) })
   })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
 
@@ -179,7 +184,7 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
       const u = add('users', { orgId, role: r, name: f.name.trim(), phone: prettyPhone(f.phone), password: f.password, title: f.title?.trim(), avatarColor: colors[Math.floor(Math.random() * colors.length)], status: 'active', createdBy: me.id, lastSeen: null })
       applyGroups(u.id, r, f.groupIds)
       logActivity(orgId, me.id, r === 'student' ? 'o‘quvchi qo‘shdi' : r === 'teacher' ? 'ustoz qo‘shdi' : 'admin qo‘shdi', u.name)
-      if (r === 'student') { const gs = db.groups.filter((g) => f.groupIds.includes(g.id)); notify([...new Set(gs.map((g) => g.teacherId).filter((id) => id && id !== me.id))], `${u.name} guruhingizga qo‘shildi (${gs.map((g) => g.name).join(', ')})`, '#/platform/groups') }
+      if (r === 'student') { const gs = db.groups.filter((g) => f.groupIds.includes(g.id)); notify([...new Set(gs.flatMap((g) => teacherIdsOf(g)).filter((id) => id && id !== me.id))], `${u.name} guruhingizga qo‘shildi (${gs.map((g) => g.name).join(', ')})`, '#/platform/groups') }
       toast(`${ROLES[r].label} yaratildi`)
       onClose(); onCreated?.(u)
     } else {
@@ -188,12 +193,17 @@ export function UserForm({ open, onClose, role, user: editUser, defaultGroupId, 
       toast('Saqlandi'); onClose()
     }
   }
-  // Guruhlarga biriktirish: o'quvchi -> studentIds, ustoz -> teacherId
+  // Guruhlarga biriktirish: o'quvchi -> studentIds, ustoz -> teacherIds (boshqa ustozlar saqlanib qoladi)
   const applyGroups = (uid, role, ids) => setDB((s) => ({
     ...s,
     groups: s.groups.map((g) => {
       if (role === 'student') { const has = g.studentIds.includes(uid); const want = ids.includes(g.id); return has === want ? g : { ...g, studentIds: want ? [...g.studentIds, uid] : g.studentIds.filter((x) => x !== uid) } }
-      if (role === 'teacher') { if (ids.includes(g.id)) return { ...g, teacherId: uid }; if (g.teacherId === uid) return { ...g, teacherId: null }; return g }
+      if (role === 'teacher') {
+        const cur = teacherIdsOf(g), has = cur.includes(uid), want = ids.includes(g.id)
+        if (has === want) return g
+        const next = want ? [...cur, uid] : cur.filter((x) => x !== uid)
+        return { ...g, teacherIds: next, teacherId: next[0] || null }
+      }
       return g
     }),
   }))

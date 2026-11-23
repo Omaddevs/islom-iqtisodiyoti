@@ -148,6 +148,7 @@ export const sortUnits = (a, b) => (a.num || 0) - (b.num || 0) || (a.createdAt |
 
 export async function loadGroup(groupId) {
   const g = await one(`SELECT g.*, o.data AS org_data,
+      COALESCE((SELECT array_agg(gt.user_id) FROM group_teachers gt WHERE gt.group_id = g.id), '{}') AS teacher_ids,
       COALESCE((SELECT array_agg(gm.user_id ORDER BY gm.added_at) FROM group_members gm JOIN users u ON u.id = gm.user_id WHERE gm.group_id = g.id AND u.role = 'student'), '{}') AS student_ids
     FROM groups g JOIN organizations o ON o.id = g.org_id WHERE g.id = $1`, [groupId])
   if (!g) return null
@@ -284,7 +285,7 @@ export async function computeGroup(groupId, { onlyStudent = null, now = Date.now
 
   return {
     cfg, today, N,
-    group: { id: g.id, name: g.name, orgId: g.org_id, teacherId: g.teacher_id, plannedLessons: Number(g.data?.plannedLessons) || 0, finalTestId,
+    group: { id: g.id, name: g.name, orgId: g.org_id, teacherId: g.teacher_id, teacherIds: g.teacher_ids, plannedLessons: Number(g.data?.plannedLessons) || 0, finalTestId,
       finalTest: finalTestId && testById.has(finalTestId) ? testById.get(finalTestId).title : null },
     lessons: lessonsMeta.map(({ unit, dueEnd, ...x }) => x), // eslint-disable-line no-unused-vars
     students,
@@ -329,8 +330,8 @@ export async function sendRiskAlerts(now = Date.now()) {
       const tag = `${s.risk.low2 ? 'l' : ''}${s.risk.lowAtt ? 'a' : ''}`
       const db = { query: (...a) => query(...a) }
       sent += await writeNotes(db, [s.id], `Diqqat: ${why}. Darslarni takrorlab, topshiriqlarni bajaring — ustozingiz yordam beradi.`, '#/platform/mastery', (uid) => noteId(`risk|${uid}|${s.id}|${s.risk.at}|${tag}`))
-      if (res.group.teacherId) {
-        sent += await writeNotes(db, [res.group.teacherId], `Xavf signali: ${names.get(s.id) || 'O‘quvchi'} (${res.group.name}) — ${why}`, `#/platform/mastery/${res.group.id}.${s.id}`, (uid) => noteId(`risk|${uid}|${s.id}|${s.risk.at}|${tag}`))
+      if (res.group.teacherIds.length) {
+        sent += await writeNotes(db, res.group.teacherIds, `Xavf signali: ${names.get(s.id) || 'O‘quvchi'} (${res.group.name}) — ${why}`, `#/platform/mastery/${res.group.id}.${s.id}`, (uid) => noteId(`risk|${uid}|${s.id}|${s.risk.at}|${tag}`))
       }
     }
   }

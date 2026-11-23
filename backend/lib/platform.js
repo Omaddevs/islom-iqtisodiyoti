@@ -73,15 +73,20 @@ const userOut = (x, full) => ({
   id: x.id, orgId: x.org_id, role: x.role, name: x.name, avatarColor: x.avatar_color, status: x.status, createdAt: x.created_at,
   ...(full ? { phone: prettyPhone(x.phone), lastSeen: x.last_seen_at } : {}),
 })
-const groupOut = (g) => ({
-  schedule: [], ...g.data,
-  id: g.id, orgId: g.org_id, name: g.name, course: g.course, teacherId: g.teacher_id, color: g.color, createdAt: g.created_at,
-  studentIds: g.student_ids || [],
-})
+// teacherIds — guruhning barcha ustozlari (birinchisi — asosiy), teacherId — asosiy ustoz (eski kod uchun)
+const groupOut = (g) => {
+  const teacherIds = g.teacher_ids || (g.teacher_id ? [g.teacher_id] : [])
+  return {
+    schedule: [], ...g.data,
+    id: g.id, orgId: g.org_id, name: g.name, course: g.course, teacherId: teacherIds[0] || null, teacherIds, color: g.color, createdAt: g.created_at,
+    studentIds: g.student_ids || [],
+  }
+}
 const recOut = (r) => ({ ...r.data, id: r.id })
 
 const GROUPS_SQL = `
-  SELECT g.*, COALESCE(array_agg(gm.user_id ORDER BY gm.added_at) FILTER (WHERE gm.user_id IS NOT NULL), '{}') AS student_ids
+  SELECT g.*, COALESCE(array_agg(gm.user_id ORDER BY gm.added_at) FILTER (WHERE gm.user_id IS NOT NULL), '{}') AS student_ids,
+    COALESCE((SELECT array_agg(gt.user_id ORDER BY (gt.user_id = g.teacher_id) DESC, gt.added_at) FROM group_teachers gt WHERE gt.group_id = g.id), '{}') AS teacher_ids
     FROM groups g LEFT JOIN group_members gm ON gm.group_id = g.id`
 
 // ---- O'qish: foydalanuvchi ko'rishi mumkin bo'lgan barcha ma'lumotlar ----
@@ -213,7 +218,7 @@ const orgOps = {
 
 // ---- Foydalanuvchilar ----
 async function teaches(c, teacherId, studentId) {
-  return !!(await row(c, `SELECT 1 FROM group_members gm JOIN groups g ON g.id = gm.group_id WHERE g.teacher_id = $1 AND gm.user_id = $2`, [teacherId, studentId]))
+  return !!(await row(c, `SELECT 1 FROM group_members gm JOIN group_teachers gt ON gt.group_id = gm.group_id WHERE gt.user_id = $1 AND gm.user_id = $2`, [teacherId, studentId]))
 }
 async function canManageUser(c, u, t) {
   if (t.role === 'superadmin' || t.id === u.id) return false
@@ -289,8 +294,24 @@ const userOps = {
 }
 
 // ---- Guruhlar ----
-async function validMembers(c, orgId, teacherId, studentIds) {
-  if (teacherId && !(await row(c, `SELECT 1 FROM users WHERE id = $1 AND org_id = $2 AND role = 'teacher'`, [teacherId, orgId]))) fail(422, 'Ustoz topilmadi')
+// Guruh ustoz(lar)i: yangi brauzer `teacherIds` yuboradi, eski keshlangan sahifa — bitta `teacherId`
+const teachersOf = (o) => (o.teacherIds !== undefined ? o.teacherIds : o.teacherId !== undefined ? (o.teacherId ? [o.teacherId] : []) : undefined)
+async function validTeachers(c, orgId, list) {
+  if (list === undefined) return undefined
+  if (!Array.isArray(list) || list.length > 50) fail(422, 'Ustozlar ro‘yxati noto‘g‘ri')
+  const ids = [...new Set(list.filter(Boolean).map(String))]
+  const ok = ids.length ? await c.query(`SELECT id FROM users WHERE id = ANY($1) AND org_id = $2 AND role = 'teacher'`, [ids, orgId]) : { rowCount: 0 }
+  if (ok.rowCount !== ids.length) fail(422, 'Ustoz topilmadi')
+  return ids
+}
+async function setTeachers(c, groupId, ids) {
+  await c.query('DELETE FROM group_teachers WHERE group_id = $1 AND NOT (user_id = ANY($2))', [groupId, ids])
+  for (const tid of ids) await c.query('INSERT INTO group_teachers (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [groupId, tid])
+  await c.query('UPDATE groups SET teacher_id = $2 WHERE id = $1', [groupId, ids[0] || null])
+}
+// Ustoz shu guruhda dars beradimi (asosiy yoki qo'shimcha)
+const teachesGroup = async (c, userId, groupId) => !!(await row(c, 'SELECT 1 FROM group_teachers WHERE group_id = $1 AND user_id = $2', [groupId, userId]))
+async function validMembers(c, orgId, studentIds) {
   if (studentIds !== undefined) {
     if (!Array.isArray(studentIds) || studentIds.length > 2000) fail(422, 'O‘quvchilar ro‘yxati noto‘g‘ri')
     const ids = [...new Set(studentIds.map(String))]
@@ -319,36 +340,42 @@ const groupOps = {
   async insert(c, u, { item }, id) {
     const orgId = item.orgId
     if (!orgId || !(await row(c, 'SELECT 1 FROM organizations WHERE id = $1', [orgId]))) fail(422, 'Avval tashkilotni tanlang')
-    // Ustoz o'z tashkilotida faqat o'zi dars beradigan guruhni yaratadi
-    const ownTeacher = u.role === 'teacher' && u.org_id === orgId && item.teacherId === u.id
+    const teachers = (await validTeachers(c, orgId, teachersOf(item))) || []
+    // Ustoz o'z tashkilotida faqat o'zi dars beradigan guruhni yaratadi (boshqa ustozlarni administrator qo'shadi)
+    const ownTeacher = u.role === 'teacher' && u.org_id === orgId && teachers.length === 1 && teachers[0] === u.id
     if (!adminOf(u, orgId) && !ownTeacher) deny('Ustoz faqat o‘zi dars beradigan guruhni yaratadi')
-    const ids = await validMembers(c, orgId, item.teacherId, item.studentIds || [])
+    const ids = await validMembers(c, orgId, item.studentIds || [])
     const r = await row(c, `INSERT INTO groups (id, org_id, name, course, teacher_id, color, data) VALUES ($1,$2,$3,$4,$5,$6,$7)
       ON CONFLICT (id) DO NOTHING RETURNING id`,
     [id, orgId, text(item.name, { min: 1, max: 60, label: 'Guruh nomi' }), text(item.course, { min: 1, max: 160, label: 'Kurs' }),
-      item.teacherId || null, item.color ? String(item.color).slice(0, 20) : null, groupData(item)])
+      teachers[0] || null, item.color ? String(item.color).slice(0, 20) : null, groupData(item)])
     if (!r) fail(409, 'Guruh allaqachon mavjud')
     await setMembers(c, id, ids)
+    await setTeachers(c, id, teachers)
     return loadGroup(c, id)
   },
   async patch(c, u, { changes }, id) {
     const g = await row(c, 'SELECT * FROM groups WHERE id = $1', [id])
     if (!g) fail(404, 'Guruh topilmadi')
     const admin = adminOf(u, g.org_id)
-    const own = u.role === 'teacher' && g.teacher_id === u.id
+    const own = u.role === 'teacher' && await teachesGroup(c, u.id, g.id)
     if (!admin && !own) deny()
-    if (!admin && changes.teacherId !== undefined && changes.teacherId !== g.teacher_id) deny('Ustozni faqat administrator biriktiradi')
-    const teacherId = changes.teacherId !== undefined ? changes.teacherId || null : g.teacher_id
-    const ids = await validMembers(c, g.org_id, changes.teacherId !== undefined ? teacherId : null, changes.studentIds)
-    await c.query('UPDATE groups SET name = $2, course = $3, teacher_id = $4, color = $5, data = data || $6 WHERE id = $1', [
+    const cur = (await c.query('SELECT user_id FROM group_teachers WHERE group_id = $1 ORDER BY (user_id = $2) DESC, added_at', [id, g.teacher_id])).rows.map((r) => r.user_id)
+    let teachers = await validTeachers(c, g.org_id, teachersOf(changes))
+    // Faqat asosiy ustoz yuborilgan (eski sahifa): qo'shimcha ustozlar saqlanib qoladi
+    if (teachers && changes.teacherIds === undefined) teachers = teachers.length ? [teachers[0], ...cur.filter((x) => x !== teachers[0])] : []
+    const same = teachers && teachers.length === cur.length && teachers.every((x, i) => x === cur[i])
+    if (teachers && !same && !admin) deny('Ustozlarni faqat administrator biriktiradi')
+    const ids = await validMembers(c, g.org_id, changes.studentIds)
+    await c.query('UPDATE groups SET name = $2, course = $3, color = $4, data = data || $5 WHERE id = $1', [
       id,
       changes.name !== undefined ? text(changes.name, { min: 1, max: 60, label: 'Guruh nomi' }) : g.name,
       changes.course !== undefined ? text(changes.course, { min: 1, max: 160, label: 'Kurs' }) : g.course,
-      teacherId,
       changes.color !== undefined ? String(changes.color).slice(0, 20) : g.color,
       groupData(changes),
     ])
     if (ids) await setMembers(c, id, ids)
+    if (teachers && !same) await setTeachers(c, id, teachers)
     return loadGroup(c, id)
   },
   async delete(c, u, op, id) {
@@ -366,13 +393,13 @@ const groupOps = {
 async function lessonGroup(c, u, groupId) {
   const g = await row(c, 'SELECT id, org_id, teacher_id FROM groups WHERE id = $1', [String(groupId || '')])
   if (!g) fail(422, 'Guruhni tanlang')
-  if (!adminOf(u, g.org_id) && !(u.role === 'teacher' && g.teacher_id === u.id)) deny('Faqat o‘zingiz dars beradigan guruh jadvalini o‘zgartira olasiz')
+  if (!adminOf(u, g.org_id) && !(u.role === 'teacher' && await teachesGroup(c, u.id, g.id))) deny('Faqat o‘zingiz dars beradigan guruh jadvalini o‘zgartira olasiz')
   return g
 }
 const lessonOrFail = (src) => { const l = cleanLesson(src); if (typeof l === 'string') fail(422, l); return l }
 async function sendLessonNotes(c, u, g, id, kind, prev, next) {
-  const members = (await c.query('SELECT user_id FROM group_members WHERE group_id = $1', [g.id])).rows.map((r) => r.user_id)
-  const to = [...members, g.teacher_id].filter((x) => x && x !== u.id)
+  const members = (await c.query('SELECT user_id FROM group_members WHERE group_id = $1 UNION SELECT user_id FROM group_teachers WHERE group_id = $1', [g.id])).rows.map((r) => r.user_id)
+  const to = members.filter((x) => x && x !== u.id)
   for (const m of lessonMessages(kind, prev, next, wallDate(Date.now()))) {
     await writeNotes(c, to, m.text, kind === 'deleted' ? '#/platform/schedule' : lessonHref(id, m.date))
   }
@@ -643,7 +670,7 @@ const recordOps = {
       const t = await getRec(c, 'tests', d.testId)
       if (!t) fail(404, 'Test topilmadi')
       const ok = adminOf(u, r.org_id) || t.owner_id === u.id
-        || (u.role === 'teacher' && !!(await row(c, 'SELECT 1 FROM groups WHERE teacher_id = $1 AND id = ANY($2) LIMIT 1', [u.id, t.data.groupIds || []])))
+        || (u.role === 'teacher' && !!(await row(c, 'SELECT 1 FROM group_teachers WHERE user_id = $1 AND group_id = ANY($2) LIMIT 1', [u.id, t.data.groupIds || []])))
       if (!ok) deny('Faqat shu test guruhi ustozi izoh yoza oladi')
       if (Object.keys(changes).some((k) => k !== 'feedback')) deny('Natijada faqat ustoz izohini o‘zgartirish mumkin')
       const fb = text(changes.feedback, { max: 2000, label: 'Izoh' })
@@ -655,8 +682,7 @@ const recordOps = {
         return updateRec(c, col, id, { ...d, text: text(changes.text ?? d.text, { min: 1, max: 20000, label: 'Javob' }), submittedAt: Date.now() })
       }
       const h = await getRec(c, 'homework', d.homeworkId)
-      const g = h && await row(c, 'SELECT teacher_id FROM groups WHERE id = $1', [h.data.groupId])
-      if (!h || !(adminOf(u, h.org_id) || h.owner_id === u.id || g?.teacher_id === u.id)) deny()
+      if (!h || !(adminOf(u, h.org_id) || h.owner_id === u.id || (u.role === 'teacher' && await teachesGroup(c, u.id, h.data.groupId)))) deny()
       const grade = Number(changes.grade)
       if (changes.grade !== undefined && (!Number.isFinite(grade) || grade < 0 || grade > (Number(h.data.maxGrade) || 100))) fail(422, 'Baho noto‘g‘ri')
       return updateRec(c, col, id, { ...d, ...pick(changes, ['status', 'grade', 'feedback', 'gradedAt']), gradedBy: u.id })

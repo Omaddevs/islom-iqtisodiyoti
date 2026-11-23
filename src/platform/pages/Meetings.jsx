@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { notify, logActivity, getDB } from '../store/db.js'
+import { notify, logActivity, getDB, teacherIdsOf } from '../store/db.js'
 import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, Select, Empty, Icon, Confirm, Menu, useToast, Search, cx, useFormInit } from '../ui/kit.jsx'
 import { fmtTime, fmtDateTime, fmtDateShort, isToday, isTomorrow, DAYS, MONTHS, toLocalInput, fromLocalInput } from '../ui/format.js'
 import { meetingsApi, syncMeetings, useServerStatus, joinLink, recordingUrl } from '../api/meetings.js'
@@ -307,7 +307,7 @@ export function MeetingForm({ open, meeting, onClose, defaultGroupId, onCreated 
       if (isNew) {
         const { meeting: m } = await meetingsApi.create(data)
         const g = db.groups.find((x) => x.id === f.groupId)
-        if (g) notify([...g.studentIds, g.teacherId].filter((id) => id && id !== user.id), `Yangi dars${isExternal(m.provider) ? ` (${provLabel(m)})` : ''}: «${m.title}» — ${fmtDateTime(ts)}`, joinHref(m))
+        if (g) notify([...g.studentIds, ...teacherIdsOf(g)].filter((id) => id && id !== user.id), `Yangi dars${isExternal(m.provider) ? ` (${provLabel(m)})` : ''}: «${m.title}» — ${fmtDateTime(ts)}`, joinHref(m))
         logActivity(m.orgId, user.id, 'dars rejalashtirdi', m.title)
         await syncMeetings().catch(() => {})
         toast(isExternal(m.provider) ? 'Dars rejalashtirildi — o‘quvchilarga xabar yuborildi' : 'Dars rejalashtirildi — endi havolani ulashing')

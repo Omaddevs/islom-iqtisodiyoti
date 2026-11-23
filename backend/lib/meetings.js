@@ -96,7 +96,7 @@ export async function listMeetings(u, { orgId } = {}) {
   }
   if (u.role === 'teacher') {
     return many(`${MEETING_SELECT}
-      WHERE m.org_id = $2 AND (m.host_id = $1 OR g.teacher_id = $1)
+      WHERE m.org_id = $2 AND (m.host_id = $1 OR EXISTS (SELECT 1 FROM group_teachers gt WHERE gt.group_id = m.group_id AND gt.user_id = $1))
       ORDER BY m.starts_at DESC LIMIT 500`, [u.id, u.org_id])
   }
   return many(`${MEETING_SELECT}
@@ -110,7 +110,7 @@ export async function assertCanCreateFor(u, groupId) {
   if (!g) return { error: 'Guruh topilmadi' }
   if (u.role === 'superadmin') return { group: g }
   if (u.role === 'org_admin' && u.org_id === g.org_id) return { group: g }
-  if (u.role === 'teacher' && g.teacher_id === u.id) return { group: g }
+  if (u.role === 'teacher' && await one('SELECT 1 FROM group_teachers WHERE group_id = $1 AND user_id = $2', [g.id, u.id])) return { group: g }
   return { error: 'Bu guruh uchun dars yaratishga ruxsat yo‘q' }
 }
 

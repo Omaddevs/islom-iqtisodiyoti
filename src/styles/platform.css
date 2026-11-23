@@ -2278,3 +2278,4 @@ button.ptmx__cell:hover { transform: translateY(-1px); box-shadow: 0 6px 14px -8
   .pvq-extra { grid-template-columns: 1fr 1fr; }
   .pvq-extra > :first-child { grid-column: 1 / -1; }
 }
+.pgt-main { margin-left: 8px; vertical-align: middle; }

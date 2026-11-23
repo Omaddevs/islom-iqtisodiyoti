@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
-import { add, patch, remove, setDB, notify, logActivity, NO_ORG } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx, useFormInit } from '../ui/kit.jsx'
+import { add, patch, remove, setDB, notify, logActivity, NO_ORG, teacherIdsOf, teachesGroup } from '../store/db.js'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Select, ChipSelect, Empty, Icon, UAvatar, AvatarStack, Confirm, Menu, useToast, Table, Credentials, Stat, Search, cx, useFormInit } from '../ui/kit.jsx'
 import '../../styles/student-profile.css'
 import { fmtWhen, fmtDate, pct } from '../ui/format.js'
 import { groupLessonsText, nextLessonTs, hasFuture, lessonWhen, lessonTime, lessonPlace } from '../ui/agenda.js'
@@ -34,7 +34,7 @@ function GroupList() {
   const list =scope.groups.filter((g) => (g.name + g.course).toLowerCase().includes(q.toLowerCase()))
   const rows = list.map((g) => ({
     g,
-    teacher: db.users.find((u) => u.id === g.teacherId),
+    teachers: teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)).filter(Boolean),
     students: g.studentIds.map((id) => db.users.find((u) => u.id === id)).filter(Boolean),
     held: db.meetings.filter((m) => m.groupId === g.id && m.status === 'ended').length,
     hw: db.homework.filter((h) => h.groupId === g.id).length,
@@ -94,7 +94,8 @@ function nextOf(db, groupId) {
   return m
 }
 
-function GroupCard({ g, teacher, students, held, hw, next, sched, menu }) {
+function GroupCard({ g, teachers, students, held, hw, next, sched, menu }) {
+  const teacher = teachers[0]
   const open = () => { window.location.hash = `#/platform/groups/${g.id}` }
   const live = next?.status === 'live'
   return (
@@ -115,7 +116,8 @@ function GroupCard({ g, teacher, students, held, hw, next, sched, menu }) {
       </div>
       <div className="pgroup__foot">
         {teacher
-          ? <div className="pgroup__teacher"><UAvatar user={teacher} size={38} /><div><b title={teacher.name}>{teacher.name}</b><span>Ustoz</span></div></div>
+          ? <div className="pgroup__teacher">{teachers.length > 1 ? <AvatarStack users={teachers} max={3} size={34} /> : <UAvatar user={teacher} size={38} />}
+            <div><b title={teachers.map((x) => x.name).join(', ')}>{teacher.name}{teachers.length > 1 ? ` +${teachers.length - 1}` : ''}</b><span>{teachers.length > 1 ? `${teachers.length} ta ustoz` : 'Ustoz'}</span></div></div>
           : <Badge tone="amber">Ustoz yo‘q</Badge>}
         <AvatarStack users={students} max={3} size={30} />
       </div>
@@ -129,7 +131,7 @@ export function GroupForm({ open, group, onClose }) {
   const isNew = !group?.id
   const [f, setF] = useState({})
   const [err, setErr] = useState({})
-  useFormInit(open, group?.id, () => { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherId: user.role === 'teacher' ? user.id : '', room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length] } : { ...group }) })
+  useFormInit(open, group?.id, () => { setErr({}); setF(isNew ? { name: '', course: '', level: 'Boshlang‘ich', teacherIds: user.role === 'teacher' ? [user.id] : [], room: 'Onlayn', color: COLORS[db.groups.length % COLORS.length] } : { ...group, teacherIds: teacherIdsOf(group) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const teachers = db.users.filter((u) => u.role === 'teacher' && u.orgId === (scope.orgId || user.orgId))
   const submit = () => {
@@ -137,15 +139,18 @@ export function GroupForm({ open, group, onClose }) {
     if (!f.name?.trim()) er.name = 'Guruh nomini kiriting'
     if (!f.course?.trim()) er.course = 'Kurs nomini kiriting'
     setErr(er); if (Object.keys(er).length) return
-    const data = { name: f.name.trim(), course: f.course.trim(), level: f.level, teacherId: f.teacherId || null, room: f.room?.trim(), color: f.color }
+    const teacherIds = f.teacherIds || []
+    const data = { name: f.name.trim(), course: f.course.trim(), level: f.level, teacherIds, teacherId: teacherIds[0] || null, room: f.room?.trim(), color: f.color }
+    // Yangi biriktirilgan ustozlarga xabar (o'zidan tashqari)
+    const added = (g) => teacherIds.filter((id) => id !== user.id && !teacherIdsOf(group).includes(id)).length && notify(teacherIds.filter((id) => id !== user.id && !teacherIdsOf(group).includes(id)), `Siz ${g.name} guruhiga ustoz etib biriktirildingiz`, `#/platform/groups/${g.id}`)
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       const orgId = scope.orgId
       const g = add('groups', { ...data, orgId, studentIds: [] })
-      if (g.teacherId && g.teacherId !== user.id) notify([g.teacherId], `Siz ${g.name} guruhiga ustoz etib biriktirildingiz`, `#/platform/groups/${g.id}`)
+      added(g)
       logActivity(orgId, user.id, 'guruh yaratdi', g.name)
       toast('Guruh yaratildi'); onClose(); window.location.hash = `#/platform/groups/${g.id}`
-    } else { patch('groups', group.id, data); toast('Saqlandi'); onClose() }
+    } else { patch('groups', group.id, data); added({ ...group, ...data }); toast('Saqlandi'); onClose() }
   }
   return (
     <Modal open={open} onClose={onClose} title={isNew ? 'Guruh yaratish' : 'Guruhni tahrirlash'} footer={<><Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" onClick={submit}>{isNew ? 'Yaratish' : 'Saqlash'}</Btn></>}>
@@ -155,10 +160,21 @@ export function GroupForm({ open, group, onClose }) {
           <FField label="Daraja"><Select value={f.level} onChange={(v) => set('level', v)} options={['Boshlang‘ich', 'O‘rta', 'Yuqori'].map((l) => ({ value: l, label: l }))} /></FField>
         </div>
         <FField label="Kurs" error={err.course}><Input value={f.course || ''} onChange={(e) => set('course', e.target.value)} placeholder="Islom moliyasi asoslari" /></FField>
-        <div className="pform__row">
-          <FField label="Ustoz">{user.role === 'teacher' ? <Input value={user.name} disabled /> : <Select value={f.teacherId} onChange={(v) => set('teacherId', v)} placeholder="Keyinroq biriktirish" options={teachers.map((t) => ({ value: t.id, label: t.name }))} />}</FField>
-          <FField label="Xona / format"><Input value={f.room || ''} onChange={(e) => set('room', e.target.value)} placeholder="Onlayn" /></FField>
-        </div>
+        {user.role === 'teacher' ? (
+          <div className="pform__row">
+            <FField label="Ustozlar" hint={(f.teacherIds || []).length > 1 ? 'Boshqa ustozlarni administrator biriktiradi' : null}>
+              <Input value={(f.teacherIds || []).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ') || user.name} disabled />
+            </FField>
+            <FField label="Xona / format"><Input value={f.room || ''} onChange={(e) => set('room', e.target.value)} placeholder="Onlayn" /></FField>
+          </div>
+        ) : (
+          <>
+            <FField label="Ustozlar" hint={teachers.length ? 'Bir nechta ustozni tanlash mumkin. Birinchi tanlangani — asosiy ustoz. Har bir ustoz guruh o‘quvchilari va natijalarini ko‘radi.' : 'Tashkilotda hali ustoz yo‘q'}>
+              <ChipSelect value={f.teacherIds || []} onChange={(v) => set('teacherIds', v)} options={teachers.map((t) => ({ value: t.id, label: t.name }))} />
+            </FField>
+            <FField label="Xona / format"><Input value={f.room || ''} onChange={(e) => set('room', e.target.value)} placeholder="Onlayn" /></FField>
+          </>
+        )}
         <FField label="Rang"><div className="pswatches">{COLORS.map((c) => <button key={c} type="button" className={cx(f.color === c && 'is-on')} style={{ background: c }} onClick={() => set('color', c)} aria-label={c} />)}</div></FField>
         <p className="pform__note"><Icon name="calendar" size={15} /> Dars kunlari va vaqtlari «Dars jadvali» bo‘limida qo‘shiladi — o‘quvchilarga bildirishnoma boradi.</p>
       </div>
@@ -181,9 +197,9 @@ function GroupDetail({ id }) {
   const [rm, setRm] = useState(null)
   const [pick, setPick] = useState([])
   if (!g) return <Card><Empty icon="layers" title="Guruh topilmadi" action={<Btn as="a" href="#/platform/groups">Orqaga</Btn>} /></Card>
-  const t = db.users.find((u) => u.id === g.teacherId)
+  const teachers = teacherIdsOf(g).map((tid) => db.users.find((u) => u.id === tid)).filter(Boolean)
   const students = g.studentIds.map((sid) => db.users.find((u) => u.id === sid)).filter(Boolean)
-  const canEdit = can('groups.manage') || (user.role === 'teacher' && g.teacherId === user.id)
+  const canEdit = can('groups.manage') || (user.role === 'teacher' && teachesGroup(g, user.id))
   const meetings = db.meetings.filter((m) => m.groupId === g.id).sort((a, b) => b.startsAt - a.startsAt)
   const homework = db.homework.filter((h) => h.groupId === g.id)
   const lessons = db.lessons.filter((l) => l.groupId === g.id && hasFuture(l)).sort((a, b) => (a.repeat === b.repeat ? (a.date + a.time).localeCompare(b.date + b.time) : a.repeat === 'weekly' ? -1 : 1))
@@ -273,8 +289,12 @@ function GroupDetail({ id }) {
           )}
         </div>
         <div className="pstack-v" style={{ gap: 20 }}>
-          <Card title="Ustoz">
-            {t ? <div className="pcell-user"><UAvatar user={t} size={48} /><div><b style={{ fontSize: 15 }}>{t.name}</b><span>{t.title}</span><span className="mono">{t.phone}</span></div></div> : <Empty icon="user" title="Ustoz biriktirilmagan" action={can('groups.manage') && <Btn size="sm" onClick={() => setEditOpen(true)}>Biriktirish</Btn>} />}
+          <Card title={teachers.length > 1 ? `Ustozlar (${teachers.length})` : 'Ustoz'} action={can('groups.manage') && teachers.length > 0 && <Btn size="sm" variant="ghost" icon="edit" onClick={() => setEditOpen(true)}>O‘zgartirish</Btn>}>
+            {teachers.length ? (
+              <div className="pstack-v" style={{ gap: 14 }}>
+                {teachers.map((t, i) => <div key={t.id} className="pcell-user"><UAvatar user={t} size={teachers.length > 1 ? 40 : 48} /><div><b style={{ fontSize: 15 }}>{t.name}{teachers.length > 1 && i === 0 && <Badge tone="blue" className="pgt-main">Asosiy</Badge>}</b><span>{t.title}</span><span className="mono">{t.phone}</span></div></div>)}
+              </div>
+            ) : <Empty icon="user" title="Ustoz biriktirilmagan" action={can('groups.manage') && <Btn size="sm" onClick={() => setEditOpen(true)}>Biriktirish</Btn>} />}
           </Card>
           <Card title="Dars jadvali" action={canEdit && <Btn size="sm" icon="plus" onClick={() => setLessonOpen(true)}>Qo‘shish</Btn>}>
             {lessons.length === 0 && <Empty icon="calendar" title="Jadval belgilanmagan" text={canEdit ? 'Dars qo‘shing — o‘quvchilarga bildirishnoma boradi.' : undefined} />}
