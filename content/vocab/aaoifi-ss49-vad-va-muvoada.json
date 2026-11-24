@@ -1,0 +1,235 @@
+{
+  "title": "AAOIFI 49-shariat standarti: Bir tomonlama va ikki tomonlama va’da — izohli lug‘at",
+  "lang": "uz · ar · en",
+  "description": "AAOIFI Shariat standarti №49 «Bir tomonlama va ikki tomonlama va’da» (Unilateral and Bilateral Promise) ni tushunish uchun zarur bo‘lgan 18 ta asosiy termin: shariat terminlari (va’d, muvoada, diyonatan va qazoan majburiylik, iyna, tabarru’, ijob va qabul, haqiqiy zarar, hiyla) hamda Islom moliya muassasalari amaliyoti terminlari (murobahada xarid va’dasi, ijara muntahiya bittamlik, kamayuvchi musharaka, bosh kelishuv, akkreditiv, ta’minot shartnomalari, o‘zaro bog‘langan derivativlar). Har bir terminda arabcha asl shakli, inglizcha ekvivalenti, oddiy tildagi ta’rif, standart bandi va shariat hukmi berilgan. Ta’riflar standart matniga tayanadi; standartda bo‘lmagan izohlar «(qo‘shimcha izoh)» deb belgilangan. Standart 2013-yil 4-yanvarda (hijriy 1434-yil 21-safar) Bahraynda Shariat kengashining 34-yig‘ilishida qabul qilingan. Auditoriya: bakalavr va magistratura talabalari, CSAA/CPSS imtihoniga tayyorlanuvchilar.",
+  "orderNote": "Terminlar alifbo bo‘yicha emas, standart bandlari ketma-ketligida joylashtirilgan: ta’riflar (2-band) → bir tomonlama va’da turlari va hukmlari: harom va’dalar, diyonatan va qazoan majburiylik, haqiqiy zarar, tabarru’ va’dasi, ijob va qabul (3-band) → ikki tomonlama va’da (muvoada): taqiqlangan, majburiy istisnolar, bosh kelishuv (4-band) → joiz amaliy tatbiqlar (5-band) → joiz bo‘lmagan tatbiqlar (6-band). Standartning o‘zi «avval bir tomonlama va’da, keyin ikki tomonlama va’da, so‘ng amaliyot» mantig‘ida tuzilgan; shu tartibda o‘qilganda eng muhim farqlar — va’d va muvoada, diyonatan va qazoan majburiylik, va’da va shartnoma — yonma-yon solishtiriladi.",
+  "terms": [
+    {
+      "term": "Va’d (bir tomonlama va’da)",
+      "arabic": "الْوَعْد",
+      "translit": "al-waʿd",
+      "translation": "Unilateral promise",
+      "definition": "Bir tomonning ikkinchi tomon manfaatini ko‘zlab, kelajakda biror ishni qilishga bo‘lgan qat’iy niyatini (majburiyatini) bildirishi; ikkinchi tomon esa bu va’dadan foydalanish yoki foydalanmaslikda erkin (2/1). Biror ish yoki moliyaviy muomalaga va’da berish joiz, unga vafo qilish diyonatan vojib (3/4).",
+      "clause": "2/1; 3/4",
+      "ruling": "joiz",
+      "distinction": "Va’d — faqat bir tomon o‘z zimmasiga oladi; muvoada — ikki tomon bir-biriga qarama-qarshi va’da beradi (2/2). Va’d — hali shartnoma emas, shartnoma keyinroq ijob va qabul bilan tuziladi (3/8).",
+      "example": "Mijoz bankka: «Siz shu uskunani sotib olsangiz, men uni murobaha asosida sizdan sotib olaman» deb va’da beradi."
+    },
+    {
+      "term": "Void, mav’ud lahu va mav’ud bihi",
+      "arabic": "الْوَاعِد / الْمَوْعُود لَهُ / الْمَوْعُود بِهِ",
+      "translit": "al-wāʿid / al-mawʿūd lahu / al-mawʿūd bihi",
+      "translation": "Promisor, promisee and the subject of the promise",
+      "definition": "Va’dani beruvchi tomon — «void» (va’da beruvchi); va’da berilgan tomon — «mav’ud lahu» (va’da oluvchi, ya’ni va’dadan naf ko‘ruvchi); va’da qilingan ish — «mav’ud bihi» (va’da qilingan amal) deb ataladi (2/1).",
+      "clause": "2/1",
+      "ruling": "joiz",
+      "distinction": "Qazoan majburiy va’da faqat voidni bog‘laydi; mav’ud lahu esa bajarishni talab qilish yoki undan voz kechishda erkin (3/5).",
+      "example": "Murobahada: mijoz — void, bank — mav’ud lahu, tovarni sotib olish — mav’ud bihi."
+    },
+    {
+      "term": "Muvoada (ikki tomonlama va’da)",
+      "arabic": "الْمُوَاعَدَة",
+      "translit": "al-muwāʿadah",
+      "translation": "Bilateral promise",
+      "definition": "Ikki tomon o‘rtasida bir-biriga qarama-qarshi ikkita va’daning almashilishi: har bir tomon kelajakda ayni bir predmetga (obyektga) oid biror amalni bajarishga va’da beradi (2/2). Joiz amalga oid muvoadaga vafo qilish ikki tomon uchun diyonatan vojib, lekin qazoan majburiy emas (4/2).",
+      "clause": "2/2; 4/2",
+      "ruling": "shartli joiz",
+      "distinction": "Muvoadada ikkala va’da bir predmetga tegishli (masalan, biri sotishga, ikkinchisi shu narsani sotib olishga); 3/7 dagi holatda esa ikki tomon har xil predmetga oid alohida va’da beradi. Ikki tomon uchun ham majburiy muvoada amalda shartnomaning o‘ziga aylanib qoladi, shuning uchun u faqat istisno holatlarda joiz (qo‘shimcha izoh).",
+      "example": "Bank va mijoz bir-biriga: biri «oyning 1-sanasida uskunani sotaman», ikkinchisi «shu kuni uni sotib olaman» deb va’da beradi."
+    },
+    {
+      "term": "Harom amalga va’da va hiyla",
+      "arabic": "الْوَعْد بِمُحَرَّم / الْحِيلَة",
+      "translit": "al-waʿd bi-muḥarram / al-ḥīlah",
+      "translation": "Promise to do a prohibited act; legal stratagem (hilah)",
+      "definition": "Shariatda joiz bo‘lmagan amalni bajarishga va’da berish haromdir va bunday va’daga vafo qilish ham haromdir (3/1). Masalan, foizli (ribaviy) muomalalar haromligini chetlab o‘tish uchun hiyla sifatida beriladigan va’dalar. Xuddi shunday, haram amalga ikki tomonlama va’da berish ham harom (4/1).",
+      "clause": "3/1; 4/1",
+      "ruling": "nojoiz",
+      "distinction": "Odatda va’daga vafo qilish vojib, lekin harom amalga berilgan va’dada aksincha — vafo qilish ham gunoh. Hiyla — tashqi shakli joiz, maqsadi esa harom natijaga erishish bo‘lgan bitimlar zanjiri (qo‘shimcha izoh).",
+      "example": "«Sizga pul qarz beraman, siz esa keyin menga ustama bilan qaytarishga va’da berasiz» — harom amalga va’da."
+    },
+    {
+      "term": "Qarzda qo‘shimcha manfaat va’dasi",
+      "arabic": "الْوَعْد بِمَنْفَعَةٍ زَائِدَةٍ فِي الْقَرْض",
+      "translit": "al-waʿd bi-manfaʿah zāʾidah fī al-qarḍ",
+      "translation": "Promise of an additional benefit to the lender",
+      "definition": "Qarz shartnomasida qarz beruvchiga qarzning o‘zini qaytarishdan tashqari qo‘shimcha manfaat keltiradigan har qanday va’da, hatto u qarz shartnomasidan alohida hujjatda berilgan bo‘lsa ham, shariatda harom (3/2).",
+      "clause": "3/2",
+      "ruling": "nojoiz",
+      "distinction": "Qarz evaziga shart qilingan yoki va’da qilingan har qanday ortiqcha naf — riba. Hujjatni alohida rasmiylashtirish hukmni o‘zgartirmaydi: e’tibor shaklga emas, mohiyatga (qo‘shimcha izoh).",
+      "example": "Qarz oluvchi alohida xat bilan «qarz uchun minnatdorchilik sifatida omboringizni bir yil tekin ijaraga beraman» deb va’da beradi — harom."
+    },
+    {
+      "term": "Iyna va teskari iyna",
+      "arabic": "بَيْع الْعِينَة / عَكْس الْعِينَة",
+      "translit": "bayʿ al-ʿīnah / ʿaks al-ʿīnah",
+      "translation": "Inah sale and reverse Inah",
+      "definition": "Iyna — sotilgan narsani qayta sotib olish orqali amalda foizli qarz olish. Oldi-sotdi shartnomasida xaridor yoki sotuvchi tomonidan beriladigan va iyna shartnomasiga olib keladigan har qanday va’da harom; va’da shartnoma tarkibida, undan oldin yoki keyin berilishining ahamiyati yo‘q (3/3). Iynaga ikki tomonlama va’da berish ham harom (4/1).",
+      "clause": "3/3; 4/1",
+      "ruling": "nojoiz",
+      "distinction": "Iyna — narsani nasiyaga sotib olib, uni arzonroq narxga naqdga qayta sotish (sotuvchiga). Teskari iyna — narsani naqdga sotib, uni qimmatroq narxga nasiyaga qayta sotib olish. Tomonlar qayta sotib olishda vositachilik qilishi uchun uchinchi shaxs bilan til biriktirsalar ham, xuddi shu taqiq amal qiladi (3/3).",
+      "example": "Mijoz bankdan avtomobilni 120 mln so‘mga nasiyaga oladi va shu zahoti uni bankka 100 mln so‘mga naqdga qaytarib sotishga va’da beradi — iyna."
+    },
+    {
+      "term": "Diyonatan majburiylik",
+      "arabic": "الْإِلْزَام دِيَانَةً",
+      "translit": "al-ilzām diyānatan",
+      "translation": "Religiously (morally) binding",
+      "definition": "Va’daga vafo qilish Alloh oldidagi burch ekani: uzrsiz va’dani buzish gunoh hisoblanadi, lekin uni bajarishga sud orqali majburlab bo‘lmaydi. Biror ish yoki moliyaviy muomalaga berilgan va’da, ehson va’dasi va joiz amalga oid muvoada odatda shu darajada majburiy (3/4, 3/6, 4/2).",
+      "clause": "3/4; 3/6; 4/2",
+      "ruling": "majburiy shart",
+      "distinction": "Diyonatan majburiylik — ichki, diniy javobgarlik (gunoh); qazoan majburiylik — tashqi, huquqiy javobgarlik (sud orqali talab qilinadi, zararni qoplash). Har bir qazoan majburiy va’da diyonatan ham majburiy, lekin aksi emas.",
+      "example": "Do‘stiga «ertaga kitobimni senga hadya qilaman» degan kishi va’dasini bajarmasa — gunohkor, lekin do‘sti uni sudga bera olmaydi."
+    },
+    {
+      "term": "Qazoan majburiy va’da",
+      "arabic": "الْوَعْد الْمُلْزِم قَضَاءً",
+      "translit": "al-waʿd al-mulzim qaḍāʾan",
+      "translation": "Promise binding in the court of law (enforceable promise)",
+      "definition": "Odatda va’da qazoan (huquqiy jihatdan, sud orqali) majburiy emas; faqat uni majburiy qilishga haqiqiy ehtiyoj bo‘lgan holatlar bundan mustasno — masalan, void o‘z va’dasi sababli mav’ud lahuni biror majburiyat yoki xarajatga kiritib qo‘ygan bo‘lsa (3/4). Bunday va’da faqat va’da beruvchiga nisbatan majburiy, va’da oluvchiga nisbatan majburiy emas (3/5).",
+      "clause": "3/4; 3/5",
+      "ruling": "shartli joiz",
+      "distinction": "Qazoan majburiylik ikki tomonlama emas: void bajarishga yoki zararni qoplashga majbur, mav’ud lahu esa bajarishni talab qilish yoki undan voz kechishda erkin (3/5). Agar ikkala tomon ham majburiy bo‘lsa, bu endi muvoada bo‘ladi (4-band).",
+      "example": "Mijoz savdogardan muayyan tovarni sotib olishni so‘rab, uni sotib olishga qat’iy va’da berdi. Savdogar shu va’daga tayanib tovarni sotib oldi — endi mijoz uni sotib olishga qazoan majbur (3/4)."
+    },
+    {
+      "term": "Haqiqiy zarar",
+      "arabic": "الضَّرَر الْفِعْلِي",
+      "translit": "aḍ-ḍarar al-fiʿlī",
+      "translation": "Actual damage (actual loss)",
+      "definition": "Qazoan majburiy va’da buzilganda void qoplab beradigan zarar. Agar savdogar tovarni tannarxini qoplovchi narxda sota olmasa, void tovar tannarxi bilan savdogar uni sotishdan olgan narx o‘rtasidagi farqni to‘lab berishi lozim. Haqiqiy zarar tarkibiga boy berilgan foyda (imkoniyat xarajati) kirmaydi (3/4; muvoadada ham xuddi shunday — 4/3).",
+      "clause": "3/4; 4/3",
+      "ruling": "joiz",
+      "distinction": "Haqiqiy zarar — amalda ko‘rilgan, hisoblab bo‘ladigan yo‘qotish (tannarx va sotuv narxi farqi); boy berilgan foyda (al-furṣah aḍ-ḍāʾiʿah) — kelajakda olinishi mumkin bo‘lgan taxminiy daromad, uni undirish nojoiz. 3-sonli standartdagi penya taqiqi bilan bir mantiq (qo‘shimcha izoh).",
+      "example": "Bank mijoz va’dasiga tayanib avtomobilni 200 mln so‘mga sotib oldi; mijoz voz kechdi, bank uni 190 mln so‘mga sotdi. Mijoz 10 mln so‘m to‘laydi; bank kutgan 20 mln so‘m foydani talab qila olmaydi."
+    },
+    {
+      "term": "Ehson (tabarru’) va’dasi",
+      "arabic": "الْوَعْد بِالتَّبَرُّع / الْعَارِيَّة",
+      "translit": "al-waʿd bi at-tabarruʿ / al-ʿāriyyah",
+      "translation": "Promise of a gratuitous act (gift, loan for use – ‘Ariyah)",
+      "definition": "Ehson tarzidagi va’daga — masalan, hadya qilish yoki biror narsani oriyat (ariya, tekin foydalanishga) berish haqidagi va’daga — vafo qilish diyonatan vojib, lekin qazoan majburiy emas. Biroq agar va’da va’da oluvchining o‘ziga majburiyat yuklaydigan biror amalni bajarishiga bog‘lab berilgan bo‘lsa, bunday va’da qazoan majburiy bo‘ladi (3/6).",
+      "clause": "3/6",
+      "ruling": "shartli joiz",
+      "distinction": "Shartsiz hadya va’dasi — faqat diyonatan majburiy; shartli hadya va’dasi («agar sen … qilsang, senga … hadya qilaman») — mav’ud lahu shartni bajargach, qazoan ham majburiy. Ijara muntahiya bittamlikdagi hadya va’dasi aynan shu qoidaga asoslanadi (5/2).",
+      "example": "Sotuvchi: «Agar mendan ushbu muzlatkichni sotib olsangiz, sizga mikroto‘lqinli pechni hadya qilaman». Xaridor muzlatkichni sotib olgach, pechni berish qazoan majburiy."
+    },
+    {
+      "term": "Ikki alohida evazli shartnomaga va’dalar",
+      "arabic": "الْوَعْدَانِ الْمُتَقَابِلَانِ بِعَقْدَيْنِ مُخْتَلِفَيْن",
+      "translit": "al-waʿdān al-mutaqābilān bi-ʿaqdayn mukhtalifayn",
+      "translation": "Two promises to conclude separate exchange contracts with different subjects",
+      "definition": "Bir tomonning kelajakda evazli (muovaza) shartnoma tuzishga va’da berishi, va’da oluvchining esa birinchi tomonga birinchi va’da predmetidan farqli predmetga ega bo‘lgan alohida evazli shartnoma tuzishga va’da berishi joiz. Bu ikki va’dadan hech biri qazoan majburiy emas; faqat va’da beruvchi va’da oluvchini biror majburiyatga kiritib qo‘ygan holat bundan mustasno — bunday holatda va’da majburiy bo‘ladi (3/7, 3/5 ga havola).",
+      "clause": "3/7",
+      "ruling": "joiz",
+      "distinction": "Muvoadada ikki va’da bir predmetga tegishli; bu yerda esa ikki xil predmetga (masalan, biri tovarni sotish, ikkinchisi mulkni ijaraga berish). Lekin ular o‘zaro bog‘lanib, harom muomalani chetlab o‘tish vositasiga aylansa — nojoiz (6-band).",
+      "example": "Birinchi tomon: «Senga ushbu mashinani sotishga va’da beraman». Ikkinchi tomon: «Senga falon ofisimni ijaraga berishga va’da beraman»."
+    },
+    {
+      "term": "Ijob va qabul",
+      "arabic": "الْإِيجَاب وَالْقَبُول",
+      "translit": "al-ījāb wa al-qabūl",
+      "translation": "Offer and acceptance",
+      "definition": "Shartnomani tuzish shakli: bir tomonning taklifi (ijob) va ikkinchi tomonning roziligi (qabul). Kelajakda shartnoma tuzishga va’da berilganda, shartnoma o‘z-o‘zidan tuzilmaydi; u tegishli vaqtda ijob va qabulni almashish orqali tuzilishi shart (3/8, 4/3). Va’da qazoan majburiy bo‘lsa: ijob va’da oluvchidan bo‘lsa, va’da beruvchi uni qabul qilishga diyonatan va qazoan majbur; ijob va’da beruvchidan bo‘lsa, va’da oluvchi qabul qilish yoki rad etishda erkin (3/8).",
+      "clause": "3/8; 4/3; 4/4",
+      "ruling": "majburiy shart",
+      "distinction": "Va’da — kelajakdagi shartnomaga majburiyat; ijob va qabul — shartnomaning o‘zi. Shuning uchun majburiy va’da ham, majburiy muvoada ham «kelajakka bog‘langan shartnoma» hisoblanmaydi (4/3).",
+      "example": "Murobahada mijoz va’da beradi; bank tovarni sotib olgach, «sizga 110 mln so‘mga sotdim» (ijob) deydi, mijoz «qabul qildim» (qabul) deydi — shundagina sotuv tuziladi."
+    },
+    {
+      "term": "Majburiy muvoada (istisno holatlar)",
+      "arabic": "الْمُوَاعَدَة الْمُلْزِمَة لِلطَّرَفَيْن",
+      "translit": "al-muwāʿadah al-mulzimah li aṭ-ṭarafayn",
+      "translation": "Bilateral promise binding on both parties (exceptions)",
+      "definition": "Joiz amalga oid muvoada odatda qazoan majburiy emas. Biroq qonunchilik talablari yoki umumiy tijorat urfi sababli majburiy ikki tomonlama va’dasiz haqiqiy tijoriy bitimni amalga oshirib bo‘lmaydigan va maqsad shunchaki moliyalashtirish bo‘lmagan holatlar bundan mustasno: akkreditivlar vositasida amalga oshiriladigan xalqaro savdodagi ikki tomonlama va’dalar (4/2/1) va ta’minot (yetkazib berish) shartnomalaridagi ikki tomonlama va’dalar (4/2/2).",
+      "clause": "4/2; 4/2/1; 4/2/2; 4/3",
+      "ruling": "shartli joiz",
+      "distinction": "Bu muvoada ikki tomon uchun ham majburiy: bir tomon ijob bildirsa, ikkinchisi qabul qilishga diyonatan va qazoan majbur; bajarmasa — sud orqali shartnoma tuzishga majburlash yoki haqiqiy zararni (boy berilgan foydasiz) undirish mumkin (4/3). Asosiy shart — maqsad haqiqiy savdo, moliyalashtirish emas.",
+      "example": "O‘zbek importyor va Turkiyadagi yetkazib beruvchi akkreditiv asosidagi xalqaro savdoda bir-biriga uskunani sotish va sotib olish bo‘yicha majburiy va’da beradi — joiz."
+    },
+    {
+      "term": "Akkreditiv va ta’minot shartnomalari",
+      "arabic": "الِاعْتِمَادَات الْمُسْتَنَدِيَّة / عُقُود التَّوْرِيد",
+      "translit": "al-iʿtimādāt al-mustanadiyyah / ʿuqūd at-tawrīd",
+      "translation": "Letters of credit and supply contracts",
+      "definition": "Standart majburiy muvoadaga ruxsat bergan ikki amaliy soha. Xalqaro savdoda akkreditiv orqali to‘lov qilinadigan bitimlar va tovarlarni muntazam yetkazib berish (ta’minot) shartnomalari: bularda qonunchilik yoki tijorat urfi ikki tomondan majburiy va’dani talab qiladi (4/2/1, 4/2/2).",
+      "clause": "4/2/1; 4/2/2",
+      "ruling": "joiz",
+      "distinction": "Akkreditivda bank to‘lov majburiyatini oladi (batafsil — 14-sonli standart); ta’minot shartnomasida yetkazib beruvchi kelajakda belgilangan tovarni yetkazishga majburiyat oladi. Ikkalasida ham asl maqsad tovar ayirboshlash, shuning uchun majburiy muvoada riboga yo‘l ochmaydi (qo‘shimcha izoh).",
+      "example": "Non zavodi un kombinati bilan bir yil davomida har oy 50 tonna un yetkazib berish bo‘yicha ikki tomonlama majburiy va’da tuzadi."
+    },
+    {
+      "term": "Bosh kelishuv (umumiy asos)",
+      "arabic": "الِاتِّفَاقِيَّة الْإِطَارِيَّة",
+      "translit": "al-ittifāqiyyah al-iṭāriyyah",
+      "translation": "Master (framework) agreement",
+      "definition": "Ikki tomonning kelajakdagi bitimlar uchun umumiy (bosh) kelishuv tuzishi joiz; bunda har bir tomon kelajakdagi bitimni tuzish yoki tuzmaslik ixtiyoriga ega. Tomonlar bitim tuzsalar, bosh kelishuvda kelishilgan shartlar qo‘llaniladi. Bosh kelishuv — tomonlardan hech birini bitimlarni tuzishga majbur qilmaydigan ikki tomonlama va’da; u bitim hisoblanmaydi. Murobaha bitimlari ijob va qabul almashinuvi orqali tuziladi va bosh kelishuv shartlariga bo‘ysunadi; shartlar har bir shartnomada qayta tasdiqlanadi (4/4; 37-sonli standart).",
+      "clause": "4/4",
+      "ruling": "joiz",
+      "distinction": "Bosh kelishuv — majburiy bo‘lmagan muvoada: hech kim bitim tuzishga majbur emas. Majburiy muvoada (4/2) esa tomonlarni bitim tuzishga majburlaydi. Mijoz bosh kelishuvni imzolash bilan murobaha shartnomasini tuzishga majbur bo‘lmaydi.",
+      "example": "Bank va korxona yiliga 10 mlrd so‘mgacha murobaha moliyalashtirishning umumiy shartlarini kelishadi; har bir xarid alohida ijob-qabul bilan rasmiylashtiriladi."
+    },
+    {
+      "term": "Murobahada xarid va’dasi",
+      "arabic": "الْوَعْد بِالشِّرَاء فِي الْمُرَابَحَة",
+      "translit": "al-waʿd bi ash-shirāʾ fī al-murābaḥah",
+      "translation": "Promise to purchase in Murabahah to the purchase orderer",
+      "definition": "Muassasalar tomonidan amalga oshiriladigan murobaha bitimlarida mijoz tomonidan beriladigan va’da (tovarni muassasa sotib olgach, undan sotib olish) 3/5 bandga asosan qazoan majburiydir (5/1; 8-sonli standart).",
+      "clause": "5/1",
+      "ruling": "joiz",
+      "distinction": "Faqat mijozning va’dasi majburiy; bank va’da oluvchi sifatida erkin (3/5). Agar ikkala tomon ham majburiy bo‘lsa, bu tovar hali bankda yo‘q paytda sotuvga aylanib qoladi — muvoada sifatida nojoiz (qo‘shimcha izoh).",
+      "example": "Mijoz bankka yuk mashinasini sotib olishga majburiy va’da beradi; bank mashinani sotib oladi, mijoz voz kechsa, bank ko‘rgan haqiqiy zararni undiradi (3/4)."
+    },
+    {
+      "term": "Ijara muntahiya bittamlik va kamayuvchi musharaka va’dalari",
+      "arabic": "الْإِجَارَة الْمُنْتَهِيَة بِالتَّمْلِيك / الْمُشَارَكَة الْمُتَنَاقِصَة",
+      "translit": "al-ijārah al-muntahiyah bi at-tamlīk / al-mushārakah al-mutanāqiṣah",
+      "translation": "Ijarah Muntahia Bittamleek and diminishing Musharakah promises",
+      "definition": "Ijara muntahiya bittamlikda muassasaning ijarachi barcha ijara to‘lovlarini to‘lashi sharti bilan aktivni unga hadya qilish haqidagi va’dasi 3/6 bandga ko‘ra qazoan majburiy (9-sonli standart). Kamayuvchi musharakada muassasaning aktivdagi o‘z ulushini sherik-mulkdorga ijaraga berish haqidagi va’dasi qazoan majburiy; mijozning muassasa ulushining qismlarini belgilangan muddatlarda sotib olish haqidagi va’dasi 3/5 bandga asosan qazoan majburiy (5/2; 12-sonli standart, 5-band).",
+      "clause": "5/2",
+      "ruling": "joiz",
+      "distinction": "IMBTdagi hadya va’dasi — shartli tabarru’ va’dasi (3/6): ijarachi barcha to‘lovlarni to‘lagach, majburiy. Kamayuvchi musharakada esa ikki xil bir tomonlama va’da bor: bankniki (ijaraga berish) va mijozniki (ulushlarni sotib olish) — har biri o‘z predmetiga ega.",
+      "example": "Mijoz uyni 10 yillik IMBT asosida oladi; oxirgi ijara to‘lovidan keyin bank uyni unga hadya qilishga majbur."
+    },
+    {
+      "term": "O‘zaro bog‘langan (back-to-back) va’dalar",
+      "arabic": "الْمُوَاعَدَات الْمُتَرَابِطَة",
+      "translit": "al-muwāʿadāt al-mutarābiṭah",
+      "translation": "Interlinked (back-to-back) bilateral promises; interlinked derivatives",
+      "definition": "Shariatda taqiqlangan ayrim muomalalarni chetlab o‘tish maqsadida o‘zaro bog‘langan ikki tomonlama va’dalar tuzish joiz emas; masalan, 3/1 va 3/7 bandlarida ko‘rsatilganidek, o‘zaro bog‘langan derivativlar (6-band; 20-sonli standart, 5-band).",
+      "clause": "6",
+      "ruling": "nojoiz",
+      "distinction": "Alohida-alohida olinganda har bir va’da joiz ko‘rinishi mumkin (3/7), lekin ular bir-biriga bog‘lanib, natijada forvard, opsion yoki foizli qarz kabi taqiqlangan natijani bersa — hiyla sifatida harom (3/1).",
+      "example": "Ikki bank bir-biriga kelajakda valyuta sotish va sotib olish bo‘yicha o‘zaro bog‘langan va’dalar beradi — amalda valyuta forvardi, nojoiz."
+    }
+  ],
+  "questions": [
+    {
+      "text": "Diyonatan majburiylik va qazoan majburiylikning farqi nimada? Standart (3/4) bo‘yicha qaysi holatda bir tomonlama va’da qazoan majburiy bo‘ladi?",
+      "answer": "Diyonatan majburiylik — va’dani buzish gunoh, lekin sud orqali majburlab bo‘lmaydi; qazoan majburiylik — sud orqali bajarishni yoki zararni qoplashni talab qilish mumkin. Bir tomonlama va’da odatda faqat diyonatan majburiy; faqat haqiqiy ehtiyoj bo‘lganda, masalan, va’da beruvchi o‘z va’dasi sababli va’da oluvchini biror majburiyat yoki xarajatga kiritib qo‘ygan bo‘lsa, qazoan majburiy bo‘ladi (3/4)."
+    },
+    {
+      "text": "Mijoz bankka murobaha asosida avtomobil sotib olishga majburiy va’da berdi. Bank avtomobilni 300 mln so‘mga sotib oldi, mijoz voz kechdi va bank uni 285 mln so‘mga sotdi. Bank kutgan foyda 30 mln so‘m edi. Mijozdan qancha undiriladi?",
+      "options": ["30 mln so‘m", "15 mln so‘m", "45 mln so‘m", "Hech narsa"],
+      "answer": "B — 15 mln so‘m. Mijoz faqat haqiqiy zararni — tannarx (300) va sotuv narxi (285) farqini to‘laydi; boy berilgan foyda (imkoniyat xarajati) haqiqiy zarar tarkibiga kirmaydi (3/4, 5/1)."
+    },
+    {
+      "text": "Quyidagilardan qaysi biri AAOIFI SS 49 ga ko‘ra joiz?",
+      "options": [
+        "Qarz beruvchiga alohida hujjatda qo‘shimcha manfaat va’da qilish",
+        "Nasiyaga sotilgan narsani arzonroq narxga naqdga qayta sotib olishga va’da berish",
+        "Akkreditiv orqali xalqaro savdoda ikki tomon uchun majburiy muvoada",
+        "Valyuta forvardiga o‘xshash o‘zaro bog‘langan ikki tomonlama va’dalar"
+      ],
+      "answer": "C — 4/2/1 ga ko‘ra akkreditivlar vositasidagi xalqaro savdoda majburiy muvoada joiz. A — nojoiz (3/2), B — iyna, nojoiz (3/3), D — o‘zaro bog‘langan derivativlar, nojoiz (6)."
+    },
+    {
+      "text": "Bosh kelishuv (4/4) va majburiy muvoada (4/2) qanday farqlanadi? Murobaha bosh kelishuvini imzolagan mijoz keyin murobaha shartnomasini tuzishga majburmi?",
+      "answer": "Bosh kelishuv — tomonlardan hech birini bitim tuzishga majbur qilmaydigan ikki tomonlama va’da; u bitim emas, faqat bitim tuzilsa qo‘llanadigan umumiy shartlarni belgilaydi. Majburiy muvoada esa ikki tomonni ham bitim tuzishga majburlaydi va faqat 4/2/1–4/2/2 dagi istisno holatlarda joiz. Mijoz bosh kelishuvni imzolash bilan murobaha shartnomasini tuzishga majbur bo‘lmaydi — har bir murobaha alohida ijob va qabul bilan tuziladi (4/4)."
+    },
+    {
+      "text": "Sotuvchi xaridorga: «Agar mendan ushbu muzlatkichni sotib olsangiz, sizga mikroto‘lqinli pechni hadya qilaman» dedi. Xaridor muzlatkichni sotib oldi. Sotuvchi pechni berishga qazoan majburmi? Ijara muntahiya bittamlikdagi qaysi va’da shu qoidaga asoslanadi?",
+      "answer": "Ha. Ehson (tabarru’) va’dasi odatda faqat diyonatan majburiy, lekin u va’da oluvchiga majburiyat yuklaydigan amalga (bu yerda — muzlatkichni sotib olishga) bog‘lab berilgan, shuning uchun qazoan majburiy (3/6). IMBTda muassasaning ijarachi barcha ijara to‘lovlarini to‘lagach, aktivni unga hadya qilish haqidagi va’dasi aynan shu qoidaga ko‘ra qazoan majburiy (5/2)."
+    }
+  ]
+}
