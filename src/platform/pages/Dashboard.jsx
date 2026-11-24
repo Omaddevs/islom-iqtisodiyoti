@@ -2,6 +2,7 @@
 // Bosh admin — platforma boshqaruvi, tashkilot admini — o'quv markazi, ustoz — darslar va baholash, o'quvchi — o'qish.
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
+import { teacherIdsOf, teachesGroup } from '../store/db.js'
 import { Card, Stat, Btn, Badge, UAvatar, Icon, Progress, Empty, Menu, Table, cx } from '../ui/kit.jsx'
 import { leadsApi } from '../api/client.js'
 import { fmtWhen, fmtAgo, fmtLeft, fmtDateFull, pct, DAYS_FULL, MONTHS_FULL } from '../ui/format.js'
