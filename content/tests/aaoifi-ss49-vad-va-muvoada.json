@@ -1,0 +1,447 @@
+{
+  "title": "AAOIFI 49-shariat standarti: Bir tomonlama va ikki tomonlama va’da — 20 ta murakkab test",
+  "description": "Qo‘llash, tahlil va baholash darajasidagi vaziyatli va hisob-kitobli savollar: va’d va muvoadaning ta’rifi, harom amalga va’da, qarzda qo‘shimcha manfaat, iyna va teskari iyna, diyonatan va qazoan majburiylik, haqiqiy zarar va boy berilgan foyda, ehson va’dasi, ijob va qabul, majburiy muvoada istisnolari (akkreditiv, ta’minot shartnomalari), bosh kelishuv, murobaha, ijara muntahiya bittamlik va kamayuvchi musharaka va’dalari, o‘zaro bog‘langan va’dalar. Topshirgach har bir savol bo‘yicha izoh, variantlar tahlili va standart bandi ko‘rsatiladi.",
+  "timeLimit": 40,
+  "questions": [
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Qazoan majburiy va’da va haqiqiy zarar (3/4)",
+      "text": "Mijoz Jasur bankka murobaha asosida qadoqlash uskunasini sotib olishga qat’iy va’da berdi. Bank faqat shu va’daga tayanib uskunani 400 000 000 so‘mga sotib oldi va unga 40 000 000 so‘m ustama qo‘yishni rejalashtirgan edi. Jasur va’dasidan qaytdi, bank uskunani boshqa xaridorga 370 000 000 so‘mga sotdi. Standartga ko‘ra bank Jasurdan qancha talab qila oladi?",
+      "options": [
+        "70 000 000 so‘m — zarar va rejalashtirilgan ustama birga",
+        "30 000 000 so‘m — tannarx va sotuv narxi o‘rtasidagi farq",
+        "40 000 000 so‘m — bank kutgan ustama (foyda) miqdori",
+        "Hech narsa — va’da qazoan majburiy hisoblanmaydi"
+      ],
+      "correct": "B",
+      "explain": "Va’da beruvchi o‘z va’dasi sababli va’da oluvchini xarajatga kiritib qo‘ygan — savdogar (bank) tovarni faqat shu va’daga tayanib sotib olgan. Bunday holatda va’da qazoan majburiy bo‘ladi: void tovarni sotib olishi yoki haqiqiy zararni qoplashi shart. Haqiqiy zarar — tovar tannarxi bilan savdogar uni sotishdan olgan narx o‘rtasidagi farq; boy berilgan foyda (imkoniyat xarajati) unga kirmaydi.\n\nHisob-kitob:\n1) Haqiqiy zarar: 400 000 000 − 370 000 000 = 30 000 000 so‘m.\n2) Rejalashtirilgan 40 000 000 so‘m ustama — boy berilgan foyda, undirilmaydi.",
+      "notes": [
+        "Zararga rejalashtirilgan ustama qo‘shilgan: 30 000 000 + 40 000 000 = 70 000 000 — boy berilgan foyda haqiqiy zarar tarkibiga kirmaydi.",
+        "",
+        "Ustama — hali olinmagan foyda; standart imkoniyat xarajatini haqiqiy zarardan aniq chiqarib tashlaydi.",
+        "Bank faqat shu va’daga tayanib xarajat qilgan — aynan shu holatda va’da qazoan majburiy bo‘ladi (3/4, 5/1)."
+      ],
+      "ref": "AAOIFI SS 49, 3/4 Va’da turlari va shar’iy hukmlar; 5/1 Murobahadagi va’da",
+      "quote": "Bir shaxs savdogarga muayyan bir tovarni sotib olishni buyursa va so‘ng ushbu tovarni undan sotib olishini savdogarga qat’iy va’da qilsa. Agar savdogar tovarni faqat shu va’daga tayanib sotib olsa, va’da beruvchi ushbu tovarni undan sotib olishga qazoan majbur bo‘ladi; aks holda, va’da beruvchi va’da oluvchi (savdogar/sotuvchi) ko‘rgan haqiqiy zararni qoplab berishi shart. Ya’ni, agar savdogar tovarni uning tannarxini qoplovchi narxda sota olmasa, va’da beruvchi tovar tannarxi bilan savdogar uni sotishdan olgan narx o‘rtasidagi farqni to‘lab berishi lozim. Haqiqiy zarar tarkibiga boy berilgan foyda (imkoniyat xarajati) kirmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Qazoan majburiylik kimni bog‘laydi (3/5)",
+      "text": "Mijoz Dilnoza bankka avtomobilni murobaha asosida sotib olishga qazoan majburiy va’da berdi. Bank avtomobilni sotib olgach, uning narxi bozorda keskin oshib ketdi va bank avtomobilni Dilnozaga emas, boshqa xaridorga sotishga qaror qildi. Dilnoza «men majburiy va’da berganman, demak bank ham menga sotishga majbur» deb e’tiroz bildirdi. Vaziyatni tahlil qiling.",
+      "options": [
+        "Dilnoza haq: majburiy va’da ikkala tomonni teng bog‘laydi",
+        "Dilnoza haq: bank kamida avtomobilning narx farqini to‘laydi",
+        "Bank faqat Dilnoza roziligi bilan boshqa xaridorga sota oladi",
+        "Bank haq: majburiylik faqat va’da beruvchi Dilnozani bog‘laydi"
+      ],
+      "correct": "D",
+      "explain": "3/4 bandda bayon qilingan qazoan majburiy va’da faqat va’da beruvchiga nisbatan majburiy bo‘lib, va’da oluvchiga nisbatan majburiy emas. Bu yerda va’da beruvchi — Dilnoza (void), va’da oluvchi — bank (mav’ud lahu). Va’da oluvchi va’da beruvchidan va’dani bajarishni talab qilish yoki undan voz kechish ixtiyoriga ega. Bank va’dadan voz kechgani uchun Dilnozaga hech qanday majburiyat yuzaga kelmaydi — va bank ham unga sotishga majbur emas.",
+      "notes": [
+        "Ikkala tomon ham majburiy bo‘lsa, bu bir tomonlama va’da emas, muvoada bo‘ladi; bir tomonlama va’dada majburiylik faqat voidda.",
+        "Bank va’da bermagan, demak u buzgan va’da ham yo‘q — tovon to‘lash asosi mavjud emas.",
+        "Va’da oluvchi va’dadan voz kechish uchun va’da beruvchining roziligiga muhtoj emas.",
+        ""
+      ],
+      "ref": "AAOIFI SS 49, 3/5 Qazoan majburiy va’daning bir tomonlamaligi",
+      "quote": "Yuqoridagi 3/4 bandda bayon qilingan qazoan majburiy va’da faqat va’da beruvchiga nisbatan majburiy bo‘lib, va’da oluvchiga nisbatan majburiy emas. Va’da oluvchi va’da beruvchidan va’dani bajarishni talab qilish yoki undan voz kechish ixtiyoriga ega."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Iyna va teskari iyna (3/3)",
+      "text": "Kompaniya «Alfa» do‘koniga uskunani 120 000 000 so‘mga 1 yillik nasiyaga sotdi. Shu kuni «Alfa» uskunani 100 000 000 so‘mga naqdga kompaniyaning sho‘ba korxonasiga sotishga va’da berdi; sho‘ba korxona esa uni oradan bir hafta o‘tib bosh kompaniyaga qaytarib topshirishga oldindan kelishgan. Kompaniya: «Uskunani qayta sotib olayotgan biz emas, boshqa yuridik shaxs — iyna bo‘lmaydi» demoqda. Bu dalilni baholang.",
+      "options": [
+        "Nojoiz: uchinchi shaxs bilan til biriktirish ham iyna taqiqiga kiradi",
+        "Joiz: qayta sotib oluvchi — mustaqil yuridik shaxs, sotuvchi emas",
+        "Joiz: va’da shartnoma tarkibida emas, alohida berilgan",
+        "Nojoiz faqat agar va’da oldi-sotdi shartnomasi ichida yozilgan bo‘lsa"
+      ],
+      "correct": "A",
+      "explain": "Oldi-sotdi shartnomasida xaridor yoki sotuvchi tomonidan beriladigan va iyna (sotilgan narsani qayta sotib olish) shartnomasiga olib keladigan har qanday va’da shariatda harom. Bunda va’daning shartnoma tarkibida bo‘lishi yoki undan oldin yoxud keyin berilishining ahamiyati yo‘q. Agar tomonlar qayta sotib olishda vositachilik qilishi uchun uchinchi shaxs bilan til biriktirsalar ham, xuddi shu taqiq amal qiladi. Sho‘ba korxona aynan shu vositachi rolini o‘ynamoqda: natijada «Alfa» 100 mln oladi va 120 mln qaytaradi — amalda foizli qarz.",
+      "notes": [
+        "",
+        "Standart vositachi uchinchi shaxs orqali qayta sotib olishni ham aniq taqiqlaydi — yuridik shakl mohiyatni o‘zgartirmaydi.",
+        "Va’daning shartnomadan alohida, oldin yoki keyin berilishi hukmni o‘zgartirmaydi.",
+        "Taqiq va’da shartnoma ichida yozilgan-yozilmaganidan qat’i nazar amal qiladi."
+      ],
+      "ref": "AAOIFI SS 49, 3/3 Iyna shartnomasiga olib keluvchi va’da",
+      "quote": "Oldi-sotdi shartnomasida xaridor yoki sotuvchi tomonidan beriladigan va iyna (sotilgan narsani qayta sotib olish) shartnomasiga olib keladigan har qanday va’da shariatda haromdir. Bunda va’da oldi-sotdi shartnomasining tarkibida bo‘lishi yoki undan oldin yoxud keyin berilishining ahamiyati yo‘q. Masalan, biror narsani nasiyaga sotib olib, uni arzonroq narxga naqdga qayta sotishga va’da berish yoki biror narsani nasiyaga sotib, uni arzonroq narxga naqdga qayta sotib olishga va’da berish (teskari iyna). Agar tomonlar qayta sotib olishda vositachilik qilishi uchun uchinchi shaxs bilan til biriktirsalar ham, xuddi shu taqiq amal qiladi."
+    },
+    {
+      "kind": "theory",
+      "bloom": "apply",
+      "section": "Va’d va muvoadaning ta’rifi (2/1, 2/2)",
+      "text": "Quyidagi to‘rt holatdan qaysi biri standartdagi «ikki tomonlama va’da (muvoada)» ta’rifiga to‘liq mos keladi?",
+      "options": [
+        "Mijoz bankka: «Uyni sotib olsangiz, men uni sizdan murobahaga olaman»",
+        "A: «Senga mashinamni sotaman», B: «Senga ofisimni ijaraga beraman»",
+        "Bank: «Uskunani 1-martda sotaman», mijoz: «Shu kuni uni olaman»",
+        "Ikki bank kelajakdagi barcha murobahalarning umumiy shartlarini kelishdi"
+      ],
+      "correct": "C",
+      "explain": "Ikki tomonlama va’da (muvoada) — ikki tomon o‘rtasida bir-biriga qarama-qarshi ikkita va’daning almashilishi, bunda har bir tomon kelajakda ayni bir predmetga (obyektga) oid biror amalni bajarishga va’da beradi. C variantda bank sotishga, mijoz esa aynan shu uskunani sotib olishga va’da bermoqda — bir predmet, qarama-qarshi va’dalar.",
+      "notes": [
+        "Faqat bir tomon (mijoz) majburiyat oladi, bank erkin — bu bir tomonlama va’da (va’d), 2/1.",
+        "Ikki va’da har xil predmetga (mashina va ofis) tegishli — bu 3/7 dagi alohida evazli shartnomalarga va’dalar, muvoada emas.",
+        "",
+        "Bosh kelishuv hech kimni bitim tuzishga majbur qilmaydi va muayyan predmetga oid emas — 4/4 dagi umumiy asos."
+      ],
+      "ref": "AAOIFI SS 49, 2/1–2/2 Bir tomonlama va ikki tomonlama va’daning ta’rifi",
+      "quote": "Ushbu me’yorda ikki tomonlama va’da (muvoada) deganda ikki tomon o‘rtasida bir-biriga qarama-qarshi ikkita va’daning almashilishi tushuniladi, bunda har bir tomon kelajakda ayni bir predmetga (obyektga) oid biror amalni bajarishga va’da beradi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Qarzda qo‘shimcha manfaat va’dasi (3/2)",
+      "text": "Tadbirkor Sardor do‘stidan 200 000 000 so‘m foizsiz qarz (qarzi hasana) oldi. Qarz shartnomasi toza — unda hech qanday qo‘shimcha shart yo‘q. Lekin shu kuni Sardor alohida xat bilan «minnatdorchilik belgisi sifatida qarz qaytarilguncha omborimni sizga tekin ishlatishga beraman» deb va’da berdi. Bu va’daning hukmi qanday?",
+      "options": [
+        "Joiz: qarz shartnomasining o‘zida hech qanday ziyoda shart yo‘q",
+        "Joiz: bu ixtiyoriy ehson (tabarru’) va’dasi, faqat diyonatan majburiy",
+        "Harom: alohida hujjatda berilgan bo‘lsa ham qarzdagi qo‘shimcha manfaat",
+        "Makruh, lekin joiz: qarz beruvchi buni talab qilmagan"
+      ],
+      "correct": "C",
+      "explain": "Qarz shartnomasida qarz beruvchiga qarzning o‘zini qaytarishdan tashqari qo‘shimcha manfaat keltiradigan har qanday va’da, hatto u qarz shartnomasidan alohida hujjatda berilgan bo‘lsa ham, shariatda harom. Omborni tekin ishlatish — qarz evaziga bog‘langan qo‘shimcha manfaat, ya’ni riba mohiyatiga ega. Hujjatni alohida rasmiylashtirish hukmni o‘zgartirmaydi.",
+      "notes": [
+        "Standart aynan «qarz shartnomasidan alohida hujjatda» berilgan va’dani ham harom deb ataydi.",
+        "Manfaat qarzga bog‘lab («qarz qaytarilguncha») berilgan — bu ehson emas, qarz evaziga manfaat.",
+        "",
+        "Standart bu holatni harom deb belgilaydi; qarz beruvchining talab qilmagani hukmni yumshatmaydi."
+      ],
+      "ref": "AAOIFI SS 49, 3/2 Qarzda qo‘shimcha manfaat va’dasi",
+      "quote": "Qarz shartnomasida qarz beruvchiga qarzning o‘zini qaytarishdan tashqari qo‘shimcha manfaat keltiradigan har qanday va’da, hatto u qarz shartnomasidan alohida hujjatda berilgan bo‘lsa ham, shariatda haromdir."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Ehson (tabarru’) va’dasi (3/6)",
+      "text": "Maishiy texnika do‘koni reklamada: «Bizdan kir yuvish mashinasini sotib olsangiz, sizga dazmolni hadya qilamiz» deb e’lon qildi. Nodira kir yuvish mashinasini sotib oldi, lekin do‘kon «hadya — ixtiyoriy ehson, uni berishga majbur emasmiz» deb dazmolni bermadi. Do‘kon pozitsiyasini baholang.",
+      "options": [
+        "Noto‘g‘ri: va’da xaridorga majburiyat yuklovchi amalga bog‘langan, qazoan majburiy",
+        "To‘g‘ri: ehson va’dasi faqat diyonatan vojib, qazoan majburiy emas",
+        "To‘g‘ri: hadya qabz qilinmaguncha tugallanmaydi, uni bekor qilish mumkin",
+        "Noto‘g‘ri, lekin Nodira faqat dazmol narxining yarmini talab qila oladi"
+      ],
+      "correct": "A",
+      "explain": "Ehson (tabarru’) tarzidagi va’daga vafo qilish diyonatan vojib, lekin qazoan majburiy emas. Biroq agar va’da va’da oluvchining o‘ziga majburiyat yuklaydigan biror amalni bajarishiga bog‘lab berilgan bo‘lsa, bunday va’da qazoan majburiy bo‘ladi. Nodira mashinani sotib olib (narx to‘lash majburiyatini olib), shartni bajardi — endi dazmolni berish do‘kon uchun diyonatan vojib va qazoan majburiy.",
+      "notes": [
+        "",
+        "Bu umumiy qoida faqat shartsiz ehson va’dasiga taalluqli; shartli va’da — istisno.",
+        "Masala hadyaning tugallanishi emas, shartli va’daning majburiyligida; standart uni qazoan majburiy deydi.",
+        "Standart va’dani to‘liq bajarishni talab qiladi; yarim narx kabi murosa uchun asos yo‘q."
+      ],
+      "ref": "AAOIFI SS 49, 3/6 Ehson (tabarru’) tarzidagi va’da",
+      "quote": "Ehson (tabarru’) tarzidagi va’daga (masalan, hadya qilish yoki biror narsani oriyat (ariya) sifatida berish haqidagi va’daga) vafo qilish diyonatan vojib, lekin qazoan majburiy emas. Biroq agar va’da va’da oluvchining o‘ziga majburiyat yuklaydigan biror amalni bajarishiga bog‘lab berilgan bo‘lsa, bunday va’da qazoan majburiy bo‘ladi. Masalan, va’da beruvchi va’da oluvchiga: «Agar mendan ushbu narsani sotib olsang, senga boshqa bir muayyan narsani hadya qilaman», desa, bunday va’daga vafo qilish diyonatan vojib va qazoan majburiy bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Ijob va qabul (3/8)",
+      "text": "Mijoz Otabek bankka murobaha asosida yuk mashinasini sotib olishga qazoan majburiy va’da berdi. Bank mashinani sotib oldi va Otabekka murobaha shartnomasini taklif qildi (ijob bankdan). Otabek: «Shartnoma hali tuzilmagan, men qabul qilmayman» dedi. Huquqiy vaziyatni tahlil qiling.",
+      "options": [
+        "Shartnoma bank sotib olgan paytdayoq o‘z-o‘zidan tuzilgan",
+        "Otabek erkin: ijobni qabul qilish yoki rad etish uning ixtiyorida",
+        "Otabek rad eta oladi, chunki ijob va’da beruvchidan kelmagan",
+        "Otabek ijobni qabul qilishga diyonatan va qazoan majbur"
+      ],
+      "correct": "D",
+      "explain": "Kelajakda shartnoma tuzishga va’da berilganda, shartnoma o‘z-o‘zidan tuzilmaydi; u tegishli vaqtda ijob va qabulni almashish orqali tuzilishi shart. Va’da qazoan majburiy bo‘lgan holatda, agar ijob va’da oluvchi (bu yerda — bank) tomonidan bildirilsa, va’da beruvchi (Otabek) uni qabul qilishga diyonatan va qazoan majbur bo‘ladi. Otabek shartnoma hali tuzilmagani haqida haq, lekin qabul qilishdan bosh torta olmaydi.",
+      "notes": [
+        "Va’da shartnomani o‘z-o‘zidan tuzmaydi — ijob va qabul almashinuvi shart.",
+        "Bunday erkinlik faqat va’da oluvchida, ijob va’da beruvchidan kelganda bo‘ladi.",
+        "Aksincha: ijob va’da oluvchidan kelganda aynan va’da beruvchi qabul qilishga majbur bo‘ladi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 49, 3/8 Va’da asosida shartnoma tuzish",
+      "quote": "Kelajakda shartnoma tuzishga va’da berilganda, ushbu shartnoma o‘z-o‘zidan tuzilmaydi. Shartnoma tegishli vaqtda ijob va qabulni almashish orqali tuzilishi shart. Va’da qazoan majburiy bo‘lgan holatda, agar ijob va’da oluvchi tomonidan bildirilsa, va’da beruvchi uni qabul qilishga diyonatan va qazoan majbur bo‘ladi. Agar ijob va’da beruvchi tomonidan bildirilsa, va’da oluvchi uni qabul qilish yoki rad etish ixtiyoriga ega bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Ijob va qabul (3/8)",
+      "text": "Mijoz Kamola bankka uy jihozlarini murobaha asosida sotib olishga qazoan majburiy va’da berdi. Bank jihozlarni sotib oldi. Shundan so‘ng Kamolaning o‘zi bankka «jihozlarni sizdan 150 000 000 so‘mga sotib olaman» degan rasmiy taklif (ijob) yubordi. Bank boshqa xaridor yuqoriroq narx taklif qilgani uchun bu ijobni rad etdi. Kamola bankni sudga bermoqchi. Qaysi xulosa to‘g‘ri?",
+      "options": [
+        "Bank Kamolaning ijobini qabul qilishga qazoan majbur edi",
+        "Bank ijobni rad etishga haqli: ijob va’da beruvchidan kelgan",
+        "Bank rad eta oladi, lekin Kamolaga haqiqiy zararni qoplaydi",
+        "Kamolaning va’dasi va bankning qabuli bilan shartnoma allaqachon tuzilgan"
+      ],
+      "correct": "B",
+      "explain": "Qazoan majburiy va’dada ijob va’da beruvchi (Kamola) tomonidan bildirilsa, va’da oluvchi (bank) uni qabul qilish yoki rad etish ixtiyoriga ega bo‘ladi. Majburiylik bir tomonlama — faqat va’da beruvchini bog‘laydi (3/5). Bank hech qanday va’da bermagani uchun rad etish uning huquqi, tovon ham to‘lamaydi.",
+      "notes": [
+        "Va’da oluvchi uchun qabul qilish majburiyati yo‘q — majburiylik faqat voidda (3/5).",
+        "",
+        "Bank va’da bermagan, rad etish — huquqni amalga oshirish; zarar qoplash asosi yo‘q.",
+        "Bank qabul qilmagan; ijob va qabul almashinuvisiz shartnoma tuzilmaydi."
+      ],
+      "ref": "AAOIFI SS 49, 3/8 Va’da asosida shartnoma tuzish; 3/5",
+      "quote": "Agar ijob va’da beruvchi tomonidan bildirilsa, va’da oluvchi uni qabul qilish yoki rad etish ixtiyoriga ega bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Ikki alohida evazli shartnomaga va’dalar (3/7)",
+      "text": "Aziz Bekzodga: «Senga traktorimni sotishga va’da beraman» dedi. Bekzod esa Azizga: «Senga dalamni bir mavsumga ijaraga berishga va’da beraman» dedi. Hech bir tomon bu va’dalar sababli xarajat qilmagan. Keyinroq Aziz traktorni sotmaslikka qaror qildi. Hukm qanday?",
+      "options": [
+        "Va’dalar joiz, qazoan majburiy emas — Bekzod sud orqali talab qila olmaydi",
+        "Bu muvoada, ikkala tomon uchun ham qazoan majburiy",
+        "Va’dalar harom: ikki shartnomani bir-biriga bog‘lash taqiqlangan",
+        "Aziz Bekzodga ijara narxi miqdorida tovon to‘laydi"
+      ],
+      "correct": "A",
+      "explain": "Bir tomonning kelajakda evazli (muovaza) shartnoma tuzishga va’da berishi, va’da oluvchining esa birinchi tomonga birinchi va’da predmetidan farqli predmetga ega bo‘lgan alohida evazli shartnoma tuzishga va’da berishi joiz. Bu ikki va’dadan hech biri qazoan majburiy emas; faqat va’da beruvchi va’da oluvchini biror majburiyatga kiritib qo‘ygan holat bundan mustasno. Bu yerda hech kim xarajat qilmagan — Azizning voz kechishi faqat diyonatan masala.",
+      "notes": [
+        "",
+        "Muvoadada ikki va’da bir predmetga tegishli; bu yerda predmetlar har xil (traktor va dala).",
+        "Standart bunday va’dalarni joiz deydi; ular harom bo‘ladi faqat taqiqlangan muomalani chetlab o‘tish uchun bog‘lansa (6).",
+        "Tovon faqat va’da oluvchi majburiyatga (xarajatga) kiritilganda yuzaga keladi; bu yerda xarajat yo‘q."
+      ],
+      "ref": "AAOIFI SS 49, 3/7 Ikki alohida evazli shartnomaga va’dalar",
+      "quote": "Bir tomonning kelajakda evazli (muovaza) shartnoma tuzishga va’da berishi, va’da oluvchining esa birinchi tomonga birinchi va’da predmetidan farqli predmetga ega bo‘lgan alohida evazli shartnoma tuzishga va’da berishi joiz. Masalan, birinchi tomon: «Senga ushbu narsani sotishga va’da beraman», ikkinchi tomon esa: «Senga falon mulkni ijaraga berishga va’da beraman», deydi. Bu ikki va’dadan hech biri qazoan majburiy emas, faqat va’da beruvchi va’da oluvchini biror majburiyatga kiritib qo‘ygan holat bundan mustasno — bunday holatda ushbu va’da majburiy bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Majburiy muvoada va uning istisnolari (4/2)",
+      "text": "Bank mahalliy mijoz bilan «Ikki tomonlama majburiy va’da» hujjatini imzoladi: bank mashinani sotib olib, uni mijozga murobaha asosida sotishga, mijoz esa uni sotib olishga majburiy va’da beradi; har qaysi tomon voz kechsa, sud orqali bitim tuzishga majburlanadi. Bitim sof ichki moliyalashtirish bo‘lib, akkreditiv yoki ta’minot shartnomasi emas. Ushbu tuzilmani baholang.",
+      "options": [
+        "Joiz: va’dalar joiz amalga (murobahaga) oid",
+        "Nojoiz: maqsad moliyalashtirish, istisno holatlarga kirmaydi",
+        "Joiz, agar mijoz hamish jiddiyya (kafolat puli) to‘lasa",
+        "Joiz: murobahada mijoz va’dasi baribir qazoan majburiy (5/1)"
+      ],
+      "correct": "B",
+      "explain": "Shariatda joiz, lekin majburiy bo‘lmagan amalni bajarishga oid ikki tomonlama va’daga vafo qilish ikki tomon uchun diyonatan vojib, lekin qazoan majburiy emas. Istisno faqat qonunchilik talablari yoki umumiy tijorat urfi sababli majburiy ikki tomonlama va’dasiz haqiqiy tijoriy bitimni amalga oshirib bo‘lmaydigan va maqsad shunchaki moliyalashtirish bo‘lmagan holatlar (akkreditiv orqali xalqaro savdo, ta’minot shartnomalari). Ichki murobaha moliyalashtirishida ikki tomonni ham majburlash tovar hali bankda yo‘q paytda sotuvni amalga oshirishga teng.",
+      "notes": [
+        "Joiz amalga oid muvoada faqat diyonatan vojib; uni qazoan majburiy qilish istisno shartlarisiz joiz emas.",
+        "",
+        "Hamish jiddiyya muvoadaning hukmini o‘zgartirmaydi; muammo ikki tomonlama majburiylikda.",
+        "5/1 faqat mijozning bir tomonlama va’dasini majburiy qiladi; bankni ham majburlash — boshqa tuzilma (muvoada)."
+      ],
+      "ref": "AAOIFI SS 49, 4/2 Joiz amalga oid ikki tomonlama va’da; 5/1",
+      "quote": "Shariatda joiz, lekin majburiy bo‘lmagan amalni bajarishga oid ikki tomonlama va’daga vafo qilish har ikki tomon uchun diyonatan vojib, lekin qazoan majburiy emas. Biroq qonunchilik talablari yoki umumiy tijorat urfi sababli majburiy ikki tomonlama va’dasiz haqiqiy tijoriy bitimni amalga oshirib bo‘lmaydigan va maqsad shunchaki moliyalashtirish bo‘lmagan holatlar bundan mustasno."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Majburiy muvoada istisnolari (4/2/1–4/2/2)",
+      "text": "O‘zbekistonlik paxta eksportchisi Germaniyadagi xaridor bilan hujjatli akkreditiv orqali to‘lanadigan bitim tuzmoqda. Xaridor banki eksportchi va xaridor o‘rtasida ikki tomon uchun ham majburiy bo‘lgan sotish va sotib olish va’dalarini talab qilmoqda — busiz xalqaro amaliyotda akkreditiv ochilmaydi. Bu talabning shariat hukmi qanday?",
+      "options": [
+        "Nojoiz: har qanday majburiy muvoada sotuvni oldindan amalga oshirish hisoblanadi",
+        "Joiz faqat agar va’dalardan biri qazoan emas, diyonatan majburiy bo‘lsa",
+        "Makruh: zarurat bo‘lmasa, akkreditivdan voz kechish kerak",
+        "Joiz: akkreditiv orqali xalqaro savdo standartdagi istisno holat"
+      ],
+      "correct": "D",
+      "explain": "Standart majburiy ikki tomonlama va’dani haqiqiy tijoriy bitimni busiz amalga oshirib bo‘lmaydigan va maqsad moliyalashtirish bo‘lmagan holatlarda joiz deb biladi va birinchi misol sifatida akkreditivlar vositasida amalga oshiriladigan xalqaro savdodagi ikki tomonlama va’dalarni keltiradi. Bu yerda real tovar (paxta) savdosi bor va tijorat urfi majburiy va’dani talab qiladi.",
+      "notes": [
+        "Standart istisno holatlarni aniq belgilagan; akkreditivli xalqaro savdo — ulardan biri.",
+        "Istisno holatda ikki tomonlama va’da to‘liq majburiy bo‘lishi mumkin — bu aynan uning mazmuni.",
+        "Standart bu holatni makruh deb emas, joiz istisno deb belgilaydi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 49, 4/2/1 Akkreditivlar vositasidagi xalqaro savdo",
+      "quote": "Akkreditivlar vositasida amalga oshiriladigan xalqaro savdodagi ikki tomonlama va’dalar."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Majburiy muvoada buzilganda zarar (4/3)",
+      "text": "Un kombinati va non zavodi o‘rtasida ta’minot shartnomasi bo‘yicha ikki tomonlama majburiy va’da tuzilgan: kombinat 100 tonna unni tonnasi 5 000 000 so‘mdan sotishga, zavod sotib olishga va’da bergan. Zavod va’dani bajarmadi; zavodni sud orqali shartnoma tuzishga majburlashning imkoni bo‘lmadi. Kombinat zararini kamaytirish uchun unni uchinchi shaxsga tonnasi 4 600 000 so‘mdan sotdi. Kombinat bu bitimdan 50 000 000 so‘m foyda kutgan edi. Zavod qancha tovon to‘laydi?",
+      "options": [
+        "90 000 000 so‘m — narx farqi va kutilgan foyda",
+        "50 000 000 so‘m — faqat kutilgan foyda",
+        "40 000 000 so‘m — va’da qilingan va yangi narx farqi",
+        "460 000 000 so‘m — uchinchi shaxsga sotilgan unning to‘liq narxi"
+      ],
+      "correct": "C",
+      "explain": "Ikki tomonlama va’da ikki tomon uchun majburiy bo‘lgan holatda, agar shartnoma tuzishning imkoni bo‘lmasa va va’da oluvchi zararini kamaytirish uchun ayni shu shartnomani uchinchi shaxs bilan tuzishga majbur bo‘lsa-yu, yangi shartnoma bo‘yicha olingan narx va’da qilingan narxdan past bo‘lsa, va’dani buzgan tomon unga yetkazilgan haqiqiy zararni (boy berilgan foyda, ya’ni imkoniyat xarajati bundan mustasno) qoplab berishi shart.\n\nHisob-kitob:\n1) Va’da qilingan narx: 100 × 5 000 000 = 500 000 000 so‘m.\n2) Yangi narx: 100 × 4 600 000 = 460 000 000 so‘m.\n3) Haqiqiy zarar: 500 000 000 − 460 000 000 = 40 000 000 so‘m.",
+      "notes": [
+        "Kutilgan 50 000 000 so‘m foyda — imkoniyat xarajati, standart uni aniq chiqarib tashlaydi: 40 + 50 = 90 noto‘g‘ri.",
+        "Faqat kutilgan foyda olingan — bu aynan undirilmaydigan qism; haqiqiy zarar esa e’tiborga olinmagan.",
+        "",
+        "Kombinat 460 mln so‘mni uchinchi shaxsdan oldi; zavod faqat narx farqini qoplaydi."
+      ],
+      "ref": "AAOIFI SS 49, 4/3 Majburiy ikki tomonlama va’da hukmlari",
+      "quote": "Agar shartnoma tuzishning imkoni bo‘lmasa va va’da oluvchi o‘z zararini kamaytirish uchun ayni shu shartnomani uchinchi shaxs bilan tuzishga majbur bo‘lsa-yu, lekin ushbu shartnoma orqali o‘z xarajatini qoplay olmasa, yangi shartnoma (uchinchi shaxs bilan tuzilgan shartnoma) bo‘yicha olingan narx va’dani buzgan tomon va’da qilgan narxdan past bo‘lgan taqdirda, va’dani buzgan tomon unga yetkazilgan haqiqiy zararni (boy berilgan foyda, ya’ni imkoniyat xarajati bundan mustasno) qoplab berishi shart."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Majburiy muvoada — kelajakka bog‘langan shartnoma emas (4/3)",
+      "text": "Ta’minot shartnomasi bo‘yicha ikki tomonlama majburiy va’dada «yetkazib beruvchi 1-martda 20 tonna sement sotadi, quruvchi kompaniya uni sotib oladi» deb kelishilgan. 1-mart keldi, yetkazib beruvchi ijob bildirmadi. Quruvchi kompaniya «shartnoma 1-martda o‘z-o‘zidan tuzildi, sement allaqachon bizniki» deb da’vo qilmoqda. To‘g‘ri xulosa qaysi?",
+      "options": [
+        "Kompaniya haq: majburiy muvoada belgilangan sanada shartnomaga aylanadi",
+        "Kompaniya haq, lekin faqat sement yetkazib berilgan bo‘lsa",
+        "Kompaniya hech narsa qila olmaydi: muvoada faqat diyonatan majburiy",
+        "Shartnoma tuzilmagan; kompaniya uni tuzishga majburlovchi sud qarori ola oladi"
+      ],
+      "correct": "D",
+      "explain": "4/2 bandda ko‘rsatilgan majburiy ikki tomonlama va’dalar kelajakka bog‘langan shartnomalar hisoblanmaydi, ya’ni va’da qilingan shartnoma belgilangan sanada o‘z-o‘zidan tuzilmaydi. Shartnoma tegishli vaqtda ijob va qabul haqidagi bildirishnomalarni almashish orqali tuzilishi shart. Agar tomonlardan biri va’dani bajarmasa, ikkinchi tomon uni shartnoma tuzishga majburlash haqida sud qarorini olishi mumkin.",
+      "notes": [
+        "Standart majburiy muvoadani kelajakka bog‘langan shartnoma deb hisoblamaydi — u o‘z-o‘zidan tuzilmaydi.",
+        "Yetkazib berish ham ijob va qabulsiz shartnomani yuzaga keltirmaydi; avval shartnoma tuzilishi kerak.",
+        "4/2/2 istisnosiga kiruvchi muvoada ikki tomon uchun qazoan ham majburiy — sud orqali talab qilinadi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 49, 4/3 Majburiy ikki tomonlama va’da hukmlari",
+      "quote": "4/2 bandda ko‘rsatilgan majburiy ikki tomonlama va’dalar kelajakka bog‘langan shartnomalar hisoblanmaydi, ya’ni va’da qilingan shartnoma belgilangan sanada o‘z-o‘zidan tuzilmaydi. Shartnoma tegishli vaqtda ijob va qabul haqidagi bildirishnomalarni almashish orqali tuzilishi shart. Ikki tomonlama va’da har ikki tomon uchun majburiy bo‘lgani sababli, tomonlardan biri ijob bildirsa, ikkinchi tomon uni qabul qilishga diyonatan va qazoan majbur bo‘ladi. Agar tomonlardan biri va’dani bajarmasa, ikkinchi tomon uni shartnoma tuzishga majburlash haqida sud qarorini olishi mumkin."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Bosh kelishuv (4/4)",
+      "text": "«Tekstil-Invest» MChJ bank bilan murobaha bo‘yicha bosh kelishuv (umumiy asos) imzoladi: unda yillik limit, ustama hisoblash tartibi va to‘lov shartlari belgilangan. Uch oydan keyin kompaniya navbatdagi xom ashyo uchun murobaha shartnomasini tuzishdan bosh tortdi. Bank «bosh kelishuvni imzolagansiz — shartnoma tuzishga yoki bizga tovon to‘lashga majbursiz» demoqda. Bank pozitsiyasini baholang.",
+      "options": [
+        "To‘g‘ri: bosh kelishuv majburiy muvoada, kompaniya shartnoma tuzishi shart",
+        "To‘g‘ri qisman: kompaniya bank xarajatlarini (haqiqiy zararni) qoplaydi",
+        "Noto‘g‘ri: bosh kelishuv hech bir tomonni bitim tuzishga majbur qilmaydi",
+        "Noto‘g‘ri, lekin bank limitni yopib, kelishuv uchun jarima undira oladi"
+      ],
+      "correct": "C",
+      "explain": "Ikki tomonning kelajakdagi bitimlar uchun umumiy (bosh) kelishuv tuzishi joiz, bunda har bir tomon kelajakdagi bitimni tuzish yoki tuzmaslik ixtiyoriga ega. Bosh kelishuv tomonlardan hech birini bitimlarni tuzishga majbur qilmaydigan ikki tomonlama va’da; u bitim hisoblanmaydi va mijoz uni imzolash bilan murobaha shartnomasini tuzishga majbur bo‘lmaydi. Bitim tuzilsagina bosh kelishuvdagi shartlar qo‘llaniladi.",
+      "notes": [
+        "Bosh kelishuv majburiy muvoada emas — standart uni hech kimni majburlamaydigan va’da deydi.",
+        "Majburiylik bo‘lmagani uchun buzilgan majburiyat ham, qoplanadigan zarar ham yo‘q; bank xarid qilmagan.",
+        "",
+        "Bitim tuzmaslik — kompaniyaning huquqi; bunga jarima qo‘llash asossiz."
+      ],
+      "ref": "AAOIFI SS 49, 4/4 Bosh (umumiy) kelishuv",
+      "quote": "Ikki tomonning kelajakdagi bitimlar uchun umumiy (bosh) kelishuv tuzishi joiz, bunda har bir tomon kelajakdagi bitimni tuzish yoki tuzmaslik ixtiyoriga ega bo‘ladi. Agar tomonlar bitim tuzsalar, umumiy asosda (bosh kelishuvda) kelishilgan shartlar qo‘llaniladi. Umumiy asosni o‘z ichiga olgan kelishuv (bosh kelishuv) tomonlardan hech birini ushbu bitimlarni tuzishga majbur qilmaydigan ikki tomonlama va’dadir. … Umumiy asos (bosh kelishuv) tuzilgan bitim hisoblanmaydi va mijoz uni imzolash bilan murobaha shartnomasini tuzishga majbur bo‘lmaydi, balki har bir tomon ixtiyorga ega bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Ijara muntahiya bittamlik (5/2)",
+      "text": "Mijoz Umid bankdan avtomobilni 5 yillik ijara muntahiya bittamlik asosida oldi. Shartnomada bank «barcha ijara to‘lovlari to‘lansa, avtomobilni ijarachiga hadya qilaman» deb va’da bergan. Umid oxirgi to‘lovni ham amalga oshirdi, lekin bank rahbariyati o‘zgarib, «hadya ixtiyoriy ehson, beraolmaymiz» dedi. Hukm qanday?",
+      "options": [
+        "Bank haq: hadya va’dasi faqat diyonatan majburiy",
+        "Bank avtomobilni hadya qilishga qazoan majbur",
+        "Bank avtomobilni faqat qoldiq qiymatda sotishga majbur",
+        "Umid faqat oxirgi ijara to‘lovini qaytarib olishi mumkin"
+      ],
+      "correct": "B",
+      "explain": "Ijara muntahiya bittamlik bitimlarida muassasa tomonidan beriladigan, ijarachi barcha ijara to‘lovlarini to‘lashi sharti bilan ijaraga berilgan aktivni unga hadya qilish haqidagi va’da 3/6 bandda ko‘rsatilganidek qazoan majburiy. Hadya va’dasi ijarachiga majburiyat yuklovchi amalga (barcha to‘lovlarni to‘lashga) bog‘langan va Umid shartni to‘liq bajardi.",
+      "notes": [
+        "Shartsiz ehson va’dasi uchun to‘g‘ri; lekin bu yerda va’da to‘lovlar shartiga bog‘langan — qazoan majburiy (3/6).",
+        "",
+        "Va’da hadya haqida; uni sotuvga almashtirish va’dani bajarish emas.",
+        "Standart aktivni hadya qilishni talab qiladi; pulni qaytarish bilan cheklanib bo‘lmaydi."
+      ],
+      "ref": "AAOIFI SS 49, 5/2 Ijara muntahiya bittamlikdagi va’da",
+      "quote": "Ijara muntahiya bittamlik bitimlarida muassasa tomonidan beriladigan, ijarachi barcha ijara to‘lovlarini to‘lashi sharti bilan ijaraga berilgan aktivni unga hadya qilish haqidagi va’da ushbu me’yorning 3/6 bandida ko‘rsatilganidek qazoan majburiydir."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Kamayuvchi musharaka (5/2)",
+      "text": "Bank va mijoz uy sotib olish uchun kamayuvchi musharaka tuzdi: bank — 80%, mijoz — 20%. Bank o‘z ulushini mijozga ijaraga berishga, mijoz esa bank ulushini har yili 8% dan sotib olishga va’da berdi. Ikki yildan keyin ikkalasi ham o‘z va’dasidan qaytmoqchi. Bu va’dalarning maqomini tahlil qiling.",
+      "options": [
+        "Ikkalasi ham qazoan majburiy: har biri alohida bir tomonlama va’da",
+        "Faqat mijoz va’dasi qazoan majburiy, bankniki — faqat diyonatan",
+        "Faqat bank va’dasi qazoan majburiy, mijozniki — faqat diyonatan",
+        "Ikkalasi ham nojoiz: bu taqiqlangan majburiy muvoada (4/2)"
+      ],
+      "correct": "A",
+      "explain": "Kamayuvchi musharaka bitimlarida muassasaning aktivdagi o‘z ulushini boshqa sherik-mulkdorga ijaraga berish haqidagi va’dasi qazoan majburiy, mijozning esa muassasa ulushining qismlarini belgilangan muddatlarda sotib olish haqidagi va’dasi ushbu me’yorning 3/5 bandiga asosan qazoan majburiy. Har bir va’da alohida predmetga (ijara va sotib olish) ega bir tomonlama va’da bo‘lgani uchun bu taqiqlangan muvoada emas.",
+      "notes": [
+        "",
+        "Standart bankning ijaraga berish va’dasini ham aniq qazoan majburiy deydi.",
+        "Mijozning ulushlarni sotib olish va’dasi ham 3/5 ga asosan qazoan majburiy.",
+        "Ikki va’da har xil predmetga ega bir tomonlama va’dalar, ayni bir predmetga oid muvoada emas; standart ularni joiz deydi."
+      ],
+      "ref": "AAOIFI SS 49, 5/2 Kamayuvchi musharakadagi va’dalar",
+      "quote": "Kamayuvchi musharaka bitimlarida muassasaning aktivdagi o‘z ulushini boshqa sherik-mulkdorga ijaraga berish haqidagi va’dasi qazoan majburiydir, mijozning esa muassasa ulushining qismlarini belgilangan muddatlarda sotib olish haqidagi va’dasi ushbu me’yorning 3/5 bandiga asosan qazoan majburiydir."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Joiz bo‘lmagan tatbiqlar (6)",
+      "text": "Bank A va Bank B valyuta riskini xejlash uchun quyidagi tuzilmani taklif qilmoqda: Bank A 6 oydan keyin 1 000 000 dollarni belgilangan kursda sotishga, Bank B esa xuddi shu kursda sotib olishga alohida-alohida bir tomonlama va’da beradi; ikkala va’da bitta hujjat to‘plamida bir-biriga bog‘langan. Ishlab chiquvchilar: «Har bir va’da alohida joiz — demak, tuzilma ham joiz» deyishmoqda. Bu dalilni baholang.",
+      "options": [
+        "To‘g‘ri: har bir bir tomonlama va’da 3/4 ga ko‘ra joiz",
+        "Noto‘g‘ri: o‘zaro bog‘langan va’dalar amalda taqiqlangan forvard beradi",
+        "To‘g‘ri, agar va’dalar faqat diyonatan majburiy qilib yozilsa",
+        "To‘g‘ri: valyuta savdosi 4/2/1 dagi xalqaro savdo istisnosiga kiradi"
+      ],
+      "correct": "B",
+      "explain": "Shariatda taqiqlangan ayrim muomalalarni chetlab o‘tish maqsadida o‘zaro bog‘langan (back-to-back) ikki tomonlama va’dalar tuzish joiz emas; masalan, 3/1 va 3/7 bandlarida ko‘rsatilganidek, o‘zaro bog‘langan derivativlar. Bu yerda ikki va’da bir-biriga bog‘lanib, natijada valyuta forvardini — kelajakda belgilangan kursda valyuta ayirboshlashni — hosil qiladi, bu esa taqiqlangan.",
+      "notes": [
+        "Alohida olinganda joiz ko‘rinsa ham, bog‘langan tuzilma natijasi hukmni belgilaydi (6, 3/1).",
+        "",
+        "Majburiylik darajasidan qat’i nazar harom maqsadga qaratilgan va’dalar haromdir (3/1).",
+        "4/2/1 tovar savdosidagi akkreditivlar haqida; valyuta forvardi uning doirasiga kirmaydi."
+      ],
+      "ref": "AAOIFI SS 49, 6 Joiz bo‘lmagan tatbiqlar; 3/1",
+      "quote": "Shariatda taqiqlangan ayrim muomalalarni chetlab o‘tish maqsadida o‘zaro bog‘langan (back-to-back) ikki tomonlama va’dalar tuzish joiz emas, masalan, ushbu me’yorning 3/1 va 3/7 bandlarida ko‘rsatilganidek, o‘zaro bog‘langan derivativlar."
+    },
+    {
+      "kind": "theory",
+      "bloom": "analyze",
+      "section": "Diyonatan va qazoan majburiylik (3/4)",
+      "text": "Aziza qo‘shnisiga «kelasi oy sizning eski mebelingizni 10 000 000 so‘mga sotib olaman» deb va’da berdi. Qo‘shnisi bu va’da sababli hech qanday xarajat qilmadi va hech qanday majburiyat olmadi. Kelasi oy Aziza uzrsiz fikridan qaytdi. Qaysi xulosa standartga mos?",
+      "options": [
+        "Aziza sotib olishga qazoan majbur, sud orqali talab qilinadi",
+        "Aziza mebel narxining bir qismini tovon sifatida to‘laydi",
+        "Aziza hech qanday javobgar emas: va’da shartnoma emas",
+        "Aziza gunohkor, lekin sud orqali majburlab bo‘lmaydi"
+      ],
+      "correct": "D",
+      "explain": "Biror ishni yoki moliyaviy muomalani amalga oshirishga va’da berish joiz va bunday va’daga vafo qilish diyonatan (diniy jihatdan) vojib, ya’ni uzrsiz va’dani buzish gunoh hisoblanadi. Biroq va’da qazoan (huquqiy jihatdan, sud orqali) majburiy emas, faqat uni majburiy qilishga haqiqiy ehtiyoj bo‘lgan holatlar — masalan, va’da beruvchi va’da oluvchini biror majburiyatga (xarajatga) kiritib qo‘ygan holat bundan mustasno. Qo‘shni xarajat qilmagani uchun bu istisno amal qilmaydi.",
+      "notes": [
+        "Qazoan majburiylik uchun va’da oluvchi xarajat yoki majburiyatga kiritilgan bo‘lishi kerak — bu yerda yo‘q.",
+        "Tovon faqat haqiqiy zarar bo‘lganda; qo‘shni hech narsa yo‘qotmagan.",
+        "Huquqiy javobgarlik yo‘q, lekin diyonatan javobgarlik bor — uzrsiz buzish gunoh.",
+        ""
+      ],
+      "ref": "AAOIFI SS 49, 3/4 Diyonatan va qazoan majburiylik",
+      "quote": "Biror ishni yoki moliyaviy muomalani amalga oshirishga va’da berish joiz va bunday va’daga vafo qilish diyonatan (diniy jihatdan) vojibdir, ya’ni uzrsiz va’dani buzish gunoh hisoblanadi. Biroq va’da qazoan (huquqiy jihatdan, sud orqali) majburiy emas, faqat uni majburiy qilishga haqiqiy ehtiyoj bo‘lgan holatlar bundan mustasno, masalan, va’da beruvchi o‘z va’dasi sababli va’da oluvchini biror majburiyatga (xarajatga) kiritib qo‘ygan holatda."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Haqiqiy zarar va boy berilgan foyda (3/4)",
+      "text": "Savdogar Rustam mijozning qat’iy va’dasiga tayanib, uning buyurtmasi bo‘yicha 80 000 000 so‘mlik tovar sotib oldi va 10 000 000 so‘m foyda bilan sotishni rejalashtirdi. Mijoz va’dasidan qaytdi. Rustam tovarni boshqa xaridorga 85 000 000 so‘mga sotdi. Mijoz Rustamga qancha to‘lashi kerak?",
+      "options": [
+        "Hech narsa — tovar tannarxidan yuqori narxda sotildi",
+        "10 000 000 so‘m — rejalashtirilgan foyda to‘liq",
+        "5 000 000 so‘m — rejalashtirilgan va olingan foyda farqi",
+        "80 000 000 so‘m — tovar sotib olinganidan keyin mijoz uni olishi shart"
+      ],
+      "correct": "A",
+      "explain": "Haqiqiy zarar faqat savdogar tovarni uning tannarxini qoplovchi narxda sota olmagan holda yuzaga keladi va tannarx bilan sotuv narxi o‘rtasidagi farq bilan o‘lchanadi. Boy berilgan foyda (imkoniyat xarajati) haqiqiy zarar tarkibiga kirmaydi.\n\nHisob-kitob:\n1) Tannarx: 80 000 000 so‘m; sotuv narxi: 85 000 000 so‘m.\n2) 85 000 000 > 80 000 000 — tannarx qoplangan, haqiqiy zarar = 0.\n3) Rejalashtirilgan foydadan kam olingan 5 000 000 so‘m — boy berilgan foyda, undirilmaydi.",
+      "notes": [
+        "",
+        "Rejalashtirilgan foyda imkoniyat xarajati; standart uni haqiqiy zarardan chiqarib tashlaydi.",
+        "10 000 000 − 5 000 000 = 5 000 000 — bu ham boy berilgan foyda, haqiqiy zarar emas.",
+        "Tovar boshqa xaridorga sotilib bo‘ldi; endi faqat zarar masalasi qoladi va u nolga teng."
+      ],
+      "ref": "AAOIFI SS 49, 3/4 Haqiqiy zarar",
+      "quote": "Ya’ni, agar savdogar tovarni uning tannarxini qoplovchi narxda sota olmasa, va’da beruvchi tovar tannarxi bilan savdogar uni sotishdan olgan narx o‘rtasidagi farqni to‘lab berishi lozim. Haqiqiy zarar tarkibiga boy berilgan foyda (imkoniyat xarajati) kirmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Harom amalga ikki tomonlama va’da (4/1)",
+      "text": "Kompaniya va investor o‘zaro kelishdi: investor kompaniyaga 500 000 000 so‘m foizsiz qarz beradi, kompaniya esa investorga bozor narxidan 20% arzon narxda tovar sotadi; ikkala tomon bu ikki shartnomani birga tuzishga bir-biriga va’da berdi. Investor: «Qarz foizsiz, savdo alohida — riba yo‘q» demoqda. Ushbu tuzilmani baholang.",
+      "options": [
+        "Joiz: qarz shartnomasining o‘zida foiz yo‘q",
+        "Joiz, agar oldi-sotdi va qarz turli sanalarda imzolansa",
+        "Harom: oldi-sotdi va qarz shartnomalariga ikki tomonlama va’da",
+        "Joiz: ikki va’da har xil predmetga ega (3/7)"
+      ],
+      "correct": "C",
+      "explain": "Shariatda harom qilingan amalni bajarishga ikki tomonlama va’da berish harom. Standart misol sifatida foiz (riba) haromligini chetlab o‘tish niyatida bir yoki bir necha shartnoma tuzishga ikki tomonlama va’da berish, iyna shartnomasini tuzishga ikki tomonlama va’da berish hamda oldi-sotdi va qarz shartnomalarini tuzishga ikki tomonlama va’da berishni keltiradi. Arzon narxdagi tovar — qarz evaziga olingan manfaat, ya’ni yashirin riba.",
+      "notes": [
+        "Riba qarzga bog‘langan savdodagi chegirmada yashirilgan; shakl mohiyatni o‘zgartirmaydi.",
+        "Imzolash sanasi hukmni o‘zgartirmaydi; taqiq ikki shartnomaga berilgan o‘zaro va’dada.",
+        "",
+        "3/7 ruxsati taqiqlangan muomalani chetlab o‘tishga xizmat qiladigan va’dalarga tatbiq etilmaydi (4/1, 6)."
+      ],
+      "ref": "AAOIFI SS 49, 4/1 Harom amalga ikki tomonlama va’da",
+      "quote": "Shariatda harom qilingan amalni bajarishga ikki tomonlama va’da berish haromdir. Masalan, foiz (riba) haromligini chetlab o‘tish niyatida bir yoki bir necha shartnoma tuzishga ikki tomonlama va’da berish; jumladan, iyna (sotish va qayta sotib olish) shartnomasini tuzishga ikki tomonlama va’da berish hamda oldi-sotdi va qarz shartnomalarini tuzishga ikki tomonlama va’da berish."
+    }
+  ]
+}
