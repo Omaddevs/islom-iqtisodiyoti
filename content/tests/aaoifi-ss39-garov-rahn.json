@@ -1,0 +1,447 @@
+{
+  "title": "AAOIFI 39-shariat standarti: Garov (rahn) va uning zamonaviy tatbiqlari — 20 ta murakkab test",
+  "description": "Qo‘llash, tahlil va baholash darajasidagi vaziyatli va hisob-kitobli savollar: garovning lozimligi, hiyoziy va ta’miniy garov, garovni ushlab turish (habs), omonat qo‘li va tovon, muqossa, garovdan foydalanish va ajr al-misl, xarajatlar, bir necha murtahin, oriyat garov, garov beriladigan qarz shartlari, omonat shartnomalarida garov, garovni undirish va g‘alq ar-rahn taqiqi, bankrotlikda ustuvorlik, sukuk va aksiyalar garovi, joriy hisobvaraq va investitsiya birliklari garovi, takaful va zakot. Topshirgach har bir savol bo‘yicha izoh, variantlar tahlili va standart bandi ko‘rsatiladi.",
+  "timeLimit": 40,
+  "questions": [
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Garovni undirish (3/4/1)",
+      "text": "Mijoz Anvarning bankdagi murobaha qarzi 150 000 000 so‘m, uning to‘lovi uchun avtomobili garovda. To‘lov muddati o‘tdi, Anvar to‘lamadi. Garov shartnomasidagi vakolatga ko‘ra bank avtomobilni auksionda 180 000 000 so‘mga sotdi. Sotuvdan tushgan pul qanday taqsimlanadi?",
+      "options": [
+        "Bank 180 000 000 so‘mni to‘liq oladi — garov uning ixtiyorida edi",
+        "Bank 150 000 000 so‘m oladi, 30 000 000 so‘mni teng bo‘lishadi",
+        "Bank 150 000 000 so‘m oladi, 30 000 000 so‘m Anvarga qaytariladi",
+        "Bank avtomobilni sotmasdan o‘ziga oladi, farqni hisobga olmaydi"
+      ],
+      "correct": "C",
+      "explain": "To‘lov muddati yetib kelganda qarz to‘lanmasa, garovga oluvchi garovga qo‘yilgan molni sotishni talab qilish huquqiga ega va o‘z qarzini garovga qo‘yilgan molning narxidan undirib oladi, ortib qolganini esa garovga qo‘yuvchiga qaytaradi — bu garov shartnomasining taqozosidir.\n\nHisob-kitob:\n1) Bankning haqqi: 150 000 000 so‘m (qarz miqdori).\n2) Anvarga qaytariladi: 180 000 000 − 150 000 000 = 30 000 000 so‘m.",
+      "notes": [
+        "Garov — ta’minot, mulk emas: bank faqat qarz miqdorini oladi, ortig‘i garovga qo‘yuvchiniki.",
+        "Ortiqcha summa to‘liq garovga qo‘yuvchiga qaytadi; uni bo‘lishishga asos yo‘q.",
+        "",
+        "Garovni qarz evaziga o‘zlashtirish — g‘alq ar-rahn, standart uni taqiqlaydi (3/4/2)."
+      ],
+      "ref": "AAOIFI SS 39, 3/4 Garovga qo‘yilgan molni undirish (ijro etish), 3/4/1",
+      "quote": "3/1/4 bandda keltirilgan holatni inobatga olgan holda, to‘lov muddati yetib kelganda qarz to‘lanmasa, garovga oluvchi garovga qo‘yilgan molni sotishni talab qilish huquqiga ega va o‘z qarzini garovga qo‘yilgan molning narxidan undirib oladi, ortib qolganini esa garovga qo‘yuvchiga qaytaradi — bu garov shartnomasining taqozosidir. Agar narx qarzdan kam bo‘lsa, qolgan qism oddiy qarz hukmida bo‘ladi va garovga oluvchi uni garovga qo‘yuvchidan talab qiladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Garovga qo‘yilgan molni sug‘urtalash (8)",
+      "text": "Mijoz Shahnozaning ipoteka uyi bankda garovda; garov shartnomasi tuzilayotganda Shahnoza bank talabiga rozi bo‘lib, uyni bank foydasiga takaful bilan sug‘urtalagan. Uy yong‘inda butunlay yonib ketdi va takaful kompaniyasi 600 000 000 so‘m tovon to‘ladi. Bu pulning maqomi qanday?",
+      "options": [
+        "Shahnozaning muzlatilgan investitsiya hisobvarag‘ida daromadi bilan garov bo‘ladi",
+        "Bank uni darhol o‘z daromadiga oladi va qarzni yopilgan deb hisoblaydi",
+        "Garov uy nobud bo‘lishi bilan tugadi, pul Shahnozaga erkin to‘lanadi",
+        "Pul bankning joriy hisobvarag‘iga tushadi, bank uni o‘z ishiga ishlatadi"
+      ],
+      "correct": "A",
+      "explain": "Garovga qo‘yuvchi rozi bo‘lsa, garovga qo‘yilgan mol nobud bo‘lgan holatda tovon (to‘lov) uning o‘rnini egallaydi. Agar tovon naqd pul summasi bo‘lsa, u o‘z daromadi bilan birga garovga qo‘yuvchiga tegishli bo‘lgan muzlatilgan (bloklangan) investitsiya hisobvarag‘ida garov hisoblanadi. 3/1/6 ga ko‘ra ham takaful kabi tovon olinadigan holatda garov tugamaydi — tovon uning o‘rnini egallaydi.",
+      "notes": [
+        "",
+        "Tovon garovga qo‘yuvchining mulki bo‘lib, garov sifatida turadi; bank uni o‘zlashtira olmaydi.",
+        "Nobud bo‘lish garovni tugatadi, lekin tovon olinadigan holat bundan mustasno (3/1/6).",
+        "Bank garovdagi naqd puldan evazsiz foydalana olmaydi (5, 3/2/9); standart muzlatilgan investitsiya hisobvarag‘ini belgilaydi."
+      ],
+      "ref": "AAOIFI SS 39, 8 Garovga qo‘yilgan molni sug‘urtalash; 3/1/6",
+      "quote": "Garovga oluvchi qarz muomalasini tuzish paytida garovga qo‘yuvchidan, imkoniyat bo‘lgan har safar, garovga qo‘yilgan molni garovga oluvchi foydasiga islomiy sug‘urta (takoful) bilan sug‘urtalashni talab qilishi joiz. Agar garovga qo‘yuvchi bunga rozi bo‘lsa, garovga qo‘yilgan mol nobud bo‘lgan holatda tovon (to‘lov) garovga qo‘yilgan molning o‘rnini egallaydi. Agar tovon naqd pul summasi bo‘lsa, u o‘z daromadi bilan birga garovga qo‘yuvchiga tegishli bo‘lgan muzlatilgan (bloklangan) investitsiya hisobvarag‘ida garov hisoblanadi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "G‘alq ar-rahn taqiqi (3/4/2)",
+      "text": "Bank garov shartnomasiga quyidagi bandni kiritmoqchi: «Agar mijoz 90 kun ichida qarzni to‘lamasa, garovdagi omborga egalik huquqi qarz evaziga avtomatik ravishda bankka o‘tadi». Ombor qiymati qarzdan ancha yuqori. Shariat bo‘limi muqobil yechim taklif qilishi kerak. Qaysi yondashuv standartga mos?",
+      "options": [
+        "Bandni saqlash: mijoz uni ixtiyoriy imzolagani uchun joiz",
+        "Bandni saqlash, faqat ombor qiymati qarzga teng bo‘lsa",
+        "Bandni olib tashlash va mijozga hech qanday undirish yo‘lini qoldirmaslik",
+        "Bandni olib tashlash; bank omborni bozor narxida sotib olib, qarzni ushlashi mumkin"
+      ],
+      "correct": "D",
+      "explain": "Garovga oluvchi o‘z qarzi evaziga garovga qo‘yilgan molga egalik qilishni shart qilish huquqiga ega emas (fiqhda «g‘alq ar-rahn» deb ataladi). Biroq uning garovga qo‘yilgan molni garovga qo‘yuvchidan bozor narxida sotib olishi va uning narxidan o‘z qarzini uning miqdorida undirib olishida monelik yo‘q. Shuningdek, bank omborni sotish orqali ham qarzini undira oladi (3/4/1).",
+      "notes": [
+        "Rozilik taqiqlangan shartni joiz qilmaydi — standart bunday shartni qo‘yish huquqini butunlay inkor etadi.",
+        "Taqiq shartning o‘ziga tegishli; qiymat tengligi uni joiz qilmaydi — narx bitim paytidagi bozor narxi bo‘lishi kerak.",
+        "Bank garovni sotish yoki bozor narxida sotib olish orqali qarzni undirish huquqiga ega (3/4/1–3/4/2).",
+        ""
+      ],
+      "ref": "AAOIFI SS 39, 3/4/2 Garovga egalik qilishni shart qilish",
+      "quote": "Garovga oluvchi o‘z qarzi evaziga garovga qo‘yilgan molga egalik qilishni shart qilish huquqiga ega emas. Biroq uning garovga qo‘yilgan molni garovga qo‘yuvchidan bozor narxida sotib olishi va uning narxidan o‘z qarzini uning miqdorida undirib olishida monelik yo‘q."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Garovning lozimligi (3/1/1)",
+      "text": "Kompaniya bankdan olgan moliyalashtirish uchun uskunasini garovga qo‘ydi. Bir oydan keyin kompaniya direktori «garov shartnomasini bir tomonlama bekor qilaman, uskunani boshqa bankka garovga beraman» dedi. Shu vaqtda bank ham mijozga ishonchi ortib, garovdan voz kechish haqida o‘ylamoqda. Kimning harakati joiz?",
+      "options": [
+        "Ikkalasi ham garovni bir tomonlama bekor qila oladi",
+        "Faqat bank garovni bir tomonlama bekor qila oladi",
+        "Faqat kompaniya, chunki uskuna uning mulki",
+        "Hech biri: garov faqat ikki tomon roziligi bilan bekor bo‘ladi"
+      ],
+      "correct": "B",
+      "explain": "Garov shartnomasi tuzilishi bilanoq garovga qo‘yuvchi (rohin) haqida lozim (majburiy) bo‘ladi. Garovga qo‘yuvchi garov shartnomasini bir tomonlama bekor qilishi (fasx) yoki tugatishi joiz emas, qarz beruvchi garovga oluvchi (murtahin) esa uni bir tomonlama bekor qilishi joiz. Garov murtahin manfaati uchun tuzilgan, shuning uchun voz kechish huquqi faqat unda.",
+      "notes": [
+        "Garov rohin uchun lozim — u bir tomonlama bekor qila olmaydi.",
+        "",
+        "Mulk rohinniki bo‘lsa ham, garov shartnomasi u uchun majburiy; mulk huquqi bekor qilishga asos emas.",
+        "Murtahin garovdan bir tomonlama voz kechishi mumkin — rohin roziligi talab qilinmaydi."
+      ],
+      "ref": "AAOIFI SS 39, 3/1/1 Garovning lozimligi",
+      "quote": "Garov shartnomasi tuzilishi bilanoq garovga qo‘yuvchi (rohin) haqqida lozim (majburiy) bo‘ladi. Garovga qo‘yuvchi garov shartnomasini bir tomonlama bekor qilishi (fasx) yoki tugatishi joiz emas, qarz beruvchi garovga oluvchi (murtahin) esa uni bir tomonlama bekor qilishi joiz."
+    },
+    {
+      "kind": "theory",
+      "bloom": "apply",
+      "section": "Garovni qabz qilish (3/1/2)",
+      "text": "Bank avtokredit (murobaha) bo‘yicha avtomobilni o‘z qo‘liga olmadi — mijoz mashinada yuraveradi, lekin avtomobil davlat reyestrida bank foydasiga garov sifatida qayd etildi. Mijozning advokati: «Bank qabz qilmagan, demak garov haqiqiy emas va bankning ustuvorlik huquqi yo‘q» demoqda. Standartga ko‘ra to‘g‘ri javob qaysi?",
+      "options": [
+        "Advokat haq: garov faqat haqiqiy qo‘lga olish bilan tugallanadi",
+        "Advokat noto‘g‘ri: ro‘yxatdan o‘tkazish — hukmiy qabz, barcha hukmlar sobit",
+        "Garov haqiqiy, lekin bank undirishda ustuvorlikka ega emas",
+        "Garov faqat mashina adl (uchinchi shaxs) qo‘lida bo‘lsa haqiqiy"
+      ],
+      "correct": "B",
+      "explain": "Garovga qo‘yilgan molni qabz qilish sotilgan molni qabz qilish qanday amalga oshirilsa, shunday amalga oshiriladi. U qo‘lga olish orqali haqiqiy qabz bo‘lishi mumkin («hiyoziy garov») yoki ro‘yxatdan o‘tkazish va hujjatlashtirish orqali hukmiy qabz bo‘lishi mumkin («ta’miniy garov» yoki «rasmiy garov»). Unga ham garovning barcha hukmlari sobit bo‘ladi — jumladan, ustuvorlik (3/4/3).",
+      "notes": [
+        "Standart haqiqiy qabz bilan bir qatorda hukmiy qabzni ham tan oladi.",
+        "",
+        "Ta’miniy garovga garovning barcha hukmlari, jumladan ustuvorlik ham sobit bo‘ladi.",
+        "Adl qo‘lida saqlash — imkoniyat (3/1/3), shart emas; ro‘yxatdan o‘tkazish ham qabz hisoblanadi."
+      ],
+      "ref": "AAOIFI SS 39, 3/1/2 Hiyoziy va ta’miniy garov",
+      "quote": "Garovga qo‘yilgan mol (marhun)ni qabz qilish sotilgan molni qabz qilish qanday amalga oshirilsa, shunday amalga oshiriladi. U qo‘lga olish orqali haqiqiy qabz bo‘lishi mumkin — bu «hiyoziy garov» (egalikka olinadigan garov) deb ataladi; yoki ro‘yxatdan o‘tkazish va hujjatlashtirish orqali hukmiy qabz bo‘lishi mumkin — bu «ta’miniy garov» yoki «rasmiy garov» deb ataladi. Unga ham garovning (barcha) hukmlari sobit bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Omonat qo‘li (3/2/4)",
+      "text": "Mijoz 100 000 000 so‘mlik qarzi uchun oltin buyumlarini bankka garovga topshirdi. Bank seyfi qonun talablariga to‘liq mos, qo‘riqlash ta’minlangan. Shunga qaramay, qurollangan bosqinchilar seyfni o‘g‘irlab ketdi; tergov bankning hech qanday aybi yoki beparvoligi yo‘qligini aniqladi. Oqibatlarni tahlil qiling.",
+      "options": [
+        "Bank oltin qiymatini to‘laydi, qarz saqlanib qoladi",
+        "Qarz oltin qiymati miqdorida avtomatik soqit bo‘ladi",
+        "Bank va mijoz zararni teng bo‘lishadi",
+        "Bank tovon to‘lamaydi, qarz to‘liq saqlanib qoladi"
+      ],
+      "correct": "D",
+      "explain": "Garovga qo‘yilgan mol garovga oluvchi, adl yoki vakil huzurida omonat bo‘lib, u garovda turar ekan, garovga qo‘yuvchining mulki bo‘lib qolaveradi. Agar u garovga oluvchi yoki adlning tajovuzi (ta’addi) yoki beparvoligi (taqsir)siz nobud bo‘lsa, ularga tovon (zamon) lozim bo‘lmaydi va uning nobud bo‘lishi bilan qarzdan hech narsa soqit bo‘lmaydi.",
+      "notes": [
+        "Tovon faqat tajovuz yoki beparvolikda; bu yerda bank aybsiz.",
+        "Standart aniq: aybsiz nobud bo‘lishdan qarzdan hech narsa soqit bo‘lmaydi.",
+        "Omonatdor aybsiz bo‘lsa, zararni bo‘lishish uchun asos yo‘q — zarar mulkdorga tushadi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 39, 3/2/4 Garovga qo‘yilgan molning omonat ekani",
+      "quote": "Garovga qo‘yilgan mol garovga oluvchi, adl yoki vakil huzurida omonat bo‘lib, u garovda turar ekan, garovga qo‘yuvchining mulki bo‘lib qolaveradi. Agar u garovga oluvchi yoki adlning tajovuzi (ta’addi) yoki beparvoligi (taqsir)siz nobud bo‘lsa, ularga tovon (zamon) lozim bo‘lmaydi va uning nobud bo‘lishi bilan qarzdan hech narsa soqit bo‘lmaydi."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Tajovuz bilan nobud bo‘lish va muqossa (3/2/4)",
+      "text": "Mijozning bankdagi qarzi 100 000 000 so‘m, uning uchun oltin buyumlar garovda. Bank xodimi seyfni qulflamay ketgani sababli oltin o‘g‘irlandi. O‘g‘irlik kuni oltinning bozor qiymati 120 000 000 so‘m edi (garovga qo‘yilgan kuni — 90 000 000 so‘m). Tomonlar muqossa (o‘zaro hisob-kitob) qilsa, yakuniy natija qanday?",
+      "options": [
+        "Qarz yopiladi, bank mijozga 20 000 000 so‘m to‘laydi",
+        "Mijoz bankka hali 10 000 000 so‘m qarzdor qoladi",
+        "Qarz yopiladi, hech kim hech kimga to‘lamaydi",
+        "Bank mijozga 120 000 000 so‘m to‘laydi, qarz alohida undiriladi"
+      ],
+      "correct": "A",
+      "explain": "Agar garov garovga oluvchining tajovuzi yoki beparvoligi bilan nobud bo‘lsa, u nobud bo‘lgan paytdagi qiymati bilan tovon to‘laydi, qarz esa saqlanib qoladi va ikki tomon qarz bilan nobud bo‘lgan garov qiymati o‘rtasida o‘zaro hisob-kitob (muqossa) qilish huquqiga ega.\n\nHisob-kitob:\n1) Bank tovoni — nobud bo‘lgan paytdagi qiymat: 120 000 000 so‘m.\n2) Muqossa: 120 000 000 − 100 000 000 = 20 000 000 so‘m.\n3) Qarz to‘liq yopiladi, bank mijozga 20 000 000 so‘m to‘laydi.",
+      "notes": [
+        "",
+        "Garovga qo‘yilgan kundagi 90 mln qiymat olingan; standart nobud bo‘lgan paytdagi qiymatni belgilaydi.",
+        "Tovon (120) qarzdan (100) katta — farq mijozga qaytariladi.",
+        "Natija bir xil, lekin standart tomonlarga muqossa qilish huquqini beradi; savol muqossa qilinganda nima bo‘lishini so‘raydi."
+      ],
+      "ref": "AAOIFI SS 39, 3/2/4 Tajovuz yoki beparvolik bilan nobud bo‘lish",
+      "quote": "Agar u ulardan birining tajovuzi yoki beparvoligi bilan nobud bo‘lsa, u nobud bo‘lgan paytdagi qiymati bilan tovon to‘laydi, qarz esa saqlanib qoladi va ikki tomon qarz bilan nobud bo‘lgan garov qiymati o‘rtasida o‘zaro hisob-kitob (muqossa) qilish huquqiga ega."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Rohin huzurida nobud bo‘lish (3/2/4)",
+      "text": "Ta’miniy garov asosida mijozning yuk mashinasi uning o‘z qo‘lida qolgan va reyestrda bank foydasiga qayd etilgan. Mashina mijozning aybisiz avariyada butunlay yaroqsiz holga keldi (sug‘urta yo‘q). Bank qanday talab qo‘ya oladi?",
+      "options": [
+        "Hech qanday: garov nobud bo‘lishi bilan tugadi, bank garovsiz qoladi",
+        "Darhol butun qarzni muddatidan oldin to‘lashni",
+        "Mijoz uning o‘rniga boshqa garov taqdim etishini, agar bank voz kechmasa",
+        "Mijozdan mashina qiymati miqdorida jarima undirishni"
+      ],
+      "correct": "C",
+      "explain": "Agar garovga qo‘yilgan mol garovga qo‘yuvchining huzurida nobud bo‘lsa, garovga qo‘yuvchi uning o‘rniga boshqasini taqdim etishi shart, faqat garovga oluvchi garovdan voz kechgan holat bundan mustasno. Ta’miniy garovda mol rohin qo‘lida bo‘lgani uchun aynan shu qoida amal qiladi.",
+      "notes": [
+        "Rohin huzurida nobud bo‘lganda standart garovni almashtirish majburiyatini yuklaydi.",
+        "Standart qarz muddatini tezlashtirishni emas, garovni almashtirishni talab qiladi.",
+        "",
+        "Jarima — qarz ustiga ziyoda, joiz emas; standart faqat garovni almashtirishni ko‘zda tutadi."
+      ],
+      "ref": "AAOIFI SS 39, 3/2/4 Garovga qo‘yuvchi huzurida nobud bo‘lish",
+      "quote": "Agar garovga qo‘yilgan mol garovga qo‘yuvchining huzurida nobud bo‘lsa, garovga qo‘yuvchi uning o‘rniga boshqasini taqdim etishi shart, faqat garovga oluvchi garovdan voz kechgan holat bundan mustasno."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Garovdan foydalanish va ajr al-misl (3/2/9)",
+      "text": "Bank mijozning garovdagi omborini bo‘sh turgani uchun o‘z tovarlarini saqlashga ishlatmoqchi. Mijoz «mayli, bepul ishlating» deb yozma ruxsat berdi. Bank rahbariyati: «Mijoz roziligi bor — demak joiz» demoqda. Bu xulosani baholang.",
+      "options": [
+        "To‘g‘ri: mijoz ruxsati bilan bepul foydalanish joiz",
+        "To‘g‘ri, agar foydalanish muddati qarz muddatidan oshmasa",
+        "Noto‘g‘ri: garovdan murtahin hech qanday holatda foydalana olmaydi",
+        "Noto‘g‘ri: ruxsat bilan ham faqat ajr al-misl to‘lab foydalanish joiz"
+      ],
+      "correct": "D",
+      "explain": "Garovga qo‘yuvchi garovga oluvchining ruxsati bilan garovga qo‘yilgan moldan foydalanishi joiz. Garovga oluvchi esa garovga qo‘yuvchining ruxsati bilan ham, ruxsatisiz ham garovga qo‘yilgan moldan evazsiz foydalanishi mutlaqo joiz emas; garovga qo‘yuvchining ruxsati bo‘lsa, ajr al-misl (shunga o‘xshash mol uchun odatdagi haq) evaziga foydalanishi joiz. Qarz beruvchining garovdan tekin foydalanishi — qarz evaziga manfaat, ya’ni riba shubhasi.",
+      "notes": [
+        "Standart «ruxsat bilan ham» evazsiz foydalanishni mutlaqo taqiqlaydi.",
+        "Muddat masalasi hukmni o‘zgartirmaydi; taqiq evazsizlikka tegishli.",
+        "Mutlaq taqiq yo‘q — ruxsat va ajr al-misl bilan foydalanish joiz.",
+        ""
+      ],
+      "ref": "AAOIFI SS 39, 3/2/9 Garovga qo‘yilgan moldan foydalanish",
+      "quote": "Garovga qo‘yuvchi garovga oluvchining ruxsati bilan garovga qo‘yilgan moldan foydalanishi joiz. Garovga oluvchi esa garovga qo‘yuvchining ruxsati bilan ham, ruxsatisiz ham garovga qo‘yilgan moldan evazsiz foydalanishi mutlaqo joiz emas; garovga qo‘yuvchining ruxsati bo‘lsa, ajr al-misl (shunga o‘xshash mol uchun odatdagi haq) evaziga foydalanishi joiz."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Garov xarajatlari (3/2/10)",
+      "text": "Garovdagi binoning tomi yorilib, bank uni buzilishdan saqlash uchun 6 000 000 so‘mga ta’mirlatdi. Bundan tashqari, bank garovni notarial ro‘yxatdan o‘tkazish va qo‘riqlash uchun jami 4 000 000 so‘m sarfladi. Garov shartnomasida xarajatlar taqsimoti haqida hech qanday shart yo‘q. Bank mijozdan qancha talab qila oladi?",
+      "options": [
+        "10 000 000 so‘m — barcha xarajatlar",
+        "4 000 000 so‘m — faqat ro‘yxatdan o‘tkazish va qo‘riqlash",
+        "6 000 000 so‘m — faqat ta’mirlash xarajati",
+        "Hech narsa — bank ruxsatsiz sarflagan"
+      ],
+      "correct": "C",
+      "explain": "Garovga qo‘yilgan molni ta’mirlash va uni buzilishdan saqlash uchun zarur bo‘lgan barcha haqiqiy xarajatlarni garovga qo‘yuvchi ko‘taradi; agar ularni garovga oluvchi garovga qo‘yuvchining ruxsati bilan yoki ruxsatisiz to‘lasa, u garovga qo‘yuvchidan undirib olishi mumkin. Garovni saqlash, hujjatlashtirish va sotish bilan bog‘liq barcha xarajatlarni esa garovga oluvchi ko‘taradi, faqat shart qilinsa, ularni garovga qo‘yuvchi ko‘tarishi joiz.\n\nHisob-kitob:\n1) Ta’mir (rohin zimmasida): 6 000 000 so‘m — undiriladi.\n2) Ro‘yxatdan o‘tkazish va qo‘riqlash (murtahin zimmasida, shart yo‘q): 4 000 000 so‘m — undirilmaydi.",
+      "notes": [
+        "Hujjatlashtirish va saqlash xarajatlari shart qilinmagan bo‘lsa murtahin zimmasida.",
+        "Teskari taqsimot: bu xarajatlar aynan bank zimmasida, ta’mir esa mijoz zimmasida.",
+        "",
+        "Ta’mir xarajati ruxsatsiz to‘langan bo‘lsa ham undiriladi — standart «ruxsati bilan yoki ruxsatisiz» deydi."
+      ],
+      "ref": "AAOIFI SS 39, 3/2/10 Garov xarajatlari",
+      "quote": "Garovga qo‘yilgan molni ta’mirlash va uni buzilishdan saqlash uchun zarur bo‘lgan barcha haqiqiy xarajatlarni garovga qo‘yuvchi ko‘taradi. Agar bu xarajatlarni garovga oluvchi garovga qo‘yuvchining ruxsati bilan yoki ruxsatisiz to‘lasa, u garovga qo‘yuvchidan undirib olishi yoki garovga qo‘yilgan moldan shu xarajatlar miqdorida foydalanishi mumkin. Garovga qo‘yilgan molni saqlash, hujjatlashtirish va sotish bilan bog‘liq barcha xarajatlarni garovga oluvchi ko‘taradi, biroq shart qilinsa, ularni garovga qo‘yuvchi ko‘tarishi ham joiz."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Garovni ushlab turish huquqi (3/1/7)",
+      "text": "Mijozning 100 000 000 so‘mlik qarzi uchun ikkita do‘kon garovda. Mijoz qarzning 70 foizini to‘lab, bitta do‘konni garovdan chiqarishni so‘radi; bank rad etdi. Keyinroq mijoz qarzni to‘liq to‘ladi, lekin bank do‘konlarni mijozning boshqa (garovsiz) murobaha qarzi uchun ushlab turishga qaror qildi. Garov shartnomasida umumiy ta’minot haqida band yo‘q. Bank harakatlarini tahlil qiling.",
+      "options": [
+        "Birinchi rad etish joiz, ikkinchi ushlab turish nojoiz",
+        "Ikkalasi ham joiz: bank qarzdorning barcha qarzlarini ta’minlay oladi",
+        "Birinchi rad etish nojoiz, ikkinchi ushlab turish joiz",
+        "Ikkalasi ham nojoiz: garov to‘langan qism bo‘yicha qisman bo‘shatiladi"
+      ],
+      "correct": "A",
+      "explain": "Garovga oluvchi qarzning har qanday qismi uchun garovga qo‘yilgan molning barchasini ushlab turish huquqiga ega, faqat u garovni qisman bo‘shatishga rozi bo‘lgan holat bundan mustasno — shuning uchun birinchi rad etish joiz. Qarz to‘langandan keyin garovga oluvchi garovni u uchun garov qo‘yilmagan boshqa qarz uchun ushlab turish huquqiga ega emas, faqat tomonlar garov muayyan muddat davomida yuzaga keladigan har qanday qarz uchun ta’minot bo‘lishiga kelishgan holat bundan mustasno — bunday band yo‘q, shuning uchun ikkinchi ushlab turish nojoiz.",
+      "notes": [
+        "",
+        "Garov faqat o‘zi bog‘langan qarz uchun; boshqa qarzga faqat oldindan kelishilgan bo‘lsa tatbiq etiladi.",
+        "Aksincha: qisman to‘lovda butun garovni ushlab turish joiz, to‘liq to‘lovdan keyin boshqa qarz uchun — nojoiz.",
+        "Garov bo‘linmaydi: qisman bo‘shatish faqat murtahin roziligi bilan."
+      ],
+      "ref": "AAOIFI SS 39, 3/1/7 Garovni ushlab turish huquqi",
+      "quote": "Garovga oluvchi qarzning har qanday qismi uchun garovga qo‘yilgan molning barchasini ushlab turish huquqiga ega, faqat u garovni qisman bo‘shatishga rozi bo‘lgan holat bundan mustasno. Qarz to‘langandan keyin garovga oluvchi garovni u uchun garov qo‘yilmagan boshqa qarz uchun ushlab turish huquqiga ega emas, faqat garovga qo‘yuvchi va garovga oluvchi garov ular o‘rtasida muayyan muddat davomida yuzaga keladigan har qanday qarz uchun ta’minot bo‘lishiga kelishgan holat bundan mustasno."
+    },
+    {
+      "kind": "calc",
+      "bloom": "apply",
+      "section": "Bir necha garovga oluvchi (3/2/3)",
+      "text": "Bino ikki bankka bir xil darajadagi garov sifatida, barcha tomonlarning roziligi bilan qo‘yilgan. A bankka qarz — 300 000 000 so‘m, B bankka — 200 000 000 so‘m. Qarzlar to‘lanmadi va bino 400 000 000 so‘mga sotildi. Sotuvdan tushgan pul qanday taqsimlanadi?",
+      "options": [
+        "A bank — 300 000 000, B bank — 100 000 000 so‘m",
+        "A bank — 240 000 000, B bank — 160 000 000 so‘m",
+        "A bank — 200 000 000, B bank — 200 000 000 so‘m",
+        "B bank — 200 000 000, A bank — 200 000 000 so‘m qoldiq"
+      ],
+      "correct": "B",
+      "explain": "Agar garovlarning barchasi bir xil darajada bo‘lsa, barcha tomonlarning o‘zaro roziligi shart va garovga qo‘yilgan mol ular o‘rtasida qarzlarining nisbatiga ko‘ra umumiy bo‘ladi.\n\nHisob-kitob:\n1) Jami qarz: 300 000 000 + 200 000 000 = 500 000 000 so‘m.\n2) A ulushi: 300 / 500 = 60% → 400 000 000 × 60% = 240 000 000 so‘m.\n3) B ulushi: 200 / 500 = 40% → 400 000 000 × 40% = 160 000 000 so‘m.\nIkkala bankning qolgan qarzlari (60 mln va 40 mln) oddiy qarz bo‘lib qoladi (3/4/1).",
+      "notes": [
+        "Bu darajalangan garov taqsimoti (A birinchi navbatda); teng darajada nisbat bo‘yicha bo‘linadi.",
+        "",
+        "Teng bo‘lish qarz nisbatini hisobga olmaydi; standart qarzlar nisbatini belgilaydi.",
+        "B bankka ustuvorlik berilgan — teng darajadagi garovda bunga asos yo‘q."
+      ],
+      "ref": "AAOIFI SS 39, 3/2/3 Bir necha garovga oluvchi",
+      "quote": "Garovga qo‘yilgan mol bir nechta garovga oluvchiga garov bo‘lishi joiz. Agar garovlarning barchasi bir xil darajada bo‘lsa, barcha tomonlarning o‘zaro roziligi shart va garovga qo‘yilgan mol ular o‘rtasida qarzlarining nisbatiga ko‘ra umumiy bo‘ladi. Agar garovlar shunday darajalangan bo‘lsaki, keyingi garovga oluvchi o‘z qarzini garovdan faqat birinchi qarz undirib olingandan keyingina undirib olish huquqiga ega bo‘lsa, faqat keyingi garovga oluvchining roziligi shart qilinadi."
+    },
+    {
+      "kind": "theory",
+      "bloom": "apply",
+      "section": "Garovga qo‘yilgan molning zakoti (9/1)",
+      "text": "Tadbirkor Javlonning savdo tovarlari (zakot vojib bo‘ladigan mol) bir yildan beri bankda garovda va u ularni sotish yoki boshqa tasarruf qilishdan man etilgan. Javlon: «Mol qo‘limda emas, tasarruf qila olmayman — zakoti bankka tushadi» demoqda. Standartga ko‘ra zakot kimga vojib?",
+      "options": [
+        "Javlonga: zakot mol egasiga vojib, tasarruf mani’ to‘sqinlik qilmaydi",
+        "Bankka: mol uning qo‘lida va nazoratida turgani uchun",
+        "Hech kimga: mol garovda ekan, zakot to‘xtatib turiladi",
+        "Javlon va bankka teng: ikkalasi ham moldan huquqqa ega"
+      ],
+      "correct": "A",
+      "explain": "Agar garovga qo‘yilgan mol asl mol va uning o‘sishida yoki faqat uning o‘sishida zakot vojib bo‘ladigan mollardan bo‘lsa, uning zakoti egasiga vojib bo‘ladi. Egasining uni tasarruf qilishdan man etilgan bo‘lishi bunga monelik qilmaydi. Garov mulkni o‘tkazmaydi — mol garovda turar ekan, garovga qo‘yuvchining mulki bo‘lib qolaveradi (3/2/4).",
+      "notes": [
+        "",
+        "Murtahin garov qo‘lida omonatdor, mulkdor emas; zakot mulkdorga vojib.",
+        "Standart zakotni to‘xtatmaydi: tasarrufdan man etilish monelik qilmaydi.",
+        "Bankning huquqi — ta’minot huquqi, mulk emas; zakot bo‘linmaydi."
+      ],
+      "ref": "AAOIFI SS 39, 9/1 Garovga qo‘yilgan molning zakoti",
+      "quote": "Agar garovga qo‘yilgan mol asl mol va uning o‘sishida yoki faqat uning o‘sishida zakot vojib bo‘ladigan mollardan bo‘lsa, uning zakoti egasiga vojib bo‘ladi. Egasining uni tasarruf qilishdan man etilgan bo‘lishi bunga monelik qilmaydi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Oriyat garov (3/2/6)",
+      "text": "Ota o‘g‘lining bankdagi moliyalashtiruvi uchun o‘z uyini garovga qo‘yishga ruxsat berdi (oriyat garov). Uy hech kimning aybisiz yer silkinishida vayron bo‘ldi. Ota uyning qiymatini kimdan talab qila oladi?",
+      "options": [
+        "Bankdan: uy uning garovida turgan edi",
+        "O‘g‘lidan: oriyat oluvchi garov nobud bo‘lsa tovon to‘laydi",
+        "Hech kimdan: aybsiz nobud bo‘lish tovon talab qilmaydi",
+        "Bank va o‘g‘lidan teng ulushda"
+      ],
+      "correct": "B",
+      "explain": "Garovga qo‘yuvchi garovga qo‘yish uchun boshqadan mol oriyat olishi (oriyat garov) yoki ijaraga olishi (ijara garov) joiz, har ikki holatda ham mol egasining ruxsati bilan. Agar garovga qo‘yilgan mol nobud bo‘lsa, oriyat oluvchi tovon to‘laydi, ijaraga oluvchi esa tovon to‘lamaydi, faqat nobud bo‘lish uning tajovuzi yoki beparvoligi sababli bo‘lgan holat bundan mustasno. O‘g‘il uyni oriyat olgan — u otasiga tovon to‘laydi.",
+      "notes": [
+        "Bank qo‘lidagi garov omonat; aybsiz nobud bo‘lsa bank javobgar emas (3/2/4).",
+        "",
+        "Bu qoida ijara garovga tegishli; oriyat oluvchi esa aybsiz holatda ham tovon to‘laydi.",
+        "Javobgarlik faqat oriyat oluvchi zimmasida; bankni sherik qilishga asos yo‘q."
+      ],
+      "ref": "AAOIFI SS 39, 3/2/6 Oriyat garov va ijara garov",
+      "quote": "Garovga qo‘yuvchi garovga qo‘yish uchun boshqadan mol oriyat olishi (oriyat garov) yoki garovga qo‘yish uchun mol ijaraga olishi (ijara garov) joiz, har ikki holatda ham mol egasining ruxsati bilan. … Agar garovga qo‘yilgan mol nobud bo‘lsa, oriyat oluvchi tovon to‘laydi, ijaraga oluvchi esa tovon to‘lamaydi, faqat nobud bo‘lish ijaraga oluvchining tajovuzi yoki beparvoligi sababli bo‘lgan holat bundan mustasno."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Omonat shartnomalarida garov (3/3/2)",
+      "text": "Islom banki mudaribga 1 000 000 000 so‘m muzoraba sarmoyasi bermoqda va ikki xil garov bandini ko‘rib chiqmoqda. 1-band: «Biznes zarar ko‘rsa ham sarmoyani qaytarish uchun mudaribning uyi garovda turadi». 2-band: «Mudarib tajovuz, beparvolik yoki shartnoma shartlarini buzish bilan zarar yetkazsa, uni undirish uchun uy garovda turadi». Qaysi bandlar joiz?",
+      "options": [
+        "Ikkalasi ham joiz: bank sarmoyasini himoya qilishga haqli",
+        "Faqat 1-band joiz: sarmoya kafolatlanishi kerak",
+        "Faqat 2-band joiz: garov faqat tajovuz va beparvolik uchun",
+        "Ikkalasi ham nojoiz: muzorabada garov umuman shart qilinmaydi"
+      ],
+      "correct": "C",
+      "explain": "Vakillik, omonat (ido’), mushoraka, muzoraba va ijaraga oluvchi qo‘lidagi mol kabi omonat shartnomalarida garovni shart qilish joiz emas. Agar garov tajovuz, beparvolik yoki shartlarni buzish holatlarida (zararni) undirib olish uchun bo‘lsa, joiz bo‘ladi. 1-band mudaribga sarmoyani kafolatlash yukini qo‘yadi — bu muzorabaning foyda-zarar bo‘lishish mohiyatiga zid.",
+      "notes": [
+        "Sarmoyani zarardan qat’i nazar kafolatlovchi garov omonat shartnomasida nojoiz.",
+        "Aynan 1-band nojoiz — mudarib aybsiz zarar uchun javobgar emas.",
+        "",
+        "Standart tajovuz, beparvolik va shart buzilishi uchun garovni aniq joiz deydi."
+      ],
+      "ref": "AAOIFI SS 39, 3/3/2 Omonat shartnomalarida garov; SS 5, 2/2/1",
+      "quote": "Vakillik, omonat (ido’), mushoraka, muzoraba va ijaraga oluvchi qo‘lidagi mol kabi omonat shartnomalarida garovni shart qilish joiz emas. Agar garov tajovuz, beparvolik yoki shartlarni buzish holatlarida (zararni) undirib olish uchun bo‘lsa, joiz bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Garov berilayotgan qarz (3/3/1)",
+      "text": "Quyidagi to‘rt garov holatidan qaysi biri standartga ko‘ra haqiqiy (joiz)?",
+      "options": [
+        "An’anaviy bankning foizli krediti uchun olingan garov",
+        "Hali sotuvchi qo‘lida turgan, narxi naqd to‘langan muayyan mol uchun garov",
+        "Muayyan (ayn) narx yoki muayyan molning manfaati uchun garov",
+        "Murobaha shartnomasidan oldin, undan kelib chiqadigan qarz uchun garov"
+      ],
+      "correct": "D",
+      "explain": "Garov berilayotgan narsa shariatda joiz qarz bo‘lishi shart (sotilgan mol narxi, itlof zamoni, salam tovari, istisno’ buyurtmasi, zimmadagi manfaat). Garov haqiqiy bo‘lishi uchun qarzning zimmada sobit bo‘lishi shart emas — garov qarz sobit bo‘ladigan shartnomadan oldin yoki u bilan birga tuzilsa ham haqiqiy. Ribaviy qarz kabi joiz bo‘lmagan qarz yoki qarz bo‘lmagan narsa (muayyan narx, muayyan molning manfaati, narxi naqd bo‘lib, hali sotuvchi qo‘lida turgan muayyan sotilgan mol) uchun garov haqiqiy emas.",
+      "notes": [
+        "Ribaviy qarz shariatda joiz qarz emas — garov haqiqiy bo‘lmaydi.",
+        "Narxi naqd to‘langan, sotuvchi qo‘lidagi muayyan mol — qarz emas, ayn; garov haqiqiy emas.",
+        "Muayyan narx va muayyan molning manfaati zimmadagi qarz emas — standart ularni aniq istisno qiladi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 39, 3/3/1 Garov berilayotgan qarzning hukmlari",
+      "quote": "Garov berilayotgan narsa shariatda joiz qarz bo‘lishi shart … Garov haqiqiy bo‘lishi uchun qarzning zimmada sobit bo‘lishi shart emas, balki garov qarz sobit bo‘ladigan shartnomadan oldin yoki u bilan birga tuzilsa ham haqiqiy bo‘ladi. Garov berilayotgan narsa ribaviy qarz kabi shariatda joiz bo‘lmagan qarz yoki qarz bo‘lmagan narsa, masalan, muayyan (ayn) narx, muayyan molning manfaati va narxi naqd bo‘lib, hali sotuvchining qo‘lida turgan muayyan sotilgan mol bo‘lishi haqiqiy emas."
+    },
+    {
+      "kind": "calc",
+      "bloom": "analyze",
+      "section": "Bankrotlikda ustuvorlik (3/4/3)",
+      "text": "«Qurilish-Servis» bankrot bo‘ldi. Bankning qarzi 500 000 000 so‘m, u uchun garovdagi texnika 350 000 000 so‘mga sotildi. Garovsiz oddiy kreditorlarning talablari jami 1 000 000 000 so‘m. Garovdan tashqari qolgan mol-mulk 230 000 000 so‘mga sotildi. Bank jami qancha oladi?",
+      "options": [
+        "350 000 000 so‘m — faqat garovdan",
+        "380 000 000 so‘m — garovdan va qoldiq bo‘yicha teng ulush",
+        "500 000 000 so‘m — garovli kreditor sifatida to‘liq",
+        "395 000 000 so‘m — garovdan va qoldiqning 30 foizi"
+      ],
+      "correct": "B",
+      "explain": "Agar garovga qo‘yuvchi muflis bo‘lsa, garovdan undirib olishda garovga oluvchi qolgan kreditorlardan ustun bo‘ladi. Agar garov yetarli bo‘lmasa, qarzining qolgan qismi bo‘yicha u boshqa kreditorlar (g‘uramo) bilan teng holatda bo‘ladi.\n\nHisob-kitob:\n1) Garovdan: 350 000 000 so‘m (ustuvor).\n2) Qolgan qarz: 500 000 000 − 350 000 000 = 150 000 000 so‘m — oddiy kreditor sifatida.\n3) Oddiy talablar jami: 1 000 000 000 + 150 000 000 = 1 150 000 000 so‘m; mavjud mulk 230 000 000 → 230 / 1 150 = 20%.\n4) Bank ulushi: 150 000 000 × 20% = 30 000 000 so‘m.\n5) Jami: 350 000 000 + 30 000 000 = 380 000 000 so‘m.",
+      "notes": [
+        "Qolgan 150 mln bo‘yicha bank oddiy kreditorlar bilan teng ulush olishga haqli.",
+        "",
+        "Ustuvorlik faqat garov qiymati doirasida; qolgan qism bo‘yicha bank boshqalar bilan teng.",
+        "Qolgan 150 mln ga 30% emas, barcha oddiy talablar uchun umumiy stavka 230 / 1 150 = 20% qo‘llanadi: 350 + 30 = 380."
+      ],
+      "ref": "AAOIFI SS 39, 3/4/3 Bankrotlikda garovga oluvchining ustuvorligi",
+      "quote": "Agar garovga qo‘yuvchi muflis (bankrot) bo‘lsa, garovdan undirib olishda garovga oluvchi qolgan kreditorlardan (baqiyatu-d-doinin) ustun bo‘ladi. Agar garov yetarli bo‘lmasa, qarzining qolgan qismi bo‘yicha u boshqa kreditorlar (g‘uramo) bilan teng holatda bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "evaluate",
+      "section": "Moliyaviy qog‘ozlar va sukuk garovi (4/1–4/3)",
+      "text": "Mijoz garov sifatida to‘rt xil qimmatli qog‘ozlar portfelini taklif qilmoqda. Qaysi portfel to‘liq garovga yaroqli?",
+      "options": [
+        "Ijara sukuklari, Islom banki aksiyalari va halol IT kompaniyasi aksiyalari",
+        "Islomiy sukuklar va an’anaviy bankning imtiyozli aksiyalari",
+        "Halol savdo kompaniyasi aksiyalari va an’anaviy depozit sertifikatlari",
+        "Manfaat sukuklari va ribaviy davlat obligatsiyalari"
+      ],
+      "correct": "A",
+      "explain": "Shariatga ko‘ra chiqarilishi va muomalasi joiz bo‘lgan moliyaviy qog‘ozlar va sukuklarni — masalan, islomiy sukuklar va Islom moliya muassasalarining aksiyalarini — garovga qo‘yish joiz; asosiy faoliyati halol bo‘lgan kompaniyalarning aksiyalari ham shular jumlasiga kiradi. Ribaviy obligatsiyalar, imtiyozli aksiyalar, an’anaviy investitsiya va depozit sertifikatlari, an’anaviy moliya muassasalari aksiyalarini garovga qo‘yish joiz emas.",
+      "notes": [
+        "",
+        "Imtiyozli aksiyalar va an’anaviy bank aksiyalari garovga qo‘yilishi joiz emas (4/3).",
+        "An’anaviy investitsiya depozitlari sertifikatlari joiz emas (4/3).",
+        "Manfaat sukuklari joiz (4/2), lekin ribaviy obligatsiyalar nojoiz (4/3)."
+      ],
+      "ref": "AAOIFI SS 39, 4 Moliyaviy qog‘ozlar va sukuklarni garovga qo‘yish, 4/1–4/3",
+      "quote": "Shariatga ko‘ra chiqarilishi va muomalasi joiz bo‘lgan moliyaviy qog‘ozlar va sukuklarni, masalan, islomiy sukuklar va Islom moliya muassasalarining aksiyalarini garovga qo‘yish joiz. Asosiy faoliyati halol bo‘lgan kompaniyalarning aksiyalari ham shular jumlasiga kiradi. … Shariatga ko‘ra chiqarilishi va muomalasi joiz bo‘lmagan moliyaviy qog‘ozlar va sukuklarni, masalan, ribaviy obligatsiyalar, imtiyozli aksiyalar va tamattu’ (intifo’) aksiyalarini garovga qo‘yish joiz emas."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "analyze",
+      "section": "Joriy hisobvaraq garovi (5)",
+      "text": "Mijoz akkreditiv ochish uchun bankdagi joriy hisobvarag‘idagi 200 000 000 so‘mni bank foydasiga garovga qo‘ydi. Bankning g‘aznachilik bo‘limi bu mablag‘ni 6 oy davomida o‘z murobaha portfeliga yo‘naltirib, foydani to‘liq o‘zida qoldirmoqchi. Shariat nazorati qanday xulosa beradi?",
+      "options": [
+        "Bank joiz deb hisoblaydi: joriy hisobvaraq bankka berilgan qarz",
+        "Joiz, agar bank mijozga belgilangan foiz to‘lab tursa",
+        "Joiz, agar mablag‘ garov muddati tugagach to‘liq qaytarilsa",
+        "Nojoiz: faqat muzoraba hisobvarag‘iga o‘tkazilsa joiz bo‘ladi"
+      ],
+      "correct": "D",
+      "explain": "Muassasadagi joriy hisobvaraq uning o‘zi foydasiga garovga qo‘yilgan holatda, muassasa uni o‘z foydasi uchun ishlatmasligi lozim, faqat ikki tomon uni investitsiya hisobvarag‘iga o‘tkazishga kelishgan holat bundan mustasno — bunda u qarz (qard) hukmidan muzoraba hukmlariga o‘tadi. Bu garovga oluvchi muassasaning undan evazsiz foydalanishidan saqlanish uchun qilinadi; bu holatda hisobvaraq egasi sarmoya egasi (robb ul-mol) foydasiga, muassasa esa muzorib foydasiga haqli bo‘ladi.",
+      "notes": [
+        "Garovga olingan joriy hisobvaraqdan bank o‘z foydasi uchun foydalanmasligi lozim — garov sabab ortiqcha manfaat.",
+        "Belgilangan foiz — riba; standart foyda muzoraba asosida bo‘linishini talab qiladi.",
+        "Asl summani qaytarish evazsiz foydalanish taqiqini olib tashlamaydi.",
+        ""
+      ],
+      "ref": "AAOIFI SS 39, 5 Joriy hisobvaraqlar va naqd pul ta’minotlarini garovga qo‘yish",
+      "quote": "Muassasadagi joriy hisobvaraq uning o‘zi foydasiga garovga qo‘yilgan holatda, muassasa uni o‘z foydasi uchun ishlatmasligi lozim, faqat ikki tomon uni investitsiya hisobvarag‘iga o‘tkazishga kelishgan holat bundan mustasno — bunda u qarz (qard) hukmidan muzoraba hukmlariga o‘tadi. Bu (garovga oluvchi) muassasaning undan (evazsiz) foydalanishidan saqlanish uchun qilinadi. (Bu holatda) hisobvaraq egasi sarmoya egasi (robb ul-mol) foydasiga, muassasa esa muzorib foydasiga haqli bo‘ladi."
+    },
+    {
+      "kind": "scenario",
+      "bloom": "apply",
+      "section": "Investitsiya birliklari garovi (6/1–6/2)",
+      "text": "Mijozning islomiy investitsiya fondida 300 000 000 so‘mlik birliklari bor; u bankdan 200 000 000 so‘m murobaha moliyalashtiruvini olib, birliklarni garovga qo‘ymoqda. Yil davomida birliklar 30 000 000 so‘m foyda keltirishi kutilmoqda. Garov shartnomasida foyda haqida alohida band yo‘q. Standartga eng mos tuzilma qaysi?",
+      "options": [
+        "Barcha 300 mln birlik mutlaq muzlatiladi, foyda mijozga erkin to‘lanadi",
+        "200 mln qism muzlatiladi, foyda bankning daromadi bo‘ladi",
+        "Qarz miqdori (200 mln) muzlatiladi, foyda ham garovga qo‘shiladi",
+        "Birliklar garovga olinmaydi: fond aktivlari garovga yaroqsiz"
+      ],
+      "correct": "C",
+      "explain": "Muassasaga islomiy investitsiya fondlaridagi investitsiya birliklarini garovga olish joiz. Bu holatda muassasa mijozning birliklarni qaytarib olish yoki hisobvaraqdan mablag‘ yechish huquqini mutlaq yoki qarz miqdorida to‘xtatib qo‘yishi mumkin, keyingisi (qarz miqdorida to‘xtatish) afzalroq. Birliklar va investitsiya hisobvarag‘ining foydasi hamda o‘sishi asl mablag‘ kabi garov hisoblanadi, faqat buning aksiga kelishilgan holat bundan mustasno. Foyda mijozning mulki bo‘lib qoladi, faqat garov sifatida turadi.",
+      "notes": [
+        "Mutlaq muzlatish joiz, lekin afzal emas; foyda esa kelishuv bo‘lmasa garovga qo‘shiladi.",
+        "Foyda garovga qo‘shiladi, lekin bankning mulkiga aylanmaydi — u mijozniki.",
+        "",
+        "Standart islomiy fond birliklarini garovga olishni aniq joiz deydi (6/1)."
+      ],
+      "ref": "AAOIFI SS 39, 6 Investitsiya birliklari va hisobvaraqlarini garovga qo‘yish, 6/1–6/2",
+      "quote": "Muassasaga islomiy investitsiya fondlaridagi investitsiya birliklarini garovga olish joiz. Bu holatda muassasa mijozning (birliklarni) qaytarib olish (istirdod) yoki hisobvaraqdan mablag‘ yechish huquqini mutlaq yoki qarz miqdorida to‘xtatib qo‘yishi mumkin, keyingisi (qarz miqdorida to‘xtatish) afzalroqdir. Birliklar va investitsiya hisobvarag‘ining foydasi hamda o‘sishi asl mablag‘ kabi garov hisoblanadi."
+    }
+  ]
+}
