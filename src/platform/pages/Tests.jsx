@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../store/auth.jsx'
 import { add, patch, remove, notify, logActivity, commit, loadDB, NO_ORG, teacherIdsOf, teachesGroup } from '../store/db.js'
-import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, Select, cx, useFormInit } from '../ui/kit.jsx'
-import { fmtDate, fmtDateShort, fmtLeft, fmtDateTime, toLocalInput, fromLocalInput, pct, fmtDuration } from '../ui/format.js'
+import { PageHead, Card, Btn, Badge, Tabs, Modal, FField, Input, Textarea, ChipSelect, Empty, Icon, UAvatar, Confirm, Menu, useToast, Table, Progress, Search, cx, useFormInit } from '../ui/kit.jsx'
+import { fmtDate, fmtDateShort, fmtDateTime, pct, fmtDuration } from '../ui/format.js'
 import { uid } from '../store/ids.js'
 import { StatSpark, series, endOfDay } from '../ui/charts.jsx'
 import { ChartPanel } from '../ui/chartpanel.jsx'
@@ -107,19 +107,19 @@ function TestList() {
     // Guruhdan chiqqan bo'lsa ham topshirgan o'quvchi hisobda qoladi
     const total = new Set([...groups.flatMap((g) => g.studentIds), ...ta.map((a) => a.studentId)]).size
     const author = db.users.find((u) => u.id === t.authorId)
-    return { t, my, groups, total, author, done: ta.length, avg: ta.length ? `${avgOf(ta)}%` : '—', expired: t.dueAt < now }
-  }).sort((a, b) => (a.expired - b.expired) || (a.expired ? b.t.dueAt - a.t.dueAt : a.t.dueAt - b.t.dueAt)), [scope.tests, attempts, db.groups, db.users, user.id, now])
+    // Testlar yopilmaydi: muddat yo'q, har bir o'quvchi xohlagancha qayta topshira oladi
+    return { t, my, groups, total, author, done: ta.length, runs: ta.reduce((n, a) => n + (a.used || 1), 0), avg: ta.length ? `${avgOf(ta)}%` : '—' }
+  }).sort((a, b) => (b.t.createdAt || 0) - (a.t.createdAt || 0)), [scope.tests, attempts, db.groups, db.users, user.id])
 
   const is = {
-    active: (r) => !r.expired && (isStaff || !r.my),
+    active: (r) => isStaff || !r.my,
     done: (r) => !!r.my,
-    expired: (r) => r.expired && !r.my,
     all: () => true,
   }
   const count = (k) => rows.filter(is[k]).length
   const tabs = isStaff
     ? [{ value: 'active', label: 'Faol', icon: 'clipboard', count: count('active') }, { value: 'all', label: 'Barchasi', icon: 'fileText', count: rows.length }]
-    : [{ value: 'active', label: 'Topshirish kerak', icon: 'clipboard', count: count('active') }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle', count: count('done') }, { value: 'expired', label: 'Muddati o‘tgan', icon: 'clock', count: count('expired') }]
+    : [{ value: 'active', label: 'Topshirish kerak', icon: 'clipboard', count: count('active') }, { value: 'done', label: 'Topshirilgan', icon: 'checkCircle', count: count('done') }]
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase()
@@ -134,7 +134,7 @@ function TestList() {
       active: count('active'),
       takers,
       avg: attempts.length ? `${avgOf(attempts)}%` : '—',
-      sActive: series(14, (ts) => scope.tests.filter((t) => t.createdAt <= endOfDay(ts) && t.dueAt > ts).length),
+      sActive: series(14, (ts) => scope.tests.filter((t) => (t.createdAt || 0) <= endOfDay(ts)).length),
       sTakers: series(14, (ts) => new Set(upto(ts).map((a) => a.studentId)).size),
       sAvg: series(14, (ts) => avgOf(upto(ts))),
     }
@@ -234,12 +234,11 @@ function TestList() {
 }
 
 function TestCard({ r, isStaff, menu }) {
-  const { t, my, groups, total, author, done, avg, expired } = r
-  const left = t.dueAt - Date.now()
+  const { t, my, groups, total, author, done, runs, avg } = r
   const href = `#/platform/tests/${t.id}`
   const myP = my && pct(my.score, my.total)
   return (
-    <article className={cx('pcard', 'ptcardx', expired && 'is-expired')}>
+    <article className="pcard ptcardx">
       <div className="ptcardx__top">
         <span className="ptcardx__icon"><Icon name="clipboard" size={22} /></span>
         <div className="ptcardx__ttl">
@@ -247,22 +246,21 @@ function TestCard({ r, isStaff, menu }) {
           <span>{t.questions.length} savol · {t.timeLimit} daq · {author?.name}</span>
         </div>
         {my ? <span className={cx('ptpill', `ptpill--${gradeOf(myP).tone}`, 'ptpill--lg')}><Icon name="checkCircle" size={15} />{myP}%</span>
-          : expired ? <span className="ptdue ptdue--off"><Icon name="lock" size={15} />Yopilgan</span>
-            : <span className={cx('ptdue', left < D && 'ptdue--hot')}><Icon name="clock" size={15} />{fmtLeft(t.dueAt)}</span>}
+          : <span className="ptdue"><Icon name="lockOpen" size={15} />Ochiq</span>}
       </div>
       {t.description && <p className="ptcardx__desc">{t.description}</p>}
       <div className="ptcardx__meta">
         {groups.map((g) => <span key={g.id} className="ptgrp" style={{ '--gc': g.color }}>{g.name}</span>)}
-        <span className="ptcardx__due"><Icon name="calendar" size={15} />Muddat: {fmtDateTime(t.dueAt)}</span>
+        {t.createdAt && <span className="ptcardx__due"><Icon name="calendar" size={15} />Berilgan: {fmtDateTime(t.createdAt)}</span>}
       </div>
       {isStaff ? (
         <div className="ptcardx__prog">
-          <div><span>Topshirganlar: <b>{done}/{total}</b></span><span>O‘rtacha: <b>{avg}</b></span></div>
+          <div><span>Topshirganlar: <b>{done}/{total}</b>{runs > done && <> · {runs} urinish</>}</span><span>O‘rtacha: <b>{avg}</b></span></div>
           <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${pct(done, total)}%` }} /></span>
         </div>
       ) : my && (
         <div className="ptcardx__prog">
-          <div><span>To‘g‘ri javoblar: <b>{my.score}/{my.total}</b></span><span>{fmtDateTime(my.finishedAt)}</span></div>
+          <div><span>Eng yaxshi: <b>{my.score}/{my.total}</b> · {my.used || 1} marta topshirilgan</span><span>{fmtDateTime(my.finishedAt)}</span></div>
           <span className="pprog ptbar"><span className="pprog__bar" style={{ width: `${myP}%`, background: GRADES.find((g) => g.key === gradeOf(myP).key).color }} /></span>
         </div>
       )}
@@ -271,9 +269,8 @@ function TestCard({ r, isStaff, menu }) {
           <Btn variant="primary" icon="play" as="a" href={`#/platform/tests/preview.${t.id}`} title="Testni o‘quvchi kabi ishlab ko‘rish — natija saqlanmaydi">Boshlash</Btn>
           <Btn variant="soft" icon="chart" as="a" href={href}>Natijalar</Btn>
         </div>
-          : my ? <Btn variant="soft" icon="eye" as="a" href={href}>Natijani ko‘rish</Btn>
-            : expired ? <span className="pmuted" style={{ fontSize: 13.5 }}>Test yopilgan</span>
-              : <Btn variant="primary" icon="play" as="a" href={href}>Testni boshlash</Btn>}
+          : my ? <Btn variant="soft" icon="eye" as="a" href={href}>Natija va qayta topshirish</Btn>
+            : <Btn variant="primary" icon="play" as="a" href={href}>Testni boshlash</Btn>}
         {menu && <Menu items={menu} trigger={<button type="button" className="ptmore" aria-label="Amallar"><Icon name="moreV" size={18} /></button>} />}
       </div>
     </article>
@@ -365,7 +362,7 @@ function TestForm({ open, test, onClose }) {
   useEffect(() => { setErr('') }, [f]) // forma tuzatilganda eski xato ko'rinib turmasin
   // Topshirilgan testning savollari qulflanadi: aks holda eski natijalar buziladi
   const locked = !isNew && db.testAttempts.some((a) => a.testId === test.id)
-  useFormInit(open, test?.id, () => { setErr(''); setF(isNew ? { title: '', description: '', groupIds: scope.groups[0] ? [scope.groups[0].id] : [], timeLimit: 15, attempts: 3, shuffle: true, dueAt: toLocalInput(Date.now() + 7 * 864e5), questions: [emptyQ(), emptyQ()] } : { attempts: 1, shuffle: true, ...test, dueAt: toLocalInput(test.dueAt), questions: test.questions.map((q) => ({ ...q, options: [...q.options] })) }) })
+  useFormInit(open, test?.id, () => { setErr(''); setF(isNew ? { title: '', description: '', groupIds: scope.groups[0] ? [scope.groups[0].id] : [], timeLimit: 15, shuffle: true, questions: [emptyQ(), emptyQ()] } : { shuffle: true, ...test, questions: test.questions.map((q) => ({ ...q, options: [...q.options] })) }) })
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }))
   const setQ = (i, k, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, [k]: v } : q)) }))
   const setOpt = (i, oi, v) => setF((x) => ({ ...x, questions: x.questions.map((q, j) => (j === i ? { ...q, options: q.options.map((o, k) => (k === oi ? v : o)) } : q)) }))
@@ -399,10 +396,8 @@ function TestForm({ open, test, onClose }) {
     if (!f.groupIds?.length) return setErr('Kamida bitta guruh tanlang')
     const limit = Number(f.timeLimit)
     if (!Number.isFinite(limit) || limit < 1 || limit > 600) return setErr('Vaqt chegarasi 1 daqiqadan 600 daqiqagacha bo‘lishi kerak')
-    const dueAt = fromLocalInput(f.dueAt)
-    if (!dueAt) return setErr('Muddatni kiriting')
-    if (isNew && dueAt <= Date.now()) return setErr('Muddat kelajakdagi vaqt bo‘lishi kerak')
-    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: limit, dueAt, attempts: Math.min(3, Math.max(1, Number(f.attempts) || 1)), shuffle: f.shuffle !== false }
+    // Test muddatsiz va urinishlar cheklanmagan: hamma uchun doim ochiq
+    const data = { title: f.title.trim(), description: f.description?.trim(), groupIds: f.groupIds, timeLimit: limit, shuffle: f.shuffle !== false }
     if (!locked) {
       const qs = []
       for (let n = 0; n < f.questions.length; n++) {
@@ -430,7 +425,7 @@ function TestForm({ open, test, onClose }) {
     if (isNew) {
       if (!scope.orgId) return toast(NO_ORG, 'err')
       const t = add('tests', { ...data, orgId: scope.orgId, authorId: user.id })
-      notify([...new Set(scope.groups.filter((g) => f.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Yangi test: «${t.title}» — muddat ${fmtDate(t.dueAt)}`, '#/platform/tests')
+      notify([...new Set(scope.groups.filter((g) => f.groupIds.includes(g.id)).flatMap((g) => g.studentIds))], `Yangi test: «${t.title}»`, '#/platform/tests')
       logActivity(scope.orgId, user.id, 'yangi test yaratdi', t.title)
       toast('Test yaratildi, o‘quvchilarga xabar yuborildi')
     } else { patch('tests', test.id, data); toast('Test saqlandi') }
@@ -438,18 +433,14 @@ function TestForm({ open, test, onClose }) {
   }
 
   return (
-    <Modal open={open} onClose={onClose} width={760} title={isNew ? 'Test yaratish' : 'Testni tahrirlash'} sub={locked ? 'Nomi, guruhlari va muddatini o‘zgartirish mumkin' : 'Savollar, variantlar va to‘g‘ri javobni belgilang'}
+    <Modal open={open} onClose={onClose} width={760} title={isNew ? 'Test yaratish' : 'Testni tahrirlash'} sub={locked ? 'Nomi, guruhlari va vaqt chegarasini o‘zgartirish mumkin' : 'Savollar, variantlar va to‘g‘ri javobni belgilang'}
       footer={<>{err && <span className="ptform__err" role="alert">{err}</span>}<Btn onClick={onClose}>Bekor</Btn><Btn variant="primary" onClick={submit}>{isNew ? 'Yaratish' : 'Saqlash'}</Btn></>}>
       <div className="pform">
         <FField label="Test nomi"><Input value={f.title || ''} onChange={(e) => set('title', e.target.value)} autoFocus /></FField>
         <FField label="Tavsif"><Input value={f.description || ''} onChange={(e) => set('description', e.target.value)} /></FField>
         <div className="pform__row">
-          <FField label="Vaqt chegarasi (daqiqa)"><Input type="number" min="1" max="600" value={f.timeLimit || ''} onChange={(e) => set('timeLimit', e.target.value)} /></FField>
-          <FField label="Topshirish muddati"><Input type="datetime-local" value={f.dueAt || ''} onChange={(e) => set('dueAt', e.target.value)} /></FField>
-        </div>
-        <div className="pform__row">
-          <FField label="Urinishlar soni" hint="Eng yaxshi natija olinadi; o‘zlashtirishda 2- va 3-urinishga −10%. To‘g‘ri javoblar urinishlar tugagach ochiladi">
-            <Select value={String(f.attempts || 1)} onChange={(v) => set('attempts', Number(v))} options={[{ value: '1', label: '1 ta urinish' }, { value: '2', label: '2 ta urinish' }, { value: '3', label: '3 ta urinish' }]} />
+          <FField label="Vaqt chegarasi (daqiqa)" hint="Test muddatsiz va hamma uchun ochiq: o‘quvchi xohlagancha qayta topshira oladi, har bir urinish statistikada ko‘rinadi">
+            <Input type="number" min="1" max="600" value={f.timeLimit || ''} onChange={(e) => set('timeLimit', e.target.value)} />
           </FField>
           <label className="pms-check ptform__shuffle"><input type="checkbox" checked={f.shuffle !== false} onChange={(e) => set('shuffle', e.target.checked)} />
             <span><b>Tasodifiy tartib</b> — har bir o‘quvchiga savollar va javob variantlari aralashtirib beriladi</span></label>
@@ -696,6 +687,26 @@ function ScoreHero({ test, attempt, staff }) {
   )
 }
 
+// Urinishlar tarixi: o'quvchi testni necha marta topshirgani va har bir urinish natijasi
+function AttemptsHistory({ attempt }) {
+  const history = attempt?.history || []
+  if (!history.length) return null
+  const best = history.reduce((b, h) => (h.score > (b?.score ?? -1) ? h : b), null)
+  return (
+    <section className="pcard ptrv__hist">
+      <h3 className="pdt ptrv__ttl"><span className="pdt__ico"><Icon name="refresh" size={18} /></span>Urinishlar: {history.length} marta topshirilgan</h3>
+      <div className="ptattempts">
+        {history.map((h, i) => (
+          <span key={h.id || i} className={cx(h.id === best?.id && 'is-best')} title={fmtDateTime(h.finishedAt)}>
+            {Number(h.n) || i + 1}-urinish: {h.score}/{h.total} · {pct(h.score, h.total)}%{h.id === best?.id && history.length > 1 ? ' · eng yaxshi' : ''}
+            <small style={{ fontWeight: 500, opacity: 0.75 }}>{fmtDateTime(h.finishedAt)}</small>
+          </span>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 // ---- Talaba: testni topshirish ----
 const readRun = (k) => {
   try {
@@ -721,11 +732,9 @@ function TakeTest({ id, preview = false }) {
   const existing = preview ? null : db.testAttempts.find((a) => a.testId === id && a.studentId === user.id)
   const storeKey = `ii_test_${preview ? 'preview' : 'run'}_${user.id}_${id}`
   // Urinishlar: server o'quvchi/test bo'yicha eng yaxshi urinishni va tarixni (history) qaytaradi
-  const limit = Number(t?.attempts) || 1
   const history = existing?.history || (existing ? [existing] : [])
   const used = existing ? existing.used || history.length : 0
-  const solved = history.some((h) => h.total && h.score >= h.total)
-  const canRetry = !preview && !!existing && used < limit && !solved && !!t && t.dueAt > Date.now()
+  const canRetry = !preview && !!existing && !!t // urinishlar cheklanmagan, test yopilmaydi
   // Javoblar va boshlangan vaqt saqlanadi: sahifa yangilansa ham test davom etadi, taymer qaytadan boshlanmaydi
   const [run, setRun] = useState(() => { const r = readRun(storeKey); return existing && !(r && r.retry) ? null : r })
   const [fresh, setFresh] = useState(null)
@@ -841,15 +850,16 @@ function TakeTest({ id, preview = false }) {
         <PageHead crumbs={crumbs} title={preview ? 'Sinov natijasi' : 'Test natijasi'} sub={t.title}
           actions={preview
             ? <><Btn icon="refresh" onClick={() => { setFresh(null); setRun(null); sending.current = false }}>Qayta boshlash</Btn><Btn as="a" href={`#/platform/tests/${t.id}`} icon="chart">Natijalar</Btn></>
-            : <Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn>} />
+            : <>{canRetry && <Btn variant="primary" icon="refresh" onClick={() => { setRetry(true); setFresh(null); sending.current = false }}>Qayta topshirish</Btn>}<Btn as="a" href="#/platform/tests" icon="chevLeft">Testlarga qaytish</Btn></>} />
         {previewBanner}
         {!preview && canRetry && !reviewReady ? (
-          <AttemptSummary test={t} history={history} limit={limit} last={fresh || history[history.length - 1]} onRetry={() => { setRetry(true); setFresh(null); sending.current = false }} />
+          <AttemptSummary history={history} last={fresh || history[history.length - 1]} onRetry={() => { setRetry(true); setFresh(null); sending.current = false }} />
         ) : !reviewReady ? (
           <Card><Empty icon="refresh" title="Javoblar yuklanmoqda" text={`Natijangiz saqlandi: ${result.score}/${result.total}. To‘g‘ri javoblarni ko‘rish uchun yangilang.`} action={<Btn variant="primary" icon="refresh" onClick={() => loadDB().catch((e) => toast(e.message, 'err'))}>Yangilash</Btn>} /></Card>
         ) : (
           <>
             <ScoreHero test={t} attempt={result} />
+            {!preview && <AttemptsHistory attempt={existing} />}
             {!preview && <FeedbackBox test={t} attempt={result} />}
             <StandardAnalysis test={t} attempt={result} />
             <ChartPanel title="Natija grafigi" storeKey="test_result" datasets={datasets} defaultType="donut" />
@@ -864,29 +874,27 @@ function TakeTest({ id, preview = false }) {
   }
 
   if (!run) {
-    const closed = !preview && t.dueAt < Date.now()
     const locked = !preview && !existing && gate?.locked
     return (
       <>
         <PageHead crumbs={crumbs} title={t.title} sub={t.description} />
         {previewBanner}
         <section className="pcard ptintro">
-          <span className="ptintro__icon"><Icon name={closed || locked ? 'lock' : 'clipboard'} size={30} /></span>
-          <h2>{closed ? 'Test muddati tugagan' : locked ? 'Test hali ochilmagan' : retry ? `${used + 1}-urinish` : 'Testni boshlashga tayyormisiz?'}</h2>
+          <span className="ptintro__icon"><Icon name={locked ? 'lock' : 'clipboard'} size={30} /></span>
+          <h2>{locked ? 'Test hali ochilmagan' : retry ? `${used + 1}-urinish` : 'Testni boshlashga tayyormisiz?'}</h2>
           <dl className="ptintro__facts">
             <div><dt><Icon name="clipboard" size={17} />Savollar</dt><dd>{t.questions.length} ta</dd></div>
             <div><dt><Icon name="timer" size={17} />Vaqt</dt><dd>{t.timeLimit} daqiqa</dd></div>
-            <div><dt><Icon name="calendar" size={17} />Muddat</dt><dd>{fmtDateTime(t.dueAt)}</dd></div>
-            <div><dt><Icon name="refresh" size={17} />Urinishlar</dt><dd>{preview ? `${limit} ta` : `${used} / ${limit}`}</dd></div>
+            <div><dt><Icon name="refresh" size={17} />Urinishlar</dt><dd>{preview || !used ? 'Cheklanmagan' : `${used} marta topshirilgan`}</dd></div>
           </dl>
           {locked && (
             <div className="ptlock"><Icon name="lock" size={20} />
               <span>Bu test «{gate.unitTitle}» darsiga bog‘langan. U darsda qatnashganingiz qayd etilgandan{gate.standardId ? <> yoki <a href={`#/platform/library/item.${gate.standardId}`}>standartni ochganingizdan</a></> : null}{gate.videoId ? <> yoki <a href={`#/platform/videos/${gate.videoId}`}>dars yozuvini ko‘rganingizdan</a></> : null} keyin ochiladi. <a href={`#/platform/library/unit.${gate.unitId}`}>Darsga o‘tish</a></span>
             </div>
           )}
-          {closed ? <p className="pmuted">Bu testni endi topshirib bo‘lmaydi. Savollaringiz bo‘lsa, ustozingizga murojaat qiling.</p> : (
+          {(
             <ul className="ptintro__rules">
-              <li><Icon name="check" size={16} />{preview ? `Sinov rejimida testni xohlagancha qayta ishlash mumkin, o‘quvchilar uchun esa — ${limit} marta.` : limit > 1 ? `Testni ${limit} martagacha topshirish mumkin, eng yaxshi natija olinadi. 2- va 3-urinish o‘zlashtirish ko‘rsatkichida −10% bilan hisoblanadi.` : 'Testni faqat bir marta topshirish mumkin.'}</li>
+              <li><Icon name="check" size={16} />{preview ? 'Sinov rejimida natija saqlanmaydi. O‘quvchilar testni muddatsiz va xohlagancha qayta topshira oladi.' : 'Test muddatsiz: xohlagancha qayta topshirish mumkin, eng yaxshi natija olinadi. Har bir urinish ustoz statistikasida ko‘rinadi, o‘zlashtirish ko‘rsatkichida qayta urinish −10% bilan hisoblanadi.'}</li>
               {t.shuffle !== false && <li><Icon name="check" size={16} />Savollar va javob variantlari tasodifiy tartibda chiqadi.</li>}
               <li><Icon name="check" size={16} />Boshlaganingizdan so‘ng vaqt to‘xtamaydi, vaqt tugasa test avtomatik topshiriladi.</li>
               <li><Icon name="check" size={16} />Sahifa yangilansa, javoblaringiz saqlanib qoladi.</li>
@@ -894,7 +902,7 @@ function TakeTest({ id, preview = false }) {
             </ul>
           )}
           <div className="prow ptintro__cta">
-            {!closed && !locked && <Btn variant="primary" size="lg" icon="play" disabled={!preview && !existing && !gate} onClick={() => setRun({ ...newRun(t), retry: retry || undefined })}>{retry ? 'Qayta topshirishni boshlash' : 'Testni boshlash'}</Btn>}
+            {!locked && <Btn variant="primary" size="lg" icon="play" disabled={!preview && !existing && !gate} onClick={() => setRun({ ...newRun(t), retry: retry || undefined })}>{retry ? 'Qayta topshirishni boshlash' : 'Testni boshlash'}</Btn>}
             {retry ? <Btn size="lg" onClick={() => setRetry(false)}>Natijaga qaytish</Btn> : <Btn as="a" href="#/platform/tests" size="lg">Orqaga</Btn>}
           </div>
         </section>
@@ -964,7 +972,7 @@ function TakeTest({ id, preview = false }) {
 }
 
 // Urinish qolgan bo'lsa: to'g'ri javoblar yashirin, faqat ball va urinishlar tarixi
-function AttemptSummary({ test, history, limit, last, onRetry }) {
+function AttemptSummary({ history, last, onRetry }) {
   const best = history.reduce((b, h) => (h.score > (b?.score ?? -1) ? h : b), null)
   const p = last ? pct(last.score, last.total) : 0
   const g = gradeOf(p)
@@ -975,12 +983,11 @@ function AttemptSummary({ test, history, limit, last, onRetry }) {
       <div className="ptattempts" style={{ justifyContent: 'center' }}>
         {history.map((h, i) => <span key={h.id || i} className={cx(best && h.id === best.id && 'is-best')}>{Number(h.n) || i + 1}-urinish: {h.score}/{h.total}{best && h.id === best.id ? ' · eng yaxshi' : ''}</span>)}
       </div>
-      <p className="pmuted">Yana {limit - history.length} ta urinishingiz bor. To‘g‘ri javoblar va izohlar barcha urinishlar tugagach (yoki test muddati o‘tgach) ko‘rsatiladi. Hisobga eng yaxshi natija olinadi, lekin o‘zlashtirish ko‘rsatkichida har bir qayta urinish −10% bilan hisoblanadi.</p>
+      <p className="pmuted">Testni xohlagancha qayta topshirishingiz mumkin. Hisobga eng yaxshi natija olinadi, lekin o‘zlashtirish ko‘rsatkichida har bir qayta urinish −10% bilan hisoblanadi.</p>
       <div className="prow ptintro__cta">
         <Btn variant="primary" size="lg" icon="refresh" onClick={onRetry}>Qayta topshirish</Btn>
         <Btn as="a" href="#/platform/tests" size="lg">Testlarga qaytish</Btn>
       </div>
-      <p className="pmuted" style={{ margin: 0 }}>Muddat: {fmtDateTime(test.dueAt)}</p>
     </section>
   )
 }
@@ -1039,7 +1046,7 @@ function TestResults({ id }) {
   const groupName = (sid) => groups.filter((g) => g.studentIds.includes(sid)).map((g) => g.name).join(', ')
   return (
     <>
-      <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddat ${fmtDateTime(t.dueAt)}`}
+      <PageHead crumbs={[{ label: 'Testlar', href: '#/platform/tests' }, { label: t.title }]} title={t.title} sub={`${t.questions.length} savol · ${t.timeLimit} daq · muddatsiz, hamma uchun ochiq`}
         actions={<>
           {groups.length > 1 && (
             <label className="pdsel"><span>{groupId === 'all' ? 'Barcha guruhlar' : groups.find((g) => g.id === groupId)?.name}</span><Icon name="chevDown" size={16} />
@@ -1062,7 +1069,8 @@ function TestResults({ id }) {
           { key: 's', label: 'O‘quvchi', render: (r) => <div className="pcell-user"><UAvatar user={r.s} size={34} /><div><b>{r.s.name}</b><span>{r.s.phone}</span></div></div> },
           { key: 'g', label: 'Guruh', render: (r) => groupName(r.id) || <span className="pmuted">Guruhda emas</span> },
           { key: 'res', label: 'Natija', render: (r) => r.a ? <div className="ptres__cell"><div><b>{r.a.score}/{r.a.total}</b><span className={cx('ptpill', `ptpill--${gradeOf(pct(r.a.score, r.a.total)).tone}`)}>{pct(r.a.score, r.a.total)}%</span></div><Progress size="sm" value={pct(r.a.score, r.a.total)} tone={pct(r.a.score, r.a.total) >= 50 ? 'green' : 'red'} /></div> : <Badge tone="gray">Topshirmagan</Badge> },
-          { key: 'time', label: 'Topshirilgan vaqt', render: (r) => r.a ? <span className="ptdate">{fmtDateTime(r.a.finishedAt)}</span> : '—' },
+          { key: 'tries', label: 'Urinishlar', render: (r) => r.a ? <span title={(r.a.history || []).map((h, i) => `${Number(h.n) || i + 1}-urinish: ${h.score}/${h.total} · ${fmtDateTime(h.finishedAt)}`).join('\n')}><b>{r.a.used || 1} marta</b>{(r.a.history || []).length > 1 && <span className="pmuted" style={{ display: 'block', fontSize: 12 }}>{r.a.history.map((h) => `${pct(h.score, h.total)}%`).join(' → ')}</span>}</span> : '—' },
+          { key: 'time', label: 'Oxirgi urinish', render: (r) => r.a ? <span className="ptdate">{fmtDateTime(Math.max(...(r.a.history || [r.a]).map((h) => h.finishedAt || 0)))}</span> : '—' },
           { key: 'fb', label: 'Izoh', render: (r) => r.a?.feedback ? <Badge tone="blue"><Icon name="message" size={13} /> Yozilgan</Badge> : <span className="pmuted">—</span> },
           { key: 'go', label: '', align: 'right', render: (r) => <span onClick={(e) => e.stopPropagation()}><Menu items={[
             r.a && { label: 'Javoblar va izoh', icon: 'eye', onClick: () => setOpen(r) },
@@ -1119,19 +1127,17 @@ function groupStats(g, tests, attempts, users) {
   const students = g.studentIds.map((id) => users.find((u) => u.id === id)).filter(Boolean)
   const sIds = new Set(students.map((s) => s.id))
   const list = attempts.filter((a) => tIds.has(a.testId) && sIds.has(a.studentId))
-  const now = Date.now()
   const rows = students.map((s) => {
     const mine = list.filter((a) => a.studentId === s.id)
     const cells = new Map(mine.map((a) => [a.testId, a]))
-    const missed = gt.filter((t) => t.dueAt < now && !cells.has(t.id)).length
-    return { s, cells, done: mine.length, avg: mine.length ? avgOf(mine) : null, missed }
+    return { s, cells, done: mine.length, runs: mine.reduce((n, a) => n + (a.used || 1), 0), avg: mine.length ? avgOf(mine) : null }
   })
-  // Muddati o'tgan yoki topshirilgan testlar — o'quvchidan kutilgan ishlar
-  const due = gt.reduce((n, t) => n + students.filter((s) => t.dueAt < now || list.some((a) => a.testId === t.id && a.studentId === s.id)).length, 0)
+  // Testlar muddatsiz: topshirish ko'rsatkichi — berilgan barcha testlar × o'quvchilar
   return {
     g, tests: gt, students, rows, list,
+    runs: list.reduce((n, a) => n + (a.used || 1), 0),
     avg: list.length ? avgOf(list) : null,
-    rate: pct(list.length, due),
+    rate: pct(list.length, gt.length * students.length),
     weak: rows.filter((r) => r.avg !== null && r.avg < 50).length,
   }
 }
@@ -1156,7 +1162,7 @@ function GroupsOverview({ tests, attempts }) {
             <div className="ptgo__nums">
               <div><b>{r.students.length}</b><span>o‘quvchi</span></div>
               <div><b>{r.tests.length}</b><span>test</span></div>
-              <div><b>{r.list.length}</b><span>topshiruv</span></div>
+              <div><b>{r.runs}</b><span>urinish</span></div>
             </div>
             <div className="ptgo__bar">
               <span>Topshirish ko‘rsatkichi <b>{r.rate}%</b></span>
@@ -1204,10 +1210,9 @@ function GroupTestStats({ gid }) {
   if (!g) return <Card><Empty icon="layers" title="Guruh topilmadi" text="Guruh o‘chirilgan yoki sizga biriktirilmagan." action={<Btn as="a" href="#/platform/tests">Testlarga qaytish</Btn>} /></Card>
   const rows = [...st.rows].sort((a, b) => (sort === 'name' ? a.s.name.localeCompare(b.s.name) : (b.avg ?? -1) - (a.avg ?? -1) || a.s.name.localeCompare(b.s.name)))
   const teacherNames = teacherIdsOf(g).map((id) => db.users.find((u) => u.id === id)?.name).filter(Boolean).join(', ')
-  const now = Date.now()
   const exportCsv = () => downloadCsv(`${g.name} — test natijalari`,
-    ['O‘quvchi', ...st.tests.map((t) => t.title), 'O‘rtacha, %', 'Topshirgan', 'Qoldirgan'],
-    rows.map((r) => [r.s.name, ...st.tests.map((t) => { const a = r.cells.get(t.id); return a ? `${pctOf(a)}% (${a.score}/${a.total})` : t.dueAt < now ? 'topshirmagan' : 'kutilmoqda' }), r.avg ?? '', r.done, r.missed]))
+    ['O‘quvchi', ...st.tests.map((t) => t.title), 'O‘rtacha, %', 'Topshirgan testlar', 'Jami urinishlar'],
+    rows.map((r) => [r.s.name, ...st.tests.map((t) => { const a = r.cells.get(t.id); return a ? `${pctOf(a)}% (${a.score}/${a.total}), ${a.used || 1} marta` : 'topshirmagan' }), r.avg ?? '', r.done, r.runs]))
   const openCell = (t, a, s) => setOpen({ t, aId: a.id, s })
   const cur = open && db.testAttempts.find((a) => a.id === open.aId)
 
@@ -1243,18 +1248,18 @@ function GroupTestStats({ gid }) {
                   <thead>
                     <tr>
                       <th className="ptmx__name">O‘quvchi</th>
-                      {st.tests.map((t) => <th key={t.id} title={t.title}><a href={`#/platform/tests/${t.id}`}>{t.title}</a><small>{fmtDateShort(t.dueAt)}</small></th>)}
+                      {st.tests.map((t) => <th key={t.id} title={t.title}><a href={`#/platform/tests/${t.id}`}>{t.title}</a>{t.createdAt && <small>{fmtDateShort(t.createdAt)}</small>}</th>)}
                       <th className="ptmx__avg">O‘rtacha</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => (
                       <tr key={r.s.id}>
-                        <th className="ptmx__name"><a href={`#/platform/tests/student.${r.s.id}`} className="pcell-user ptuser"><UAvatar user={r.s} size={30} /><span><b>{r.s.name}</b><small>{r.done}/{st.tests.length} test{r.missed ? ` · ${r.missed} qoldirgan` : ''}</small></span></a></th>
+                        <th className="ptmx__name"><a href={`#/platform/tests/student.${r.s.id}`} className="pcell-user ptuser"><UAvatar user={r.s} size={30} /><span><b>{r.s.name}</b><small>{r.done}/{st.tests.length} test{r.runs > r.done ? ` · ${r.runs} urinish` : ''}</small></span></a></th>
                         {st.tests.map((t) => {
                           const a = r.cells.get(t.id)
-                          if (a) return <td key={t.id}><button type="button" className={cx('ptmx__cell', `is-${gradeOf(pctOf(a)).tone}`)} onClick={() => openCell(t, a, r.s)} title={`${t.title}: ${a.score}/${a.total}${a.feedback ? ' · izoh yozilgan' : ''}`}>{pctOf(a)}%{a.feedback && <Icon name="message" size={11} />}</button></td>
-                          return <td key={t.id}><span className={cx('ptmx__cell', t.dueAt < now ? 'is-miss' : 'is-wait')} title={t.dueAt < now ? 'Topshirmagan, muddat tugagan' : 'Hali topshirmagan'}>{t.dueAt < now ? '✕' : '…'}</span></td>
+                          if (a) return <td key={t.id}><button type="button" className={cx('ptmx__cell', `is-${gradeOf(pctOf(a)).tone}`)} onClick={() => openCell(t, a, r.s)} title={`${t.title}: eng yaxshi ${a.score}/${a.total} · ${a.used || 1} marta topshirgan${a.feedback ? ' · izoh yozilgan' : ''}`}>{pctOf(a)}%{a.feedback && <Icon name="message" size={11} />}<small>{a.used || 1}×</small></button></td>
+                          return <td key={t.id}><span className="ptmx__cell is-wait" title="Hali topshirmagan">…</span></td>
                         })}
                         <td className="ptmx__avg">{r.avg === null ? <span className="pmuted">—</span> : pill(r.avg)}</td>
                       </tr>
@@ -1270,7 +1275,7 @@ function GroupTestStats({ gid }) {
                 </table>
               </div>
             )}
-        <p className="ptmx__legend"><span><i className="is-green" />90%+ a’lo</span><span><i className="is-blue" />70–89%</span><span><i className="is-amber" />50–69%</span><span><i className="is-red" />50% dan past</span><span>✕ topshirmagan</span><span>… kutilmoqda</span><span><Icon name="message" size={12} /> izoh yozilgan</span></p>
+        <p className="ptmx__legend"><span><i className="is-green" />90%+ a’lo</span><span><i className="is-blue" />70–89%</span><span><i className="is-amber" />50–69%</span><span><i className="is-red" />50% dan past</span><span>N× — necha marta topshirgan</span><span>… hali topshirmagan</span><span><Icon name="message" size={12} /> izoh yozilgan</span></p>
       </Card>
 
       <AttemptModal test={open?.t} attempt={cur} student={open?.s} onClose={() => setOpen(null)} />
@@ -1292,9 +1297,8 @@ function StudentTestStats({ sid }) {
     const tests = scope.tests.filter((t) => t.groupIds.some((id) => groups.some((g) => g.id === id)) || mine.some((a) => a.testId === t.id))
     const tIds = new Set(tests.map((t) => t.id))
     const done = mine.filter((a) => tIds.has(a.testId))
-    const now = Date.now()
-    const rows = tests.map((t) => ({ id: t.id, t, a: done.find((a) => a.testId === t.id), expired: t.dueAt < now, groups: groups.filter((g) => t.groupIds.includes(g.id)) }))
-      .sort((x, y) => (y.a?.finishedAt || y.t.dueAt) - (x.a?.finishedAt || x.t.dueAt))
+    const rows = tests.map((t) => ({ id: t.id, t, a: done.find((a) => a.testId === t.id), groups: groups.filter((g) => t.groupIds.includes(g.id)) }))
+      .sort((x, y) => (y.a?.finishedAt || y.t.createdAt || 0) - (x.a?.finishedAt || x.t.createdAt || 0))
     // Xatolar: topshirilgan testlardagi noto'g'ri va javobsiz savollar (to'g'ri javob ma'lum bo'lsa)
     const mistakes = rows.filter((r) => r.a && r.t.questions.every((q) => q.correct !== undefined))
       .flatMap((r) => reviewOf(r.t, r.a).filter((x) => x.status !== 'right').map((x) => ({ ...x, t: r.t, a: r.a })))
@@ -1337,14 +1341,15 @@ function StudentTestStats({ sid }) {
       <ChartPanel title={staff ? 'O‘quvchi natijalari' : 'Natijalarim'} storeKey="student_tests" datasets={datasets} defaultType="line" emptyText="Hali test topshirilmagan." />
 
       <Card title="Testlar" sub={done.length ? 'Javoblar, izohlar va to‘g‘ri javoblarni ko‘rish uchun testni tanlang' : undefined} pad={false}>
-        <Table rows={rows} onRow={(r) => (r.a ? setOpen(r.a.id) : !staff && !r.expired && (window.location.hash = `#/platform/tests/${r.t.id}`))}
+        <Table rows={rows} onRow={(r) => (r.a ? setOpen(r.a.id) : !staff && (window.location.hash = `#/platform/tests/${r.t.id}`))}
           empty={<Empty icon="clipboard" title="Hali test berilmagan" />} cols={[
             { key: 't', label: 'Test', render: (r) => <div className="ptname-cell"><b>{r.t.title}</b><span>{r.t.questions.length} savol · {r.groups.map((g) => g.name).join(', ')}</span></div> },
             { key: 'res', label: 'Natija', render: (r) => (r.a ? <div className="ptres__cell"><div><b>{r.a.score}/{r.a.total}</b>{pill(pctOf(r.a))}</div><Progress size="sm" value={pctOf(r.a)} tone={pctOf(r.a) >= 50 ? 'green' : 'red'} /></div>
-              : r.expired ? <Badge tone="red">Topshirilmagan</Badge> : <Badge tone="amber">Kutilmoqda · {fmtLeft(r.t.dueAt)}</Badge>) },
-            { key: 'd', label: 'Sana', render: (r) => <span className="ptdate">{r.a ? fmtDateTime(r.a.finishedAt) : `Muddat: ${fmtDateTime(r.t.dueAt)}`}</span> },
+              : <Badge tone="amber">Hali topshirilmagan</Badge>) },
+            { key: 'tries', label: 'Urinishlar', render: (r) => (r.a ? <span title={(r.a.history || []).map((h, i) => `${Number(h.n) || i + 1}-urinish: ${h.score}/${h.total} · ${fmtDateTime(h.finishedAt)}`).join('\n')}><b>{r.a.used || 1} marta</b>{(r.a.history || []).length > 1 && <span className="pmuted" style={{ display: 'block', fontSize: 12 }}>{r.a.history.map((h) => `${pct(h.score, h.total)}%`).join(' → ')}</span>}</span> : <span className="pmuted">—</span>) },
+            { key: 'd', label: 'Sana', render: (r) => <span className="ptdate">{r.a ? fmtDateTime(r.a.finishedAt) : '—'}</span> },
             { key: 'fb', label: 'Ustoz izohi', render: (r) => (r.a?.feedback ? <Badge tone="blue"><Icon name="message" size={13} /> Bor</Badge> : <span className="pmuted">—</span>) },
-            { key: 'go', label: '', align: 'right', render: (r) => (r.a || (!staff && !r.expired)) && <Icon name="chevRight" size={18} /> },
+            { key: 'go', label: '', align: 'right', render: (r) => (r.a || !staff) && <Icon name="chevRight" size={18} /> },
           ]} />
       </Card>
 
@@ -1390,6 +1395,7 @@ function AttemptModal({ test, attempt, student, onClose }) {
       {attempt && test && (ready ? (
         <>
           <ScoreHero test={test} attempt={attempt} staff={staff} />
+          <AttemptsHistory attempt={attempt} />
           <FeedbackBox test={test} attempt={attempt} />
           <StandardAnalysis test={test} attempt={attempt} staff={staff} />
           <QuestionReview test={test} attempt={attempt} who={staff ? 'O‘quvchi javobi' : 'Sizning javobingiz'} />

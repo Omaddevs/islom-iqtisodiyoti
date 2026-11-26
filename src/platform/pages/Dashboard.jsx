@@ -184,7 +184,7 @@ function StudentDash() {
   const attempts = db.testAttempts.filter((a) => a.studentId === user.id)
   const avg = attempts.length ? Math.round(attempts.reduce((s, a) => s + pct(a.score, a.total), 0) / attempts.length) : null
   const pendingHw = scope.homework.filter((h) => h.dueAt > now && !db.submissions.some((s) => s.homeworkId === h.id && s.studentId === user.id))
-  const pendingTests = scope.tests.filter((t) => t.dueAt > now && !attempts.some((a) => a.testId === t.id))
+  const pendingTests = scope.tests.filter((t) => !attempts.some((a) => a.testId === t.id)) // testlar muddatsiz va doim ochiq
   const learned = db.vocabProgress.filter((p) => p.studentId === user.id).reduce((s, p) => s + p.learned.length, 0)
   const totalTerms = scope.vocabSets.reduce((s, v) => s + v.terms.length, 0)
   const stats = [
@@ -329,15 +329,15 @@ function GradingQueue({ items }) {
 function Deadlines({ homework, tests }) {
   const items = [
     ...homework.map((h) => ({ id: h.id, at: h.dueAt, icon: 'fileText', tone: 'amber', title: h.title, kind: 'Uy vazifa', href: `#/platform/homework/${h.id}` })),
-    ...tests.map((t) => ({ id: t.id, at: t.dueAt, icon: 'clipboard', tone: 'violet', title: t.title, kind: 'Test', href: `#/platform/tests/${t.id}` })),
+    ...tests.map((t) => ({ id: t.id, at: Infinity, open: true, icon: 'clipboard', tone: 'violet', title: t.title, kind: 'Test', href: `#/platform/tests/${t.id}` })),
   ].sort((a, b) => a.at - b.at)
   return (
     <Card title={<CardTitle icon="clock">Topshiriqlarim</CardTitle>}>
       {items.length ? items.slice(0, 6).map((r) => (
         <a key={r.id} href={r.href} className="pdr">
           <span className="pdr__ico" style={toneStyle(r.tone)}><Icon name={r.icon} size={19} /></span>
-          <div className="pdr__body"><b>{r.title}</b><span>{r.kind} · muddat {fmtWhen(r.at)}</span></div>
-          <Badge tone={r.at - Date.now() < DAY_MS ? 'red' : 'gray'}>{fmtLeft(r.at)}</Badge>
+          <div className="pdr__body"><b>{r.title}</b><span>{r.open ? `${r.kind} · muddatsiz` : `${r.kind} · muddat ${fmtWhen(r.at)}`}</span></div>
+          {r.open ? <Badge tone="green">Ochiq</Badge> : <Badge tone={r.at - Date.now() < DAY_MS ? 'red' : 'gray'}>{fmtLeft(r.at)}</Badge>}
         </a>
       )) : <Empty icon="checkCircle" title="Barcha topshiriqlar bajarilgan" text="Yangi vazifa yoki test berilganda shu yerda ko‘rinadi." />}
     </Card>

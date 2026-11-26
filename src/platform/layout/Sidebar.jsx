@@ -12,7 +12,7 @@ export function navFor(user, scope, db) {
       ? scope.homework.filter((h) => !db.submissions.some((s) => s.homeworkId === h.id && s.studentId === user.id) && h.dueAt > Date.now()).length
       : 0
   const pendingTests = user.role === 'student'
-    ? scope.tests.filter((t) => !db.testAttempts.some((a) => a.testId === t.id && a.studentId === user.id) && t.dueAt > Date.now()).length
+    ? scope.tests.filter((t) => !db.testAttempts.some((a) => a.testId === t.id && a.studentId === user.id)).length
     : 0
 
   const L = {

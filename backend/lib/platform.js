@@ -112,8 +112,7 @@ export async function loadState(u) {
   state.groups = (student ? groups.filter((g) => myGroups.has(g.id)) : groups).map(groupOut)
 
   // Testlar: o'quvchi/test juftligi bo'yicha eng yaxshi urinish qaytariladi (tarix — `history` ichida).
-  // To'g'ri javoblar o'quvchiga barcha urinishlar ishlatilganda yoki test to'liq yechilganda ochiladi.
-  const testsById = new Map(records.filter((r) => r.collection === 'tests').map((r) => [r.id, r.data]))
+  // Testlar yopilmaydi va urinishlar cheklanmagan: to'g'ri javoblar o'quvchiga birinchi topshirgandan keyin ochiladi.
   const byPair = new Map()
   for (const r of records) {
     if (r.collection !== 'testAttempts') continue
@@ -129,10 +128,7 @@ export async function loadState(u) {
   }
   const attempted = new Set()
   for (const b of bestOf.values()) {
-    if (b.owner_id !== u.id) continue
-    const t = testsById.get(b.data.testId)
-    const closed = t?.dueAt && Date.now() > Number(t.dueAt) + ((Number(t.timeLimit) || 0) + 1) * 60e3
-    if (closed || b.data.used >= (Number(t?.attempts) || 1) || (b.data.total && b.data.history.some((h) => h.score >= h.total))) attempted.add(b.data.testId)
+    if (b.owner_id === u.id) attempted.add(b.data.testId)
   }
   for (const raw of records) {
     if (raw.collection === 'testAttempts' && !bestOf.has(raw.id)) continue
@@ -578,14 +574,9 @@ const recordOps = {
       const t = await getRec(c, 'tests', String(item.testId))
       if (!t || t.org_id !== u.org_id) fail(404, 'Test topilmadi')
       const prev = (await c.query(`SELECT data FROM records WHERE collection = 'testAttempts' AND owner_id = $1 AND data->>'testId' = $2`, [u.id, t.id])).rows
-      const limit = Number(t.data.attempts) || 1
-      if (prev.length >= limit) fail(409, limit > 1 ? `Barcha ${limit} ta urinish ishlatilgan` : 'Bu test allaqachon topshirilgan')
-      // To'liq to'g'ri javob bergan o'quvchi qayta topshirmaydi (javoblar unga ochilgan)
-      if (prev.some((a) => a.data.total && a.data.score >= a.data.total)) fail(409, 'Test to‘liq to‘g‘ri yechilgan — qayta topshirish shart emas')
+      // Testlar hamma uchun ochiq: muddat va urinishlar soni cheklanmaydi, har bir urinish statistikada saqlanadi
       const groupIds = t.data.groupIds || []
       if (groupIds.length && !(await row(c, 'SELECT 1 FROM group_members WHERE user_id = $1 AND group_id = ANY($2)', [u.id, groupIds]))) fail(404, 'Test topilmadi')
-      // Muddat oxirida boshlangan test vaqti tugaguncha topshirila oladi (+1 daqiqa tarmoq uchun)
-      if (t.data.dueAt && now > Number(t.data.dueAt) + ((Number(t.data.timeLimit) || 0) + 1) * 60e3) fail(422, 'Testni topshirish muddati tugagan')
       // Darsga bog'langan test: avval davomat qayd etilgan yoki standart ochilgan bo'lishi kerak
       if (!prev.length) {
         const gate = await testGate(u.id, t.id)

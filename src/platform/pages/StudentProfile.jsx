@@ -158,9 +158,10 @@ export default function StudentProfile({ id }) {
         {tab === 'timeline' && <Timeline items={d.timeline} loading={!act} />}
         {tab === 'test' && <Table rows={d.tests.rows} onRow={(r) => { window.location.hash = `#/platform/tests/student.${s.id}` }} empty={<Empty icon="clipboard" title="Test berilmagan" />} cols={[
           { key: 't', label: 'Test', render: (r) => <Name title={r.t.title} sub={`${r.t.questions.length} savol`} /> },
-          { key: 'r', label: 'Natija', render: (r) => (r.a ? <Score value={pct(r.a.score, r.a.total)} text={`${r.a.score}/${r.a.total}`} /> : r.expired ? <Badge tone="red">Topshirmagan</Badge> : <Badge tone="amber">Kutilmoqda</Badge>) },
+          { key: 'r', label: 'Natija', render: (r) => (r.a ? <Score value={pct(r.a.score, r.a.total)} text={`${r.a.score}/${r.a.total}`} /> : <Badge tone="amber">Topshirmagan</Badge>) },
+          { key: 'n', label: 'Urinishlar', render: (r) => (r.a ? `${r.a.used || 1} marta` : '—') },
           { key: 'sp', label: 'Sarflangan vaqt', render: (r) => (r.a ? fmtSpent((r.a.finishedAt - r.a.startedAt) / 1000) : '—') },
-          { key: 'd', label: 'Sana', render: (r) => <span className="pmuted">{r.a ? fmtDateTime(r.a.finishedAt) : `Muddat: ${fmtDateTime(r.t.dueAt)}`}</span> },
+          { key: 'd', label: 'Sana', render: (r) => <span className="pmuted">{r.a ? fmtDateTime(r.a.finishedAt) : '—'}</span> },
         ]} />}
         {tab === 'library' && <Table rows={d.lib.rows} empty={<Empty icon="bookOpen" title="Kutubxona materiali ochilmagan" />} cols={[
           { key: 't', label: 'Material', render: (r) => <Name title={r.title} sub={r.sub} /> },
@@ -233,8 +234,8 @@ function build({ s, db, scope, act, days }) {
   const attempts = db.testAttempts.filter((a) => a.studentId === s.id)
   const assigned = scope.tests.filter((t) => forMe(t) || attempts.some((a) => a.testId === t.id))
   const done = attempts.filter((a) => assigned.some((t) => t.id === a.testId))
-  const testRows = assigned.map((t) => ({ id: t.id, t, a: done.find((a) => a.testId === t.id), expired: t.dueAt < now }))
-    .sort((x, y) => (y.a?.finishedAt || y.t.dueAt) - (x.a?.finishedAt || x.t.dueAt))
+  const testRows = assigned.map((t) => ({ id: t.id, t, a: done.find((a) => a.testId === t.id) }))
+    .sort((x, y) => (y.a?.finishedAt || y.t.createdAt || 0) - (x.a?.finishedAt || x.t.createdAt || 0))
   const tAvg = done.length ? Math.round(done.reduce((a, x) => a + pct(x.score, x.total), 0) / done.length) : null
 
   // Kutubxona: vaqt yozilgan yoki fayli ochilgan materiallar
@@ -293,8 +294,7 @@ function build({ s, db, scope, act, days }) {
 
   // E'tibor talab qiladiganlar
   const todo = [
-    ...testRows.filter((r) => !r.a && r.expired).map((r) => ({ key: `t-${r.id}`, kind: 'test', tone: 'red', title: r.t.title, text: `Test topshirilmagan · muddat ${fmtDate(r.t.dueAt)} da tugagan` })),
-    ...testRows.filter((r) => !r.a && !r.expired).map((r) => ({ key: `t2-${r.id}`, kind: 'test', tone: 'amber', title: r.t.title, text: `Hali ishlamagan · muddat ${fmtDateShort(r.t.dueAt)}` })),
+    ...testRows.filter((r) => !r.a).map((r) => ({ key: `t2-${r.id}`, kind: 'test', tone: 'amber', title: r.t.title, text: 'Test hali topshirilmagan' })),
     ...hwList.filter((r) => !r.sub && r.h.dueAt < now).map((r) => ({ key: `h-${r.id}`, kind: 'homework', tone: 'red', title: r.h.title, text: `Vazifa topshirilmagan · muddat ${fmtDate(r.h.dueAt)}` })),
     ...testRows.filter((r) => r.a && pct(r.a.score, r.a.total) < 50).map((r) => ({ key: `tl-${r.id}`, kind: 'test', tone: 'amber', title: r.t.title, text: `Past natija: ${pct(r.a.score, r.a.total)}%` })),
     ...meetPast.filter((r) => r.past && !r.joinedAt).slice(0, 3).map((r) => ({ key: `m-${r.id}`, kind: 'meeting', tone: 'amber', title: r.title, text: `Onlayn darsda qatnashmagan · ${fmtDateShort(r.startsAt)}` })),

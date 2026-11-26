@@ -444,7 +444,7 @@ function UnitMastery({ unit, canMark, onRun, onEdit }) {
     meeting && { key: 'm', icon: 'video', comp: 'D', title: meeting.title, sub: `Onlayn dars · ${fmtDateTime(meeting.startsAt)}`, href: '#/platform/meetings' },
     video && { key: 'v', icon: 'play', comp: 'D', title: video.title, sub: 'Dars yozuvi · ko‘rilgan ulush × 0,8', href: `#/platform/videos/${video.id}` },
     std && { key: 's', icon: 'scale', comp: 'S', title: std.title, sub: `Standart · chop eting yoki oxirigacha o‘qing (kamida ${cfg.readMin ?? 10} daqiqa)`, run: std },
-    test && { key: 't', icon: 'clipboard', comp: 'T', title: test.title, sub: `Test · ${test.questions?.length || 0} savol, ${test.attempts || 1} ta urinish`, href: `#/platform/tests/${test.id}` },
+    test && { key: 't', icon: 'clipboard', comp: 'T', title: test.title, sub: `Test · ${test.questions?.length || 0} savol, urinishlar cheklanmagan`, href: `#/platform/tests/${test.id}` },
     vocab && { key: 'l', icon: 'translate', comp: 'L', title: vocab.title, sub: `Lug‘at · ${vocab.terms?.length || 0} atama`, href: `#/platform/vocabulary/${vocab.id}` },
   ].filter(Boolean)
 

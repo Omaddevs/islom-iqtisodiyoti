@@ -193,6 +193,10 @@ a.pmu__task:hover { border-color: var(--uc, var(--pf-primary)); background: #faf
 .ptattempts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .ptattempts span { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: #f7f9fc; font-size: 12.5px; font-weight: 600; color: var(--pf-text-2); }
 .ptattempts span.is-best { background: var(--pf-green-soft); color: #047857; }
+.ptattempts span small { font-size: 11.5px; }
+.ptrv__hist .ptrv__ttl { margin-bottom: 12px; }
+.pmodal .ptrv__hist { box-shadow: none; border: 1px solid var(--pf-line); padding: 16px 18px; margin-bottom: 18px; }
+.ptmx__cell small { display: block; font-size: 10.5px; font-weight: 600; opacity: 0.8; line-height: 1.1; }
 .ptlock { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--pf-amber-soft); color: #92400e; font-size: 13.5px; line-height: 1.55; text-align: left; margin: 4px auto 0; max-width: 560px; }
 .ptlock a { color: #92400e; font-weight: 700; }
 
